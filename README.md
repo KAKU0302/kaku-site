@@ -1,0 +1,60 @@
+# KAKU ～核～
+
+QUESTION × BIRTH × STATE = YOUR KAKU
+
+行動パターン（QUESTION）・生まれ持った資質（BIRTH）・今の状態（STATE）の3つから、
+あなたという人の core＝「KAKU」を解き明かす自己理解診断サイトです。
+
+このリポジトリは、サーバーを必要としない静的サイト（HTML / CSS / 素のJavaScript）として実装されています。
+外部ライブラリへの依存もありません（レーダーチャートも含め、すべて自前のコードで描画しています）。
+
+## ファイル構成
+
+```
+kaku-site/
+├── index.html         全ページ構成（TOP〜料金ページまで、1ファイルにセクションとしてまとめています）
+├── style.css          デザイン（配色・レイアウト）
+├── app.js             画面遷移・診断フローの制御、結果ページの描画
+├── types-data.js       16 KAKU TYPE のデータ（名前・色・コピー・WEAPON等のテキスト）
+├── core-engine.js      QUESTION診断 15問 → CORE6スコア算出ロジック
+├── birth-engine.js     生年月日 → BIRTH（生まれ持った資質）算出ロジック
+├── state-engine.js     STATE診断 6問 → 今の状態（5分類）算出ロジック
+├── gap-engine.js        KAKU GAP（BIRTHとQUESTIONのズレ）算出ロジック
+├── type-engine.js       CORE6の主軸×副軸 → KAKU TYPE 決定ロジック
+└── images/types/*.png   16タイプ分のキャラクターカード画像（KAKU CARD）
+```
+
+## 確定仕様 と 仮実装 について
+
+設計書に基づき、下記のように明確に分けて実装しています。
+
+**確定仕様（変更されない前提のもの）**
+- QUESTION × BIRTH × STATE という3つの視点から診断すること
+- CORE6（VISION / LOGIC / DRIVE / INFLUENCE / BOND / STABILITY）という6軸構造
+- TYPE判定は「CORE6の主軸 × 副軸」から機械的に決まる構造であること（type-engine.js）
+- KAKU GAPは「本来の資質」と「今よく使っている力」のズレを見るものであり、能力の優劣や医療的診断ではないこと
+- KAKU CARD（画像＋タイプ名＋カラー＋キャッチコピー）を結果ページ・SNSシェアで共通利用すること
+
+**仮実装（今後ロジック・文言を差し替え可能なもの）**
+- QUESTION 15問の具体的な質問文言・スコアリング方法（core-engine.js）
+- BIRTHの算出ロジック（生年月日から簡易的に決定的マッピングしているだけで、算命学等の精緻な計算式ではない）（birth-engine.js）
+- STATE診断の質問文言・分類ルール（state-engine.js）
+- KAKU GAPのメッセージ文言（gap-engine.js）
+- 16タイプの名称・キャッチコピー・色・モチーフ・WEAPON等のテキスト内容（types-data.js）
+
+## 今回のMVPに含まれるもの / 含まれないもの
+
+設計書「12. 今回実装せず将来拡張するもの」に基づき、このバージョンでは
+**PERSONAL BOOK・KAKU MATCH の決済導線と実際のレポート生成、および KAKU TEAM の全機能は実装していません。**
+それぞれの紹介ページは用意していますが、CTAボタンは非活性の「Coming soon」表示になっています。
+（旧サイトにあったStripe決済連携のコードは、このリニューアルでは含めていません。将来これらの機能を実装する際に、
+　あらためてサーバーサイド／決済まわりの構成を設計し直すことを想定しています。）
+
+## デプロイ方法（これまでと同じ手順です）
+
+1. このフォルダの中身一式を、GitHubリポジトリ「kaku-site」にアップロード（既存ファイルを上書き）してコミットする
+2. Vercelのダッシュボードで対象プロジェクトを開き、「Deployments」→ 最新デプロイの「…」→「Redeploy」を実行する
+3. 数十秒〜1分ほどでビルドが完了し、これまでと同じURL（例: kaku-site-mu.vercel.app）で新しいサイトが公開される
+
+サーバーサイドの環境変数（STRIPE_SECRET_KEY / SITE_URL）は、このバージョンでは使用していないため、
+設定したままでも消してしまっても、動作に影響はありません。

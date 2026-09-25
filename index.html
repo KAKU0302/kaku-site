@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KAKU ～核～｜あなたの核を、解き明かす。</title>
+<meta name="description" content="QUESTION × BIRTH × STATE = YOUR KAKU。行動パターン・生まれ持った資質・今の状態の3つから、あなたという人の「核」を解き明かす自己理解診断。" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="#" class="logo" data-nav="top">KAKU <span>～核～</span></a>
+    <nav class="site-nav">
+      <a href="#" data-nav="about">KAKUとは</a>
+      <a href="#" data-nav="pricing">料金</a>
+    </nav>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- ===================== TOP ===================== -->
+  <section class="view" id="view-top">
+    <div class="hero">
+      <p class="hero__formula">QUESTION × BIRTH × STATE = YOUR KAKU</p>
+      <h1 class="hero__title">あなたの核を、<br />解き明かす。</h1>
+      <p class="hero__lead">
+        性格診断でも、占いでもない。<br />
+        「今の行動パターン」「生まれ持った資質」「今の状態」の3つから、<br />
+        あなたという人の core＝KAKU を解き明かす自己理解診断です。
+      </p>
+      <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+      <button class="btn btn--text" data-nav="about">KAKUについてもっと知る</button>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section class="view" id="view-about" hidden>
+    <div class="container container--narrow">
+      <h2 class="section-title">KAKU ～核～ について</h2>
+      <p class="body-text">
+        KAKUは、「QUESTION（今の行動パターン）」「BIRTH（生まれ持った資質）」「STATE（今の状態）」という
+        3つの異なる視点からあなたを見つめ、その掛け合わせであなたの core＝「核」を解き明かす自己理解診断です。
+      </p>
+      <p class="body-text">
+        多くの診断は「今のあなた」か「生まれ持ったあなた」のどちらか一方しか見ません。
+        KAKUは、この2つに加えて「今の環境・状態」を組み合わせることで、
+        <strong>本来の資質が、今の環境でどれだけ発揮できているか（KAKU GAP）</strong>まで見えるようにしています。
+      </p>
+      <h3 class="subsection-title">他の診断サービスとの違い</h3>
+      <ul class="feature-list">
+        <li><strong>性格診断ではない：</strong>あなたを型にはめるのではなく、今の状態と資質のズレを見る診断です。</li>
+        <li><strong>占いではない：</strong>生年月日は「生まれ持った傾向」を語る一つの視点として使うだけで、運勢や吉凶は扱いません。</li>
+        <li><strong>一度きりで終わらない：</strong>STATE（今の状態）は変化するものとして設計されており、繰り返し受け直すことを前提にしています。</li>
+      </ul>
+      <div class="core6-explainer">
+        <h3 class="subsection-title">CORE 6｜あなたを構成する6つの力</h3>
+        <div class="core6-grid" id="about-core6-grid"></div>
+      </div>
+      <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+    </div>
+  </section>
+
+  <!-- ===================== 基本情報入力 ===================== -->
+  <section class="view" id="view-basic" hidden>
+    <div class="container container--narrow">
+      <p class="step-indicator">STEP 1 / 3｜基本情報</p>
+      <h2 class="section-title">まずは基本情報を教えてください</h2>
+      <form id="form-basic" class="form">
+        <label class="form-field">
+          <span>ニックネーム</span>
+          <input type="text" id="input-name" placeholder="例：たろう" required />
+        </label>
+        <label class="form-field">
+          <span>生年月日</span>
+          <input type="date" id="input-birthdate" required />
+        </label>
+        <p class="form-note">生年月日は「生まれ持った資質（BIRTH）」の参考として使用します。運勢や吉凶の判定には使用しません。</p>
+        <button type="submit" class="btn btn--primary">次へ（QUESTION診断へ）</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== QUESTION診断 ===================== -->
+  <section class="view" id="view-question" hidden>
+    <div class="container container--narrow">
+      <p class="step-indicator">STEP 2 / 3｜QUESTION診断</p>
+      <div class="progress-bar"><div class="progress-bar__fill" id="question-progress"></div></div>
+      <div id="question-card"></div>
+    </div>
+  </section>
+
+  <!-- ===================== STATE診断 ===================== -->
+  <section class="view" id="view-state" hidden>
+    <div class="container container--narrow">
+      <p class="step-indicator">STEP 3 / 3｜STATE診断（今の状態）</p>
+      <h2 class="section-title">今のあなたに、当てはまる度合いを教えてください</h2>
+      <form id="form-state" class="form"></form>
+    </div>
+  </section>
+
+  <!-- ===================== 解析演出 ===================== -->
+  <section class="view" id="view-analyzing" hidden>
+    <div class="analyzing">
+      <div class="analyzing__spinner" aria-hidden="true"></div>
+      <p class="analyzing__text" id="analyzing-text">QUESTIONを解析しています…</p>
+    </div>
+  </section>
+
+  <!-- ===================== 無料診断結果 ===================== -->
+  <section class="view" id="view-result" hidden>
+    <div class="container container--narrow" id="result-container"></div>
+  </section>
+
+  <!-- ===================== PERSONAL BOOK ===================== -->
+  <section class="view" id="view-personal-book" hidden>
+    <div class="container container--narrow">
+      <p class="eyebrow">PERSONAL BOOK</p>
+      <h2 class="section-title">あなただけの「核」を、1冊にまとめる。</h2>
+      <p class="body-text">
+        無料診断でわかったKAKU TYPEをベースに、WEAPON（強み）・BLIND SPOT（盲点）・TEAM ROLE・RELATION STYLE・
+        KAKU GAPの詳細解説まで、あなた専用の診断結果を1冊のブックとして読めるようになる予定のコンテンツです。
+      </p>
+      <div class="price-tag">¥980（買い切り）</div>
+      <button class="btn btn--primary" disabled>Coming soon</button>
+      <p class="form-note">※ このコンテンツは現在準備中です。決済・レポート生成機能は今後実装予定です。</p>
+    </div>
+  </section>
+
+  <!-- ===================== KAKU MATCH ===================== -->
+  <section class="view" id="view-kaku-match" hidden>
+    <div class="container container--narrow">
+      <p class="eyebrow">KAKU MATCH</p>
+      <h2 class="section-title">2人のKAKUを、重ね合わせる。</h2>
+      <p class="body-text">
+        友人・恋人・同僚など、気になる相手とKAKU TYPEを重ね合わせ、相性や関わり方のヒントを見る機能です。
+        お互いのKAKU CARDを見比べながら、関係性の理解を深めます。
+      </p>
+      <div class="price-tag">¥980（買い切り）</div>
+      <button class="btn btn--primary" disabled>Coming soon</button>
+      <p class="form-note">※ このコンテンツは現在準備中です。決済・レポート生成機能は今後実装予定です。</p>
+    </div>
+  </section>
+
+  <!-- ===================== KAKU TEAM ===================== -->
+  <section class="view" id="view-kaku-team" hidden>
+    <div class="container container--narrow">
+      <p class="eyebrow">KAKU TEAM</p>
+      <h2 class="section-title">チームの「核」を、可視化する。</h2>
+      <p class="body-text">
+        チームメンバー全員のKAKU TYPEをTEAM MAPとして可視化し、チーム全体の得意・偏り・補い合い方を見える化する
+        法人向けの機能です。
+      </p>
+      <div class="price-tag">¥9,800〜／月</div>
+      <button class="btn btn--primary" disabled>Coming soon</button>
+      <p class="form-note">※ このコンテンツは現在準備中です。今回のMVPには含まれません。</p>
+    </div>
+  </section>
+
+  <!-- ===================== 料金ページ ===================== -->
+  <section class="view" id="view-pricing" hidden>
+    <div class="container container--narrow">
+      <h2 class="section-title">料金プラン</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>無料診断</h3>
+          <p class="pricing-card__price">¥0</p>
+          <p>QUESTION × BIRTH × STATE から、あなたのKAKU TYPEとKAKU GAPの概要がわかります。</p>
+          <button class="btn btn--primary" data-action="start-diagnosis">はじめる</button>
+        </div>
+        <div class="pricing-card">
+          <h3>PERSONAL BOOK</h3>
+          <p class="pricing-card__price">¥980</p>
+          <p>あなた専用の詳細な診断結果を1冊のブックとして。</p>
+          <button class="btn" data-nav="personal-book">詳しく見る</button>
+        </div>
+        <div class="pricing-card">
+          <h3>KAKU MATCH</h3>
+          <p class="pricing-card__price">¥980</p>
+          <p>気になる相手とのKAKUを重ね合わせる。</p>
+          <button class="btn" data-nav="kaku-match">詳しく見る</button>
+        </div>
+        <div class="pricing-card">
+          <h3>KAKU TEAM</h3>
+          <p class="pricing-card__price">¥9,800〜／月</p>
+          <p>チーム全体のKAKUを可視化する法人向けプラン。</p>
+          <button class="btn" data-nav="kaku-team">詳しく見る</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>© KAKU ～核～</p>
+</footer>
+
+<script src="types-data.js"></script>
+<script src="core-engine.js"></script>
+<script src="birth-engine.js"></script>
+<script src="state-engine.js"></script>
+<script src="gap-engine.js"></script>
+<script src="type-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
