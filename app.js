@@ -660,11 +660,27 @@
         const matchTarget = document.getElementById("kaku-match-preview");
         const partnerId = matchSelect.value || Object.keys(KAKU_TYPES)[0];
         const typeB = KAKU_TYPES[partnerId];
-        const insight = generateMatchInsight(type, typeB);
+        const insight = generateMatchInsight(session.core6.scores, typeB);
+
+        const categoryRows = insight.categories
+          .map(
+            (c) => `
+          <div class="match-category">
+            <div class="match-category__head">
+              <span class="match-category__label">${c.label}</span>
+              <span class="match-category__score">${c.score}<span class="match-category__score-unit">%</span></span>
+            </div>
+            <div class="match-category__bar"><div class="match-category__bar-fill match-category__bar-fill--${c.key}" style="width:${c.score}%"></div></div>
+            <p class="match-category__comment">${c.commentary}</p>
+          </div>`
+          )
+          .join("");
+
         matchTarget.innerHTML = `
-          <div class="result-block">
-            <h3>${insight.headline}</h3>
-            <p>${insight.message}</p>
+          <div class="result-block match-result">
+            <h3>${type.nameJp} × ${typeB.nameJp} の相性</h3>
+            <p class="form-note">恋愛・結婚・仕事の3つの軸で、それぞれ相性の傾向をスコア化しました。</p>
+            ${categoryRows}
           </div>
         `;
       });
