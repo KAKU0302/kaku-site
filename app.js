@@ -3,10 +3,13 @@
  * 「KAKU ～核～」 画面遷移・診断フロー制御【仮実装】
  *
  * サイトマップ / ユーザー導線（設計書 3章・4章）に沿って、以下の順で画面を切り替える:
- * TOP → KAKUについて / 基本情報入力 → QUESTION診断 → STATE診断 → 解析演出 → 無料診断結果
- * → (PERSONAL BOOK / KAKU MATCH / KAKU TEAM 紹介 / 料金ページ はナビゲーションからいつでも遷移可)
+ * TOP → KAKUについて / タイプ一覧 / 基本情報入力 → QUESTION診断 → STATE診断 → 解析演出 → 無料診断結果
+ * → (PERSONAL BOOK / KAKU TEAM 紹介 / 料金ページ はナビゲーションからいつでも遷移可)
  *
- * PERSONAL BOOK・KAKU MATCH・KAKU TEAM の実際の決済・レポート生成は
+ * KAKU MATCH（相性）は、単体の有料ページではなく PERSONAL BOOK の「第4章」として統合している
+ * （ユーザーからのフィードバックにより、980円の単体コンテンツとしては見つけにくく・薄く感じられたため統合）。
+ *
+ * PERSONAL BOOK・KAKU TEAM の実際の決済・レポート生成は
  * 設計書12章により「今回実装せず将来拡張するもの」に分類されているため、
  * このMVPでは紹介ページ＋非活性の「Coming soon」ボタンのみを実装する。
  */
@@ -35,7 +38,7 @@
   // ---------------------------------------------------------------------
   const VIEW_IDS = [
     "top", "about", "types", "basic", "question", "state", "analyzing",
-    "result", "personal-book", "kaku-match", "kaku-team", "pricing",
+    "result", "personal-book", "kaku-team", "pricing",
   ];
 
   function showView(id) {
@@ -599,6 +602,10 @@
           </div>`;
       }).join("");
 
+      const partnerOptions = Object.values(KAKU_TYPES)
+        .map((t) => `<option value="${t.id}">${t.nameEn}｜${t.nameJp}</option>`)
+        .join("");
+
       target.innerHTML = `
         <div class="book-preview">
           <p class="form-note">※ ここから先は購入前の内容サンプルです。実際の購入版では、全16タイプぶんの書き下ろし解説がさらに続きます。</p>
@@ -629,47 +636,38 @@
             <p><strong>Step 2（1か月後）：</strong>「${type.weapon}」を意識して使えた場面を、3つ振り返ってみましょう。</p>
             <p><strong>Step 3（3か月後）：</strong>「${type.blindSpot}」について、以前より上手く付き合えるようになったか振り返ってみましょう。</p>
           </div>
-        </div>
-      `;
-    });
-  }
 
-  // ---------------------------------------------------------------------
-  // KAKU MATCH プレビュー（購入前サンプル・仮実装）
-  // ---------------------------------------------------------------------
-  const matchSelect = document.getElementById("match-partner-select");
-  if (matchSelect) {
-    matchSelect.innerHTML = Object.values(KAKU_TYPES)
-      .map((t) => `<option value="${t.id}">${t.nameEn}｜${t.nameJp}</option>`)
-      .join("");
-  }
-
-  const matchPreviewBtn = document.getElementById("btn-preview-match");
-  if (matchPreviewBtn) {
-    matchPreviewBtn.addEventListener("click", () => {
-      const target = document.getElementById("kaku-match-preview");
-      if (!session.typeId) {
-        target.innerHTML = `
           <div class="result-block">
-            <p>プレビューを見るには、先に無料診断でKAKUタイプを診断してください。</p>
-            <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
-          </div>`;
-        return;
-      }
-      const typeA = KAKU_TYPES[session.typeId];
-      const partnerId = matchSelect.value || Object.keys(KAKU_TYPES)[0];
-      const typeB = KAKU_TYPES[partnerId];
-      const insight = generateMatchInsight(typeA, typeB);
-      target.innerHTML = `
-        <div class="result-block">
-          <p class="form-note">
-            ※ 簡易サンプルです。実際の購入版では、お相手にもQUESTION・BIRTH・STATEを診断してもらい、
-            2人分のデータから相性を算出する予定です。
-          </p>
-          <h3>${insight.headline}</h3>
-          <p>${insight.message}</p>
+            <p class="book-chapter">第4章</p>
+            <h3>気になる相手との相性（KAKU MATCH）</h3>
+            <p class="form-note">
+              本来は相手にもQUESTION・BIRTH・STATEを診断してもらい、2人分のデータから相性を算出する章です。
+              サンプルでは「お相手のタイプ」を選ぶだけの簡易版を試せます。
+            </p>
+            <label class="form-field" style="max-width:320px;margin:16px 0;text-align:left;">
+              <span>お相手のKAKUタイプ（サンプル選択）</span>
+              <select id="match-partner-select">${partnerOptions}</select>
+            </label>
+            <button class="btn" id="btn-preview-match">この相性を見る</button>
+            <div id="kaku-match-preview"></div>
+          </div>
         </div>
       `;
+
+      const matchSelect = document.getElementById("match-partner-select");
+      const matchPreviewBtn = document.getElementById("btn-preview-match");
+      matchPreviewBtn.addEventListener("click", () => {
+        const matchTarget = document.getElementById("kaku-match-preview");
+        const partnerId = matchSelect.value || Object.keys(KAKU_TYPES)[0];
+        const typeB = KAKU_TYPES[partnerId];
+        const insight = generateMatchInsight(type, typeB);
+        matchTarget.innerHTML = `
+          <div class="result-block">
+            <h3>${insight.headline}</h3>
+            <p>${insight.message}</p>
+          </div>
+        `;
+      });
     });
   }
 

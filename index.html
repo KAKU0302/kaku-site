@@ -132,44 +132,20 @@
     <div class="container container--narrow" id="result-container"></div>
   </section>
 
-  <!-- ===================== PERSONAL BOOK ===================== -->
+  <!-- ===================== PERSONAL BOOK（KAKU MATCH統合） ===================== -->
   <section class="view" id="view-personal-book" hidden>
     <div class="container container--narrow">
       <p class="eyebrow">PERSONAL BOOK</p>
       <h2 class="section-title">あなただけの「核」を、1冊にまとめる。</h2>
       <p class="body-text">
-        無料診断でわかったKAKU TYPEをベースに、WEAPON（強み）・BLIND SPOT（盲点）・TEAM ROLE・RELATION STYLE・
-        KAKU GAPの詳細解説まで、あなた専用の診断結果を1冊のブックとして読めるようになる予定のコンテンツです。
+        無料診断でわかったKAKU TYPEをベースに、WEAPON（強み）・BLIND SPOT（盲点）・CORE6全軸の詳細解説・
+        アクションプランに加えて、気になる相手との相性まで。あなた専用の診断結果を1冊のブックとして読めるようになる予定のコンテンツです。
       </p>
       <div class="price-tag">¥980（買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
       <p class="form-note">※ 実際の購入・レポート生成機能は今後実装予定です。下のボタンから、購入前の内容サンプルだけ確認できます。</p>
       <button class="btn" id="btn-preview-personal-book">プレビューを見る（無料サンプル）</button>
       <div id="personal-book-preview"></div>
-    </div>
-  </section>
-
-  <!-- ===================== KAKU MATCH ===================== -->
-  <section class="view" id="view-kaku-match" hidden>
-    <div class="container container--narrow">
-      <p class="eyebrow">KAKU MATCH</p>
-      <h2 class="section-title">2人のKAKUを、重ね合わせる。</h2>
-      <p class="body-text">
-        友人・恋人・同僚など、気になる相手とKAKU TYPEを重ね合わせ、相性や関わり方のヒントを見る機能です。
-        お互いのKAKU CARDを見比べながら、関係性の理解を深めます。
-      </p>
-      <div class="price-tag">¥980（買い切り）</div>
-      <button class="btn btn--primary" disabled>Coming soon</button>
-      <p class="form-note">
-        ※ 本来は相手にもQUESTION・BIRTH・STATEを診断してもらい、2人分のデータから相性を算出する機能です。
-        今回はプレビューとして、あなたのKAKUタイプと「お相手のタイプ」を選ぶだけの簡易サンプルを試せます。
-      </p>
-      <label class="form-field" style="max-width:320px;margin:16px auto;text-align:left;">
-        <span>お相手のKAKUタイプ（サンプル選択）</span>
-        <select id="match-partner-select"></select>
-      </label>
-      <button class="btn" id="btn-preview-match">プレビューを見る（無料サンプル）</button>
-      <div id="kaku-match-preview"></div>
     </div>
   </section>
 
@@ -202,14 +178,8 @@
         <div class="pricing-card">
           <h3>PERSONAL BOOK</h3>
           <p class="pricing-card__price">¥980</p>
-          <p>あなた専用の詳細な診断結果を1冊のブックとして。</p>
+          <p>あなた専用の詳細な診断結果に加え、気になる相手との相性まで、1冊のブックとして。</p>
           <button class="btn" data-nav="personal-book">詳しく見る</button>
-        </div>
-        <div class="pricing-card">
-          <h3>KAKU MATCH</h3>
-          <p class="pricing-card__price">¥980</p>
-          <p>気になる相手とのKAKUを重ね合わせる。</p>
-          <button class="btn" data-nav="kaku-match">詳しく見る</button>
         </div>
         <div class="pricing-card">
           <h3>KAKU TEAM</h3>
