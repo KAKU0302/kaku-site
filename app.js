@@ -194,7 +194,8 @@
       "QUESTIONを解析しています…",
       "BIRTHの傾向と重ね合わせています…",
       "STATEとのGAPを確認しています…",
-      "KAKU TYPEを確定しています…",
+      "16タイプの中から、あなたのKAKUを絞り込んでいます…",
+      "まもなく結果が見えてきます…",
     ];
     const textEl = document.getElementById("analyzing-text");
     let step = 0;
@@ -286,11 +287,13 @@
       <p class="step-indicator">無料診断結果</p>
       <h2 class="section-title">${session.name ? session.name + "さんの" : "あなたの"}KAKUは…</h2>
 
-      <div class="kaku-card" id="kaku-card-share">
+      <div class="kaku-card kaku-card--reveal" id="kaku-card-share">
+        <div class="kaku-card__rarity">出現率 ${type.rarity}｜16タイプ中</div>
         <img class="kaku-card__image" src="${type.image}" alt="${type.nameEn} ${type.nameJp}" />
         <div class="kaku-card__body">
           <p class="kaku-card__type-en">${type.nameEn}</p>
           <p class="kaku-card__type-jp">${type.nameJp}</p>
+          <p class="kaku-card__praise">${type.praise}</p>
           <p class="kaku-card__catchcopy">${type.catchcopy}</p>
         </div>
       </div>
@@ -347,22 +350,171 @@
       </div>
 
       <div class="share-row">
-        <button class="btn btn--primary" id="btn-share">結果をシェアする</button>
+        <button class="btn btn--primary" id="btn-save-image">シェア画像を保存する</button>
+        <button class="btn" id="btn-share-x">Xでシェア</button>
         <button class="btn" data-nav="personal-book">PERSONAL BOOKを見る</button>
         <button class="btn btn--text" data-action="start-diagnosis">もう一度診断する</button>
       </div>
+      <p class="form-note" id="share-image-status" aria-live="polite"></p>
     `;
 
-    const shareBtn = document.getElementById("btn-share");
-    shareBtn.addEventListener("click", () => {
+    document.getElementById("btn-share-x").addEventListener("click", () => {
       const shareText = `私のKAKUは「${type.nameEn}（${type.nameJp}）」でした。\n${type.catchcopy}\n\n#KAKU核診断`;
-      if (navigator.share) {
-        navigator.share({ text: shareText, url: location.href }).catch(() => {});
-      } else {
-        const url =
-          "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText);
-        window.open(url, "_blank", "noopener");
+      const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText);
+      window.open(url, "_blank", "noopener");
+    });
+
+    document.getElementById("btn-save-image").addEventListener("click", async () => {
+      const statusEl = document.getElementById("share-image-status");
+      const btn = document.getElementById("btn-save-image");
+      btn.disabled = true;
+      statusEl.textContent = "画像を作成しています…";
+      try {
+        const canvas = await buildShareCardCanvas(type);
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        const fileName = `kaku-${type.id}.png`;
+        const file = new File([blob], fileName, { type: "image/png" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: "KAKU診断結果",
+            text: `私のKAKUは「${type.nameEn}（${type.nameJp}）」でした。 #KAKU核診断`,
+          });
+          statusEl.textContent = "";
+        } else {
+          const objectUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = objectUrl;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(objectUrl);
+          statusEl.textContent = "画像を保存しました。SNSに投稿してシェアしてください。";
+        }
+      } catch (err) {
+        statusEl.textContent = "画像の作成に失敗しました。時間をおいて再度お試しください。";
+      } finally {
+        btn.disabled = false;
       }
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // SNSシェア用カード画像を canvas で組み立てる
+  // ---------------------------------------------------------------------
+  function wrapCanvasText(ctx, text, centerX, startY, maxWidth, lineHeight) {
+    let line = "";
+    const lines = [];
+    for (const ch of text) {
+      const testLine = line + ch;
+      if (ctx.measureText(testLine).width > maxWidth && line !== "") {
+        lines.push(line);
+        line = ch;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line) lines.push(line);
+    lines.forEach((l, i) => ctx.fillText(l, centerX, startY + i * lineHeight));
+    return lines.length * lineHeight;
+  }
+
+  function buildShareCardCanvas(type) {
+    return new Promise((resolve, reject) => {
+      const W = 900;
+      const H = 1200;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      // 背景（タイプカラーを薄くにじませたグラデーション）
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, type.color + "22");
+      grad.addColorStop(1, "#FAFAF8");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // ブランドロゴ
+      ctx.fillStyle = "#1C1D21";
+      ctx.font = "bold 28px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("KAKU ～核～", 48, 72);
+
+      // 出現率バッジ
+      ctx.textAlign = "right";
+      ctx.font = "bold 18px sans-serif";
+      ctx.fillStyle = type.color;
+      ctx.fillText(`出現率 ${type.rarity}`, W - 48, 72);
+
+      const img = new Image();
+      img.onload = () => {
+        try {
+          // キャラクター画像（アスペクト比を保って中央配置）
+          const boxW = W - 160;
+          const boxH = 520;
+          const boxX = 80;
+          const boxY = 120;
+          const scale = Math.min(boxW / img.width, boxH / img.height);
+          const drawW = img.width * scale;
+          const drawH = img.height * scale;
+          const drawX = boxX + (boxW - drawW) / 2;
+          const drawY = boxY + (boxH - drawH) / 2;
+
+          // 白い角丸カード（画像の背景）
+          ctx.fillStyle = "#FFFFFF";
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(boxX, boxY, boxW, boxH, 24);
+          } else {
+            ctx.rect(boxX, boxY, boxW, boxH);
+          }
+          ctx.fill();
+
+          ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+          let y = boxY + boxH + 64;
+          ctx.textAlign = "center";
+
+          ctx.fillStyle = "#5B5E68";
+          ctx.font = "bold 20px sans-serif";
+          ctx.fillText(type.nameEn, W / 2, y);
+          y += 44;
+
+          ctx.fillStyle = "#1C1D21";
+          ctx.font = "bold 44px sans-serif";
+          ctx.fillText(type.nameJp, W / 2, y);
+          y += 56;
+
+          ctx.fillStyle = type.color;
+          ctx.font = "bold 26px sans-serif";
+          y += wrapCanvasText(ctx, type.praise, W / 2, y, W - 160, 36);
+          y += 12;
+
+          ctx.fillStyle = "#5B5E68";
+          ctx.font = "20px sans-serif";
+          wrapCanvasText(ctx, type.catchcopy, W / 2, y, W - 200, 30);
+
+          // フッター
+          ctx.strokeStyle = "#E4E4E0";
+          ctx.beginPath();
+          ctx.moveTo(80, H - 100);
+          ctx.lineTo(W - 80, H - 100);
+          ctx.stroke();
+
+          ctx.fillStyle = "#5B5E68";
+          ctx.font = "18px sans-serif";
+          ctx.fillText("QUESTION × BIRTH × STATE = YOUR KAKU　#KAKU核診断", W / 2, H - 60);
+
+          resolve(canvas);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = reject;
+      img.src = type.image;
     });
   }
 

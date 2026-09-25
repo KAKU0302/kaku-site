@@ -3,10 +3,12 @@
  * QUESTION（行動・心理質問）から CORE6 を算出するエンジン【仮実装】
  *
  * 確定仕様: CORE6 は6軸・0〜100のスコアで表現され、TYPE判定の入力になる（設計書 6章・8章）。
- * 仮実装: 15問の二択質問から算出する具体的なロジック・質問文言そのものは今後調整可能。
+ * 仮実装: 30問の二択質問から算出する具体的なロジック・質問文言そのものは今後調整可能。
  *
- * 6軸それぞれが「6軸から2つを選ぶ組み合わせ」(6C2 = 15問) にちょうど1回ずつ登場するように設計し、
- * 各軸は15問中5問に登場する（1問正解=1点、5点満点 → ×20 して0〜100にスケーリング）。
+ * 6軸から2つを選ぶ組み合わせ(6C2 = 15パターン)を2周ぶん（シーン違いで2問ずつ）用意し、
+ * 各軸はちょうど10問に登場する（1問正解=1点、10点満点 → ×10 して0〜100にスケーリング）。
+ * QUESTIONだけで判定を終えず、この後のBIRTH・STATEと掛け合わせて総合的にKAKUを算出する設計のため、
+ * 質問数自体を過度に増やしすぎず、多角的な視点との組み合わせで精度を担保している（詳細はABOUTページに記載）。
  */
 
 const CORE6_AXES = [
@@ -18,7 +20,7 @@ const CORE6_AXES = [
   { id: "stability", nameEn: "STABILITY", nameJp: "安定力" },
 ];
 
-// 15問 = 6軸から2つを選ぶ組み合わせ(6C2)。各軸はちょうど5問に登場する。
+// 30問 = 6軸から2つを選ぶ組み合わせ(6C2=15パターン)を2周。各軸はちょうど10問に登場する。
 const QUESTIONS = [
   {
     id: "q1",
@@ -110,6 +112,96 @@ const QUESTIONS = [
     optionA: { axis: "bond", text: "気持ちが通じ合う人間関係がある安心感" },
     optionB: { axis: "stability", text: "変化が少なく、見通しが立つ安心感" },
   },
+  {
+    id: "q16",
+    prompt: "休日に何かを学ぶとしたら？",
+    optionA: { axis: "vision", text: "まだ誰も答えを出していないテーマに惹かれる" },
+    optionB: { axis: "logic", text: "体系立てて学べる分野を選びたい" },
+  },
+  {
+    id: "q17",
+    prompt: "5年後の理想を聞かれたら？",
+    optionA: { axis: "vision", text: "具体的な理想像をイメージするのが好き" },
+    optionB: { axis: "drive", text: "考えるよりまず動いて、道を切り拓いていたい" },
+  },
+  {
+    id: "q18",
+    prompt: "自分のアイデアが認められたとき、うれしいのは？",
+    optionA: { axis: "vision", text: "頭の中にあった構想が形になったこと" },
+    optionB: { axis: "influence", text: "そのアイデアに人が共感し、動いてくれたこと" },
+  },
+  {
+    id: "q19",
+    prompt: "休みの日、心が満たされるのは？",
+    optionA: { axis: "vision", text: "新しい可能性についてじっくり考える時間" },
+    optionB: { axis: "bond", text: "大切な人と過ごす時間" },
+  },
+  {
+    id: "q20",
+    prompt: "5年後の自分を考えるとき？",
+    optionA: { axis: "vision", text: "今とは全く違う可能性にワクワクする" },
+    optionB: { axis: "stability", text: "今の積み重ねの延長線上にいたい" },
+  },
+  {
+    id: "q21",
+    prompt: "何か新しいことを始めるとき、あなたは？",
+    optionA: { axis: "logic", text: "まず情報を集めて理解してから動きたい" },
+    optionB: { axis: "drive", text: "考えるより先にやってみたい" },
+  },
+  {
+    id: "q22",
+    prompt: "自分の考えを人に伝えるとき、あなたは？",
+    optionA: { axis: "logic", text: "根拠やデータを示して納得してもらいたい" },
+    optionB: { axis: "influence", text: "情熱や言葉の力で心を動かしたい" },
+  },
+  {
+    id: "q23",
+    prompt: "友人が悩んでいるとき、あなたは？",
+    optionA: { axis: "logic", text: "一緒に原因を整理して、解決策を考えたい" },
+    optionB: { axis: "bond", text: "まず話を聞いて、寄り添ってあげたい" },
+  },
+  {
+    id: "q24",
+    prompt: "仕事を任されたとき、あなたは？",
+    optionA: { axis: "logic", text: "もっと良いやり方がないか工夫したい" },
+    optionB: { axis: "stability", text: "決められた手順を確実にこなしたい" },
+  },
+  {
+    id: "q25",
+    prompt: "チームで成果を出したいとき、あなたは？",
+    optionA: { axis: "drive", text: "誰よりも早く行動して結果を出したい" },
+    optionB: { axis: "influence", text: "みんなを鼓舞して巻き込みたい" },
+  },
+  {
+    id: "q26",
+    prompt: "困難な状況に直面したとき、あなたは？",
+    optionA: { axis: "drive", text: "とにかく突破口を見つけて前に進みたい" },
+    optionB: { axis: "bond", text: "仲間と支え合いながら乗り越えたい" },
+  },
+  {
+    id: "q27",
+    prompt: "スケジュールを立てるとき、あなたは？",
+    optionA: { axis: "drive", text: "多少無理してでも一気に終わらせたい" },
+    optionB: { axis: "stability", text: "無理のないペースで着実に進めたい" },
+  },
+  {
+    id: "q28",
+    prompt: "人から相談を受けたとき、あなたは？",
+    optionA: { axis: "influence", text: "自分の考えをはっきり伝えてあげたい" },
+    optionB: { axis: "bond", text: "相手の気持ちにそっと寄り添いたい" },
+  },
+  {
+    id: "q29",
+    prompt: "自分が誇りに思うのは？",
+    optionA: { axis: "influence", text: "周りを巻き込み、場を動かせること" },
+    optionB: { axis: "stability", text: "どんな時も変わらず信頼されること" },
+  },
+  {
+    id: "q30",
+    prompt: "居心地の良さを感じるのは？",
+    optionA: { axis: "bond", text: "気持ちが通じ合う相手といるとき" },
+    optionB: { axis: "stability", text: "予定通り、安定した日常を送れているとき" },
+  },
 ];
 
 /**
@@ -133,7 +225,7 @@ function computeCore6(answers) {
 
   const scores = {};
   Object.keys(raw).forEach((axis) => {
-    scores[axis] = raw[axis] * 20; // 0-5点 → 0-100
+    scores[axis] = raw[axis] * 10; // 0-10点 → 0-100
   });
 
   const ranking = Object.keys(scores)

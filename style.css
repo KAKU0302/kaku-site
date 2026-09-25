@@ -211,6 +211,15 @@ img { max-width: 100%; display: block; }
   transition: width 0.3s ease;
 }
 
+.reassurance-note {
+  font-size: 12px;
+  color: var(--color-text-soft);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 24px;
+}
+
 /* ---------- Question card ---------- */
 .question-card {
   background: var(--color-surface);
@@ -296,6 +305,7 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Result / KAKU CARD ---------- */
 .kaku-card {
+  position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -318,9 +328,38 @@ img { max-width: 100%; display: block; }
   font-weight: 800;
   margin: 4px 0 12px;
 }
+.kaku-card__praise {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-accent);
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
 .kaku-card__catchcopy {
   font-size: 14px;
   color: var(--color-text-soft);
+}
+.kaku-card__rarity {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes kakuCardReveal {
+  0% { opacity: 0; transform: scale(0.88) translateY(14px); }
+  60% { opacity: 1; transform: scale(1.03) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.kaku-card--reveal {
+  animation: kakuCardReveal 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .core6-grid {

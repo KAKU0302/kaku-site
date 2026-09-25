@@ -16,12 +16,12 @@ kaku-site/
 ├── style.css          デザイン（配色・レイアウト）
 ├── app.js             画面遷移・診断フローの制御、結果ページの描画
 ├── types-data.js       16 KAKU TYPE のデータ（名前・色・コピー・WEAPON等のテキスト）
-├── core-engine.js      QUESTION診断 15問 → CORE6スコア算出ロジック
+├── core-engine.js      QUESTION診断 30問 → CORE6スコア算出ロジック
 ├── birth-engine.js     生年月日 → BIRTH（生まれ持った資質）算出ロジック
 ├── state-engine.js     STATE診断 6問 → 今の状態（5分類）算出ロジック
 ├── gap-engine.js        KAKU GAP（BIRTHとQUESTIONのズレ）算出ロジック
 ├── type-engine.js       CORE6の主軸×副軸 → KAKU TYPE 決定ロジック
-└── images/types/*.png   16タイプ分のキャラクターカード画像（KAKU CARD）
+└── *.png（16ファイル）  16タイプ分のキャラクターカード画像（KAKU CARD。ファイル名は各タイプ名の小文字、例: architect.png）
 ```
 
 ## 確定仕様 と 仮実装 について
@@ -36,7 +36,7 @@ kaku-site/
 - KAKU CARD（画像＋タイプ名＋カラー＋キャッチコピー）を結果ページ・SNSシェアで共通利用すること
 
 **仮実装（今後ロジック・文言を差し替え可能なもの）**
-- QUESTION 15問の具体的な質問文言・スコアリング方法（core-engine.js）
+- QUESTION 30問の具体的な質問文言・スコアリング方法（core-engine.js）
 - BIRTHの算出ロジック（生年月日から簡易的に決定的マッピングしているだけで、算命学等の精緻な計算式ではない）（birth-engine.js）
 - STATE診断の質問文言・分類ルール（state-engine.js）
 - KAKU GAPのメッセージ文言（gap-engine.js）
