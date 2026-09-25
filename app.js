@@ -506,7 +506,7 @@
 
           ctx.fillStyle = "#5B5E68";
           ctx.font = "18px sans-serif";
-          ctx.fillText("QUESTION × BIRTH × STATE = YOUR KAKU　#KAKU核診断", W / 2, H - 60);
+          ctx.fillText("行動 × 資質 × 状態 ＝ あなたの核　#KAKU核診断", W / 2, H - 60);
 
           resolve(canvas);
         } catch (err) {
@@ -515,6 +515,75 @@
       };
       img.onerror = reject;
       img.src = type.image;
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // PERSONAL BOOK プレビュー（購入前サンプル・仮実装）
+  // ---------------------------------------------------------------------
+  const personalBookPreviewBtn = document.getElementById("btn-preview-personal-book");
+  if (personalBookPreviewBtn) {
+    personalBookPreviewBtn.addEventListener("click", () => {
+      const target = document.getElementById("personal-book-preview");
+      if (!session.typeId) {
+        target.innerHTML = `
+          <div class="result-block">
+            <p>プレビューを見るには、先に無料診断でKAKUタイプを診断してください。</p>
+            <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+          </div>`;
+        return;
+      }
+      const type = KAKU_TYPES[session.typeId];
+      target.innerHTML = `
+        <div class="result-block">
+          <p class="form-note">※ ここから先は購入前の内容サンプルです（実際の購入時は、より詳細な内容になる予定です）</p>
+          <h3>${type.nameJp}のためのDEEP DIVE</h3>
+          <p>${type.personalBookInsight}</p>
+        </div>
+        <div class="result-block">
+          <h3>今日からできるアクション</h3>
+          <p>${type.personalBookAction}</p>
+        </div>
+      `;
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // KAKU MATCH プレビュー（購入前サンプル・仮実装）
+  // ---------------------------------------------------------------------
+  const matchSelect = document.getElementById("match-partner-select");
+  if (matchSelect) {
+    matchSelect.innerHTML = Object.values(KAKU_TYPES)
+      .map((t) => `<option value="${t.id}">${t.nameEn}｜${t.nameJp}</option>`)
+      .join("");
+  }
+
+  const matchPreviewBtn = document.getElementById("btn-preview-match");
+  if (matchPreviewBtn) {
+    matchPreviewBtn.addEventListener("click", () => {
+      const target = document.getElementById("kaku-match-preview");
+      if (!session.typeId) {
+        target.innerHTML = `
+          <div class="result-block">
+            <p>プレビューを見るには、先に無料診断でKAKUタイプを診断してください。</p>
+            <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+          </div>`;
+        return;
+      }
+      const typeA = KAKU_TYPES[session.typeId];
+      const partnerId = matchSelect.value || Object.keys(KAKU_TYPES)[0];
+      const typeB = KAKU_TYPES[partnerId];
+      const insight = generateMatchInsight(typeA, typeB);
+      target.innerHTML = `
+        <div class="result-block">
+          <p class="form-note">
+            ※ 簡易サンプルです。実際の購入版では、お相手にもQUESTION・BIRTH・STATEを診断してもらい、
+            2人分のデータから相性を算出する予定です。
+          </p>
+          <h3>${insight.headline}</h3>
+          <p>${insight.message}</p>
+        </div>
+      `;
     });
   }
 

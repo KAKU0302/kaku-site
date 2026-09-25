@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>KAKU ～核～｜あなたの核を、解き明かす。</title>
-<meta name="description" content="QUESTION × BIRTH × STATE = YOUR KAKU。行動パターン・生まれ持った資質・今の状態の3つから、あなたという人の「核」を解き明かす自己理解診断。" />
+<meta name="description" content="行動 × 資質 × 状態 ＝ あなたの核。行動パターン・生まれ持った資質・今の状態の3つから、あなたという人の「核」を解き明かす自己理解診断。" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -24,12 +24,12 @@
   <!-- ===================== TOP ===================== -->
   <section class="view" id="view-top">
     <div class="hero">
-      <p class="hero__formula">QUESTION × BIRTH × STATE = YOUR KAKU</p>
+      <p class="hero__formula">行動 × 資質 × 状態 ＝ あなたの核</p>
       <h1 class="hero__title">あなたの核を、<br />解き明かす。</h1>
       <p class="hero__lead">
-        性格診断でも、占いでもない。<br />
-        「今の行動パターン」「生まれ持った資質」「今の状態」の3つから、<br />
-        あなたという人の core＝KAKU を解き明かす自己理解診断です。
+        性格診断でも、占いでもありません。<br />
+        今の行動、生まれ持った資質、いまの状態。<br />
+        3つを重ね合わせて、あなたという人の核を解き明かす自己理解診断です。
       </p>
       <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
       <button class="btn btn--text" data-nav="about">KAKUについてもっと知る</button>
@@ -130,7 +130,9 @@
       </p>
       <div class="price-tag">¥980（買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
-      <p class="form-note">※ このコンテンツは現在準備中です。決済・レポート生成機能は今後実装予定です。</p>
+      <p class="form-note">※ 実際の購入・レポート生成機能は今後実装予定です。下のボタンから、購入前の内容サンプルだけ確認できます。</p>
+      <button class="btn" id="btn-preview-personal-book">プレビューを見る（無料サンプル）</button>
+      <div id="personal-book-preview"></div>
     </div>
   </section>
 
@@ -145,7 +147,16 @@
       </p>
       <div class="price-tag">¥980（買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
-      <p class="form-note">※ このコンテンツは現在準備中です。決済・レポート生成機能は今後実装予定です。</p>
+      <p class="form-note">
+        ※ 本来は相手にもQUESTION・BIRTH・STATEを診断してもらい、2人分のデータから相性を算出する機能です。
+        今回はプレビューとして、あなたのKAKUタイプと「お相手のタイプ」を選ぶだけの簡易サンプルを試せます。
+      </p>
+      <label class="form-field" style="max-width:320px;margin:16px auto;text-align:left;">
+        <span>お相手のKAKUタイプ（サンプル選択）</span>
+        <select id="match-partner-select"></select>
+      </label>
+      <button class="btn" id="btn-preview-match">プレビューを見る（無料サンプル）</button>
+      <div id="kaku-match-preview"></div>
     </div>
   </section>
 
@@ -172,7 +183,7 @@
         <div class="pricing-card">
           <h3>無料診断</h3>
           <p class="pricing-card__price">¥0</p>
-          <p>QUESTION × BIRTH × STATE から、あなたのKAKU TYPEとKAKU GAPの概要がわかります。</p>
+          <p>行動・資質・状態の3つから、あなたのKAKU TYPEとKAKU GAPの概要がわかります。</p>
           <button class="btn btn--primary" data-action="start-diagnosis">はじめる</button>
         </div>
         <div class="pricing-card">
@@ -209,6 +220,7 @@
 <script src="state-engine.js"></script>
 <script src="gap-engine.js"></script>
 <script src="type-engine.js"></script>
+<script src="match-engine.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

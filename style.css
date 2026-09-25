@@ -183,13 +183,15 @@ img { max-width: 100%; display: block; }
   font-size: 13px;
   color: var(--color-text-soft);
 }
-.form-field input {
+.form-field input,
+.form-field select {
   padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 15px;
   font-family: inherit;
   color: var(--color-text);
+  background: var(--color-surface);
 }
 .form-note {
   font-size: 12px;
