@@ -34,7 +34,7 @@
   // 画面遷移
   // ---------------------------------------------------------------------
   const VIEW_IDS = [
-    "top", "about", "basic", "question", "state", "analyzing",
+    "top", "about", "types", "basic", "question", "state", "analyzing",
     "result", "personal-book", "kaku-match", "kaku-team", "pricing",
   ];
 
@@ -86,6 +86,56 @@
         <div class="core6-grid__label">${a.nameEn}｜${a.nameJp}</div>
       </div>`
     ).join("");
+  }
+
+  // ---------------------------------------------------------------------
+  // タイプ一覧ページ: 全16 KAKU TYPE
+  // ---------------------------------------------------------------------
+  function renderTypesGallery() {
+    const grid = document.getElementById("types-grid");
+    if (!grid) return;
+
+    grid.innerHTML = Object.values(KAKU_TYPES)
+      .map(
+        (type) => `
+        <div class="type-card" data-type-id="${type.id}">
+          <button type="button" class="type-card__summary">
+            <img src="${type.image}" alt="${type.nameEn} ${type.nameJp}" class="type-card__image" />
+            <div class="type-card__body">
+              <p class="type-card__type-en">${type.nameEn}</p>
+              <p class="type-card__type-jp">${type.nameJp}</p>
+              <p class="type-card__catchcopy">${type.catchcopy}</p>
+              <p class="type-card__rarity">出現率 ${type.rarity}</p>
+            </div>
+            <span class="type-card__toggle" aria-hidden="true">＋</span>
+          </button>
+          <div class="type-card__detail" hidden>
+            <p class="result-block__mini-title">WEAPON｜強み</p>
+            <p>${type.weapon}</p>
+            <p class="result-block__mini-title">BLIND SPOT｜盲点</p>
+            <p>${type.blindSpot}</p>
+            <p class="result-block__mini-title">TEAM ROLE｜チームでの役割</p>
+            <p>${type.teamRole}</p>
+            <p class="result-block__mini-title">RELATION STYLE｜関係の築き方</p>
+            <p>${type.relationStyle}</p>
+            <p class="result-block__mini-title">AWAKEN｜3つの言葉</p>
+            <p><strong>${type.awaken.keywords.join(" × ")}</strong><br />${type.awaken.sentence}</p>
+          </div>
+        </div>`
+      )
+      .join("");
+
+    grid.querySelectorAll(".type-card__summary").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest(".type-card");
+        const detail = card.querySelector(".type-card__detail");
+        const toggle = card.querySelector(".type-card__toggle");
+        const isOpen = !detail.hidden;
+        detail.hidden = isOpen;
+        toggle.textContent = isOpen ? "＋" : "－";
+        card.classList.toggle("type-card--open", !isOpen);
+      });
+    });
   }
 
   // ---------------------------------------------------------------------
@@ -534,15 +584,51 @@
         return;
       }
       const type = KAKU_TYPES[session.typeId];
+      const scores = session.core6.scores;
+
+      const axisSection = CORE6_AXES.map((a) => {
+        const score = scores[a.id];
+        return `
+          <div class="book-axis-row">
+            <div class="book-axis-row__label">
+              <span>${a.nameEn}｜${a.nameJp}</span>
+              <span>${score}</span>
+            </div>
+            <div class="core6-grid__bar"><div class="core6-grid__bar-fill" style="width:${score}%"></div></div>
+            <p class="book-axis-row__comment">${getAxisCommentary(a.id, score)}</p>
+          </div>`;
+      }).join("");
+
       target.innerHTML = `
-        <div class="result-block">
-          <p class="form-note">※ ここから先は購入前の内容サンプルです（実際の購入時は、より詳細な内容になる予定です）</p>
-          <h3>${type.nameJp}のためのDEEP DIVE</h3>
-          <p>${type.personalBookInsight}</p>
-        </div>
-        <div class="result-block">
-          <h3>今日からできるアクション</h3>
-          <p>${type.personalBookAction}</p>
+        <div class="book-preview">
+          <p class="form-note">※ ここから先は購入前の内容サンプルです。実際の購入版では、全16タイプぶんの書き下ろし解説がさらに続きます。</p>
+
+          <div class="book-cover">
+            <p class="book-cover__label">PERSONAL BOOK｜SAMPLE</p>
+            <img src="${type.image}" alt="${type.nameJp}" class="book-cover__image" />
+            <p class="book-cover__title">${type.nameJp}のための取扱説明書</p>
+          </div>
+
+          <div class="result-block">
+            <p class="book-chapter">第1章</p>
+            <h3>あなたの核の全体像</h3>
+            <p>${type.personalBookInsight}</p>
+          </div>
+
+          <div class="result-block">
+            <p class="book-chapter">第2章</p>
+            <h3>CORE6 全軸解説</h3>
+            <div class="radar-wrap">${buildRadarSVG(scores)}</div>
+            ${axisSection}
+          </div>
+
+          <div class="result-block">
+            <p class="book-chapter">第3章</p>
+            <h3>核を活かす3ステップ・アクションプラン</h3>
+            <p><strong>Step 1（今週）：</strong>${type.personalBookAction}</p>
+            <p><strong>Step 2（1か月後）：</strong>「${type.weapon}」を意識して使えた場面を、3つ振り返ってみましょう。</p>
+            <p><strong>Step 3（3か月後）：</strong>「${type.blindSpot}」について、以前より上手く付き合えるようになったか振り返ってみましょう。</p>
+          </div>
         </div>
       `;
     });
@@ -591,5 +677,6 @@
   // 初期化
   // ---------------------------------------------------------------------
   renderAboutCore6();
+  renderTypesGallery();
   showView("top");
 })();

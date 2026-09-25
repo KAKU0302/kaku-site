@@ -240,6 +240,52 @@ function computeCore6(answers) {
   };
 }
 
+/**
+ * CORE6の各軸を「高い（70以上）／平均的（40〜69）／控えめ（40未満）」の3段階に分け、
+ * スコアの数値だけでは伝わらない意味を言葉で補うための解説文【仮実装】。
+ * PERSONAL BOOKなど、無料診断より踏み込んだ解説が必要な場面で使用する。
+ */
+const CORE6_TIER_COMMENTARY = {
+  vision: {
+    high: "VISIONの数値が高いあなたは、まだ見えていない可能性を思い描く力が際立っています。ゼロから発想する場面で強みを発揮できるはずです。",
+    mid: "VISIONは平均的な水準です。必要な場面ではアイデアを描けますが、それを主軸にするタイプではなさそうです。",
+    low: "VISIONの数値は控えめです。抽象的な可能性より、目の前の現実的な選択肢を重視するタイプと言えます。",
+  },
+  logic: {
+    high: "LOGICが高いあなたは、物事を筋道立てて理解し、根拠をもって判断する力に長けています。",
+    mid: "LOGICは平均的です。必要に応じて分析はできますが、それだけで動くタイプではなさそうです。",
+    low: "LOGICの数値は控えめです。分析よりも感覚や勢いを大切にするタイプと言えます。",
+  },
+  drive: {
+    high: "DRIVEが高いあなたは、迷うより先に動き出す行動力が武器です。困難な状況ほど力を発揮します。",
+    mid: "DRIVEは平均的です。状況次第で行動力を発揮しますが、常に前のめりというわけではなさそうです。",
+    low: "DRIVEの数値は控えめです。勢いで動くより、慎重に見極めてから動くタイプと言えます。",
+  },
+  influence: {
+    high: "INFLUENCEが高いあなたは、言葉や熱量で周囲を動かす力に長けています。",
+    mid: "INFLUENCEは平均的です。必要な場面では発信できますが、常に前に出るタイプではなさそうです。",
+    low: "INFLUENCEの数値は控えめです。人を動かすより、静かに実力で語るタイプと言えます。",
+  },
+  bond: {
+    high: "BONDが高いあなたは、人の気持ちに寄り添い、関係性の中で力を発揮するタイプです。",
+    mid: "BONDは平均的です。関係性を大切にはしますが、それだけに頼らないバランス感覚があります。",
+    low: "BONDの数値は控えめです。関係性より、成果や役割そのものに重きを置くタイプと言えます。",
+  },
+  stability: {
+    high: "STABILITYが高いあなたは、着実に積み重ね、変化の中でも安定を保つ力があります。",
+    mid: "STABILITYは平均的です。安定も大事にしつつ、状況に応じて変化も受け入れられます。",
+    low: "STABILITYの数値は控えめです。安定よりも変化やスピード感を求めるタイプと言えます。",
+  },
+};
+
+function getAxisCommentary(axisId, score) {
+  const tiers = CORE6_TIER_COMMENTARY[axisId];
+  if (!tiers) return "";
+  if (score >= 70) return tiers.high;
+  if (score >= 40) return tiers.mid;
+  return tiers.low;
+}
+
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { CORE6_AXES, QUESTIONS, computeCore6 };
+  module.exports = { CORE6_AXES, QUESTIONS, computeCore6, CORE6_TIER_COMMENTARY, getAxisCommentary };
 }

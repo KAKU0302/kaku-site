@@ -442,6 +442,138 @@ img { max-width: 100%; display: block; }
   margin: 16px 0;
 }
 
+/* ---------- タイプ一覧 ---------- */
+.types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.type-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.type-card__summary {
+  display: block;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  position: relative;
+}
+.type-card__image {
+  width: 100%;
+  display: block;
+  background: var(--color-accent-soft);
+}
+.type-card__body { padding: 16px; }
+.type-card__type-en {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--color-text-soft);
+}
+.type-card__type-jp {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 2px 0 8px;
+}
+.type-card__catchcopy {
+  font-size: 13px;
+  color: var(--color-text-soft);
+  margin-bottom: 6px;
+}
+.type-card__rarity {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.type-card__toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-accent);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.type-card__detail {
+  padding: 0 16px 20px;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-soft);
+}
+.type-card__detail p { margin: 6px 0; }
+.result-block__mini-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-top: 14px !important;
+}
+.type-card--open .type-card__image { filter: brightness(1.02); }
+
+/* ---------- PERSONAL BOOK preview ---------- */
+.book-preview {
+  text-align: left;
+  margin-top: 8px;
+}
+.book-cover {
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.book-cover__label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  opacity: 0.75;
+  margin-bottom: 16px;
+}
+.book-cover__image {
+  width: 160px;
+  border-radius: var(--radius-sm);
+  margin: 0 auto 16px;
+}
+.book-cover__title {
+  font-size: 20px;
+  font-weight: 800;
+}
+.book-chapter {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+.book-axis-row {
+  margin: 20px 0;
+}
+.book-axis-row__label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.book-axis-row__comment {
+  font-size: 13px;
+  color: var(--color-text-soft);
+  margin: 8px 0 0;
+}
+
 /* ---------- Footer ---------- */
 .site-footer {
   text-align: center;
