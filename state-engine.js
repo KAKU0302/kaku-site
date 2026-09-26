@@ -6,7 +6,7 @@
  *   FLOW｜充実・STABLE｜安定・SEARCHING｜探索・STAGNATION｜停滞・OVERLOAD｜過負荷
  * STATEはあくまで「今の環境・状況」を映すものであり、性格診断ではない。
  *
- * 仮実装: 6項目のリッカート尺度（1〜5）と、シンプルなルールベースの分類ロジック。
+ * 仮実装: 10項目のリッカート尺度（1〜5）と、シンプルなルールベースの分類ロジック。
  * 将来的により精緻な質問・分類ロジックに差し替え可能な構造にしている。
  */
 
@@ -17,6 +17,10 @@ const STATE_QUESTIONS = [
   { id: "s4", key: "relationship", prompt: "周囲の人間関係に満足している" },
   { id: "s5", key: "rest", prompt: "十分な休息が取れている" },
   { id: "s6", key: "hope", prompt: "将来に対して期待を持てている" },
+  { id: "s7", key: "growth", prompt: "今の環境で、成長している実感がある" },
+  { id: "s8", key: "autonomy", prompt: "自分のペースや裁量で物事を進められている" },
+  { id: "s9", key: "recognition", prompt: "周囲から自分の頑張りを認めてもらえていると感じる" },
+  { id: "s10", key: "margin", prompt: "心に余裕を持って日々を過ごせている" },
 ];
 
 const STATE_DEFINITIONS = {

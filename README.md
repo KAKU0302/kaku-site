@@ -18,7 +18,7 @@ kaku-site/
 ├── types-data.js       16 KAKU TYPE のデータ（名前・色・コピー・WEAPON等のテキスト）
 ├── core-engine.js      QUESTION診断 30問 → CORE6スコア算出ロジック
 ├── birth-engine.js     生年月日 → BIRTH（生まれ持った資質）算出ロジック
-├── state-engine.js     STATE診断 6問 → 今の状態（5分類）算出ロジック
+├── state-engine.js     STATE診断 10問 → 今の状態（5分類）算出ロジック
 ├── gap-engine.js        KAKU GAP（BIRTHとQUESTIONのズレ）算出ロジック
 ├── type-engine.js       CORE6の主軸×副軸 → KAKU TYPE 決定ロジック
 ├── match-engine.js      相性コメント生成ロジック（PERSONAL BOOK 第4章で使用）
