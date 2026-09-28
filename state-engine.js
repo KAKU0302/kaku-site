@@ -23,34 +23,35 @@ const STATE_QUESTIONS = [
   { id: "s10", key: "margin", prompt: "心に余裕を持って日々を過ごせている" },
 ];
 
+// label は日本語のみ（英語のSTATE keyはあくまで内部ロジック用で、ユーザーには見せない）。
 const STATE_DEFINITIONS = {
   FLOW: {
     key: "FLOW",
-    label: "FLOW｜充実",
+    label: "充実",
     description:
       "今のあなたは、自分の力を発揮しながら前向きに進めている状態です。意味・能力・関係性のバランスが取れており、今の環境がうまく噛み合っています。",
   },
   STABLE: {
     key: "STABLE",
-    label: "STABLE｜安定",
+    label: "安定",
     description:
       "今のあなたは、大きな波はないものの落ち着いて過ごせている状態です。急激な変化は少ないぶん、次の一歩を自分から仕掛けることで、さらに状態を上げていけます。",
   },
   SEARCHING: {
     key: "SEARCHING",
-    label: "SEARCHING｜探索",
+    label: "探索",
     description:
       "今のあなたは、新しい挑戦を求めながらも、今の環境に意味を見出しきれていない状態です。今の場所に留まるか、新しい環境を探すか、模索している時期と言えます。",
   },
   STAGNATION: {
     key: "STAGNATION",
-    label: "STAGNATION｜停滞",
+    label: "停滞",
     description:
       "今のあなたは、意味・能力発揮・関係性のいずれもが十分に満たされていない状態です。今の環境が、本来の力を発揮しにくい状況になっている可能性があります。",
   },
   OVERLOAD: {
     key: "OVERLOAD",
-    label: "OVERLOAD｜過負荷",
+    label: "過負荷",
     description:
       "今のあなたは、一定の手応えを感じながらも、休息が不足している状態です。頑張れているからこそ、意識的に負荷を調整するタイミングかもしれません。",
   },
@@ -94,6 +95,7 @@ function computeState(answers) {
     label: def.label,
     description: def.description,
     average,
+    byKey, // PERSONAL BOOK側で「なぜそう判断したのか」を具体的に示すために使用する各項目の生スコア(1-5)
   };
 }
 

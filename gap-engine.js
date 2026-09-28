@@ -13,13 +13,14 @@
 
 // 表記は「日本語（英語）」の順（英語部分は本文中では薄いグレーで表示するため、
 // 呼び出し側のCSS（.axis-en）が効くよう<span>で囲んでいる）。
+// 力の名前は app.js の AXIS_POWER_NAMES と揃えている（サイト全体で軸の呼び方を統一するため）。
 const CORE6_LABELS = {
-  vision: '構想力<span class="axis-en">（VISION）</span>',
-  logic: '解析力<span class="axis-en">（LOGIC）</span>',
-  drive: '突破力<span class="axis-en">（DRIVE）</span>',
-  influence: '影響力<span class="axis-en">（INFLUENCE）</span>',
-  bond: '共鳴力<span class="axis-en">（BOND）</span>',
-  stability: '安定力<span class="axis-en">（STABILITY）</span>',
+  vision: '未来を描く力<span class="axis-en">（VISION）</span>',
+  logic: '構造を見抜く力<span class="axis-en">（LOGIC）</span>',
+  drive: '壁を破る力<span class="axis-en">（DRIVE）</span>',
+  influence: '人を動かす力<span class="axis-en">（INFLUENCE）</span>',
+  bond: '心を通わせる力<span class="axis-en">（BOND）</span>',
+  stability: '積み上げる力<span class="axis-en">（STABILITY）</span>',
 };
 
 const GOOD_STATES = ["FLOW", "STABLE"];
@@ -97,7 +98,7 @@ function computeGap(questionTopAxis, birthAxis, stateKey, core6Scores, stateAver
       message += " 今の環境は、その資質を活かしやすい環境になっているようです。";
     } else {
       message +=
-        " ただし今の状態（STATE）は万全とは言えないようなので、資質そのものより、休息や環境の負荷を見直すことがヒントになるかもしれません。";
+        " ただし今の状態は万全とは言えないようなので、資質そのものより、休息や環境の負荷を見直すことがヒントになるかもしれません。";
     }
     return { matched, headline, message, score, tier, beforeText, afterText };
   }
@@ -111,7 +112,7 @@ function computeGap(questionTopAxis, birthAxis, stateKey, core6Scores, stateAver
       " 今の状態自体は悪くなさそうなので、今のやり方に無理に合わせようとしすぎていないか、一度振り返ってみると良いかもしれません。";
   } else {
     message +=
-      " 今の状態（STATE）も揺らいでいるようなので、本来の資質を活かせる関わり方・環境に少しずつ寄せていくことが、状態の回復にもつながりそうです。";
+      " 今の状態も揺らいでいるようなので、本来の資質を活かせる関わり方・環境に少しずつ寄せていくことが、状態の回復にもつながりそうです。";
   }
   return { matched, headline, message, score, tier, beforeText, afterText };
 }

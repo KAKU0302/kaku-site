@@ -67,12 +67,12 @@
   // PERSONAL BOOK 第2章｜WORK（向いている仕事・役割・働き方）を、一番の力（topAxis）から導くための
   // 軸ごとの解説。無料診断の言い換えで終わらせず、「現実でどう使うか」まで落とし込むために新設した。
   const WORK_BY_AXIS = {
-    vision: "構想力が一番の力のあなたは、ゼロから企画を立てる仕事、新規事業やまだ答えのない課題に取り組む仕事で力を発揮します。決められた手順をなぞる仕事より、「何をやるか」から自分で考えられる裁量のある環境の方が向いています。",
-    logic: "解析力が一番の力のあなたは、データ分析や業務改善など、筋道を立てて考える仕事に向いています。感覚や勢いだけで判断が求められる環境よりも、根拠を積み上げて進められる仕事の方が力を発揮しやすいタイプです。",
-    drive: "突破力が一番の力のあなたは、新規開拓や立ち上げフェーズのプロジェクトなど、動きながら結果を出す仕事に向いています。慎重な合意形成に時間をかける環境より、スピード感のある現場の方が力を発揮します。",
-    influence: "影響力が一番の力のあなたは、営業や広報、人を巻き込むリーダー的な役割に向いています。黙々と一人で完結する仕事より、人と関わりながら進める仕事の方が力を発揮しやすいタイプです。",
-    bond: "共鳴力が一番の力のあなたは、人事やカスタマーサクセスなど、人の気持ちに寄り添う仕事に向いています。効率だけを追う環境より、関係性を大切にできる仕事の方が力を発揮します。",
-    stability: "安定力が一番の力のあなたは、オペレーションや品質管理など、積み重ねと正確さが求められる仕事に向いています。変化の激しい環境より、地に足のついた仕事の方が力を発揮しやすいタイプです。",
+    vision: "「未来を描く力」が一番の力のあなたは、ゼロから企画を立てる仕事、新規事業やまだ答えのない課題に取り組む仕事で力を発揮します。決められた手順をなぞる仕事より、「何をやるか」から自分で考えられる裁量のある環境の方が向いています。",
+    logic: "「構造を見抜く力」が一番の力のあなたは、データ分析や業務改善など、筋道を立てて考える仕事に向いています。感覚や勢いだけで判断が求められる環境よりも、根拠を積み上げて進められる仕事の方が力を発揮しやすいタイプです。",
+    drive: "「壁を破る力」が一番の力のあなたは、新規開拓や立ち上げフェーズのプロジェクトなど、動きながら結果を出す仕事に向いています。慎重な合意形成に時間をかける環境より、スピード感のある現場の方が力を発揮します。",
+    influence: "「人を動かす力」が一番の力のあなたは、営業や広報、人を巻き込むリーダー的な役割に向いています。黙々と一人で完結する仕事より、人と関わりながら進める仕事の方が力を発揮しやすいタイプです。",
+    bond: "「心を通わせる力」が一番の力のあなたは、人事やカスタマーサクセスなど、人の気持ちに寄り添う仕事に向いています。効率だけを追う環境より、関係性を大切にできる仕事の方が力を発揮します。",
+    stability: "「積み上げる力」が一番の力のあなたは、オペレーションや品質管理など、積み重ねと正確さが求められる仕事に向いています。変化の激しい環境より、地に足のついた仕事の方が力を発揮しやすいタイプです。",
   };
 
   // PERSONAL BOOK 第2章｜CAREER（会社員・管理職・専門職・起業などの適性傾向）。
@@ -94,6 +94,80 @@
     influence: "人生では、「自分の言葉や存在が誰かに影響を与えられているか」が満足度を左右します。一人で完結する生き方より、人と関わり発信し続ける生き方の方が満たされやすいタイプです。",
     bond: "人生では、「大切な人とどれだけ深く関われているか」が満足度を左右します。成果や地位より、信頼できる関係性を優先する生き方の方が満たされやすいタイプです。",
     stability: "人生では、「積み上げてきたものが揺らがずにあるか」が満足度を左右します。刺激の多さより、着実に積み重ねられる環境を優先する生き方の方が満たされやすいタイプです。",
+  };
+
+  // CORE6の6軸を、英語の軸名ではなく日本語の「力の名前」として見せるための短い呼び名。
+  // 「日本語を主役、英語は補助ラベル」という方針に沿って、結果画面・PERSONAL BOOKの数値表示で使用する。
+  const AXIS_POWER_NAMES = {
+    vision: "未来を描く力",
+    logic: "構造を見抜く力",
+    drive: "壁を破る力",
+    influence: "人を動かす力",
+    bond: "心を通わせる力",
+    stability: "積み上げる力",
+  };
+
+  // 上記の「力の名前」1つずつに添える、一言の説明（PERSONAL BOOK第2章で使用）。
+  const AXIS_POWER_DESC = {
+    vision: "まだ答えがないところから、「こうしたらいい」を考える力。",
+    logic: "表面的な問題より、「なぜそうなっているのか」を考える力。",
+    drive: "迷うより先に動き、壁を突破していく力。",
+    influence: "自分が納得した未来なら、その意味を周囲にも伝えられる力。",
+    bond: "相手の気持ちを汲み取り、深いところでつながる力。",
+    stability: "積み重ねを大切にし、崩れない土台をつくる力。",
+  };
+
+  // PERSONAL BOOK 第6章「あなたの取扱説明書」｜調子がいい時のサイン・危険信号・戻るために必要なこと。
+  // 一番の力（topAxis）を軸に、3つずつの短いサインとして提示する。
+  const AXIS_GOOD_SIGNS = {
+    vision: ["新しいアイデアが次々出てくる", "人に話したくなる", "時間を忘れて考え込む"],
+    logic: ["筋道を立てて話せる", "根拠を持って判断できる", "「腑に落ちた」と感じる瞬間が増える"],
+    drive: ["すぐに動きたくなる", "困難な状況にワクワクする", "結果が出るのが早い"],
+    influence: ["人前で話すのが楽しい", "周囲が自然と動いてくれる", "言葉に力がこもる"],
+    bond: ["人との会話が自然と増える", "相手の気持ちがよく分かる", "信頼されていると感じる"],
+    stability: ["淡々とやるべきことをこなせる", "変化があっても動じない", "積み重ねに手応えを感じる"],
+  };
+  const AXIS_DANGER_SIGNS = {
+    vision: ["同じ作業の繰り返しに苛立つ", "「意味がない」と感じ始める", "上の空になることが増える"],
+    logic: ["納得できないまま流されることが増える", "考えることを放棄したくなる", "理由のない指示に苛立つ"],
+    drive: ["待たされることに苛立つ", "やる気はあるのに動けない", "小さな失敗を引きずる"],
+    influence: ["発信しても反応がないと感じる", "一人で黙っているのがつらくなる", "本音を飲み込むことが増える"],
+    bond: ["人との距離を置きたくなる", "気を遣いすぎて疲れる", "孤独を感じやすくなる"],
+    stability: ["急な変化に苛立つ", "落ち着かない気持ちが続く", "小さなことが気になり始める"],
+  };
+  const AXIS_RECOVERY = {
+    vision: ["新しい問いを立ててみる", "制約を一度外して考えてみる", "誰かに構想を話してみる"],
+    logic: ["一度立ち止まって根拠を整理する", "「なぜ」を自分に問い直す", "小さくてもいいので検証してみる"],
+    drive: ["今すぐ動ける小さな一歩を見つける", "締め切りを自分で決める", "体を動かして勢いをつける"],
+    influence: ["誰か一人にでも本音を話す", "小さな場で発信してみる", "反応をもらえる場に身を置く"],
+    bond: ["信頼できる相手に気持ちを話す", "小さな感謝を伝えてみる", "一人の時間を意識的に取る"],
+    stability: ["いつものルーティンに戻す", "変えなくていいものを1つ決める", "予定を整理して見通しを立てる"],
+  };
+
+  // PERSONAL BOOK 第8章「人と、どう付き合うか」｜描写（relationStyle）に続けて、
+  // 「だからどうすればいいか」まで踏み込む、一番の力（topAxis）ごとの実践アドバイス。
+  const RELATION_ADVICE_BY_AXIS = {
+    vision: "人間関係で意識したいのは、「思いついた可能性を全部話す前に、まず結論を一言添えること。」相手が置いていかれずに済みます。",
+    logic: "人間関係で意識したいのは、「結論より先に、考えた過程を共有すること。」あなたにとっては当然の筋道も、相手には見えていないことがあります。",
+    drive: "人間関係で意識したいのは、「動き出す前に、一言だけ相手に共有すること。」勢いに置いていかれる人が減ります。",
+    influence: "人間関係で意識したいのは、「話す量と同じだけ、相手の話を聞く時間を作ること。」熱量に圧倒される人がいることを忘れないでください。",
+    bond: "人間関係で意識したいのは、「気を遣いすぎず、自分の本音も伝えること。」あなたが黙って合わせていることに、相手は案外気づいていません。",
+    stability: "人間関係で意識したいのは、「変化を提案されたときに、即座に拒まず一度受け止めること。」安定を守ることと、頑なになることは違います。",
+  };
+
+  // STATE診断の各項目を、PERSONAL BOOK第5章（KAKU GAP）で「なぜそう判断したのか」を
+  // 具体的に示すための日本語ラベル。数値そのものは見せず、低いものだけを言葉で示す。
+  const STATE_ITEM_LABELS = {
+    meaning: "やっていることへの意味",
+    capability: "自分の能力を発揮できている感覚",
+    challenge: "挑戦している感覚",
+    relationship: "人間関係の満足度",
+    rest: "休息が取れている感覚",
+    hope: "将来への期待",
+    growth: "成長している実感",
+    autonomy: "自分で決められる感覚",
+    recognition: "周囲から認められている感覚",
+    margin: "心の余裕",
   };
 
   // STATEごとに「まず気持ちを受け止める」ための書き出し文
@@ -152,6 +226,24 @@
   }
 
   // ---------------------------------------------------------------------
+  // TOPページ: キャラクターの見本市（「この中に自分がいるかもしれない」）
+  // 16タイプ全部を同じ大きさで並べる図鑑UIにはせず、あえて数体だけを大胆に見せる。
+  // ---------------------------------------------------------------------
+  const HERO_CAST_IDS = ["architect", "pioneer", "commander", "creator", "challenger", "connector"];
+  function renderHeroCast() {
+    const grid = document.getElementById("hero-cast-grid");
+    if (!grid) return;
+    grid.innerHTML = HERO_CAST_IDS.map((id) => {
+      const t = KAKU_TYPES[id];
+      return `
+        <a href="#" class="hero-cast__card" data-nav="types">
+          <img src="${t.image}" alt="${t.nameEn}｜${t.nameJp}" loading="lazy" />
+          <p>${t.nameEn}｜${t.nameJp}</p>
+        </a>`;
+    }).join("");
+  }
+
+  // ---------------------------------------------------------------------
   // ABOUTページ: CORE6一覧
   // ---------------------------------------------------------------------
   function renderAboutCore6() {
@@ -160,7 +252,7 @@
     grid.innerHTML = CORE6_AXES.map(
       (a) => `
       <div class="core6-grid__item">
-        <div class="core6-grid__label">${a.nameEn}｜${a.nameJp}</div>
+        <div class="core6-grid__label">${AXIS_POWER_NAMES[a.id]}<span class="axis-en">（${a.nameEn}）</span></div>
       </div>`
     ).join("");
   }
@@ -187,15 +279,15 @@
             <span class="type-card__toggle" aria-hidden="true">＋</span>
           </button>
           <div class="type-card__detail" hidden>
-            <p class="result-block__mini-title">WEAPON｜強み</p>
+            <p class="result-block__mini-title">あなたの武器</p>
             <p>${type.weapon}</p>
-            <p class="result-block__mini-title">BLIND SPOT｜盲点</p>
+            <p class="result-block__mini-title">陥りやすい罠</p>
             <p>${type.blindSpot}</p>
-            <p class="result-block__mini-title">TEAM ROLE｜チームでの役割</p>
+            <p class="result-block__mini-title">組織で輝く役割</p>
             <p>${type.teamRole}</p>
-            <p class="result-block__mini-title">RELATION STYLE｜関係の築き方</p>
+            <p class="result-block__mini-title">人との向き合い方</p>
             <p>${type.relationStyle}</p>
-            <p class="result-block__mini-title">AWAKEN｜3つの言葉</p>
+            <p class="result-block__mini-title">覚醒する条件</p>
             <p><strong>${type.awaken.keywords.join(" × ")}</strong><br />${type.awaken.sentence}</p>
           </div>
         </div>`
@@ -318,9 +410,9 @@
   function runAnalysis() {
     showView("analyzing");
     const messages = [
-      "QUESTIONを解析しています…",
-      "BIRTHの傾向と重ね合わせています…",
-      "STATEとのGAPを確認しています…",
+      "普段のあなたを読み解いています…",
+      "生まれ持った資質と重ね合わせています…",
+      "今の状態とのズレを確認しています…",
       "16タイプの中から、あなたのKAKUを絞り込んでいます…",
       "まもなく結果が見えてきます…",
     ];
@@ -435,59 +527,58 @@
         </div>
       </div>
 
-      <h3 class="subsection-title">CORE 6｜あなたを構成する6つの力</h3>
-      <p class="form-note">6つの軸はそれぞれ0〜100点。数字が大きいほど、今の行動パターン（QUESTION）でその力を強く使っていることを表します。</p>
+      <h3 class="subsection-title">あなたを構成する6つの力<span class="label-en">CORE6</span></h3>
+      <p class="form-note">6つの軸はそれぞれ0〜100点。数字が大きいほど、普段の行動でその力を強く使っていることを表します。</p>
       <div class="radar-wrap">${buildRadarSVG(core6.scores)}</div>
       <div class="core6-grid">
         ${CORE6_AXES.map(
           (a) => `
           <div class="core6-grid__item">
-            <div class="core6-grid__label">${a.nameEn}｜${a.nameJp}（${core6.scores[a.id]}点）</div>
+            <div class="core6-grid__label">${AXIS_POWER_NAMES[a.id]}<span class="axis-en">（${a.nameEn}）</span>（${core6.scores[a.id]}点）</div>
             <div class="core6-grid__bar"><div class="core6-grid__bar-fill" style="width:${core6.scores[a.id]}%"></div></div>
           </div>`
         ).join("")}
       </div>
 
       <div class="result-block">
-        <h3>WEAPON｜あなたの武器</h3>
+        <h3>あなたの武器<span class="label-en">WEAPON</span></h3>
         <p>${type.weapon}</p>
       </div>
       <div class="result-block">
-        <h3>BLIND SPOT｜あなたの盲点</h3>
+        <h3>あなたが陥りやすい罠<span class="label-en">BLIND SPOT</span></h3>
         <p>${type.blindSpot}</p>
       </div>
       <div class="result-block">
-        <h3>TEAM ROLE｜チームでの役割</h3>
+        <h3>組織で輝く役割<span class="label-en">TEAM ROLE</span></h3>
         <p>${type.teamRole}</p>
       </div>
       <div class="result-block">
-        <h3>RELATION STYLE｜関係の築き方</h3>
+        <h3>人との向き合い方<span class="label-en">RELATION STYLE</span></h3>
         <p>${type.relationStyle}</p>
       </div>
       <div class="result-block">
-        <h3>AWAKEN｜力を発揮しやすい条件</h3>
+        <h3>あなたが覚醒する条件<span class="label-en">AWAKEN</span></h3>
         <p><strong>${type.awaken.keywords.join(" × ")}</strong><br />${type.awaken.sentence}</p>
       </div>
       <div class="result-block">
-        <h3>SHUTDOWN｜力が出にくくなる条件</h3>
+        <h3>力を失いやすい環境<span class="label-en">SHUTDOWN</span></h3>
         <p><strong>${type.shutdown.keywords.join(" × ")}</strong><br />${type.shutdown.sentence}</p>
       </div>
 
-      <h3 class="subsection-title" id="kaku-gap-title">KAKU GAP｜本来のあなたと、今のあなたのズレ</h3>
+      <h3 class="subsection-title" id="kaku-gap-title">本来の自分と、今の自分の「ズレ」</h3>
       <p class="form-note">
-        KAKUだけの見方です。「生まれ持った資質（BIRTH）」と「今いちばん使っている力（QUESTION）」を比べることで、
-        今の力の発揮しやすさが見えてきます。能力の優劣を測るものでも、医療的な診断でもありません。
+        「能力が落ちた？」と感じたとき、実は本来のあなたと、今置かれている環境がズレているだけかもしれません。
+        優劣を測るものでも、医療的な診断でもありません。
       </p>
       <div class="gap-hero">
-        <p class="gap-hero__eyebrow">KAKU GAP</p>
         <div class="gap-hero__compare">
           <div class="gap-hero__before">
-            <p class="gap-hero__tag">本来のあなた｜BIRTH</p>
+            <p class="gap-hero__tag">本来のあなた</p>
             <p>${gap.beforeText}</p>
           </div>
           <div class="gap-hero__arrow" aria-hidden="true">→</div>
           <div class="gap-hero__after">
-            <p class="gap-hero__tag">今のあなた｜QUESTION × STATE</p>
+            <p class="gap-hero__tag">今のあなた</p>
             <p>${gap.afterText}</p>
           </div>
         </div>
@@ -496,36 +587,34 @@
           <div class="gap-hero__score-body">
             <p class="gap-hero__score-tier">KAKU GAP｜${gap.tier.label}</p>
             <div class="gap-hero__meter"><div class="gap-hero__meter-fill gap-hero__meter-fill--${gap.tier.key}" style="width:${gap.score}%"></div></div>
-            <p class="gap-hero__score-caption">0に近いほど「本来の資質をそのまま活かせている」、100に近いほど「本来の資質と、今使っている力にズレがある」ことを表します。</p>
+            <p class="gap-hero__score-caption">0に近いほど「本来のあなたのまま活かせている」、100に近いほど「本来のあなたと、今の環境にズレがある」ことを表します。</p>
           </div>
         </div>
         <p class="gap-hero__message"><strong>${gap.headline}。</strong><br />${gap.message}</p>
       </div>
 
       <div class="result-block">
-        <h3>BIRTH｜${birth.title}（生まれ持った資質）</h3>
+        <h3>生まれ持ったあなた｜${birth.title}</h3>
         <p>${birth.description}</p>
       </div>
       <div class="result-block">
-        <h3>STATE｜${state.label}（今のあなたの状態）</h3>
+        <h3>今のあなた｜${state.label}</h3>
         <p>${state.description}</p>
       </div>
 
       <div class="upsell-banner">
         <div class="upsell-banner__formula" aria-hidden="true">
-          <span class="upsell-banner__chip">QUESTION</span>
+          <span class="upsell-banner__chip">普段のあなた</span>
           <span class="upsell-banner__times">×</span>
-          <span class="upsell-banner__chip">BIRTH</span>
+          <span class="upsell-banner__chip">生まれ持ったあなた</span>
           <span class="upsell-banner__times">×</span>
-          <span class="upsell-banner__chip">STATE</span>
+          <span class="upsell-banner__chip">今のあなた</span>
         </div>
-        <h3 class="upsell-banner__title">あなただけのPERSONAL BOOKで<br />自己理解をより深める。</h3>
+        <h3 class="upsell-banner__title">PERSONAL BOOKは、<br />あなた専用の「自分の攻略本」。</h3>
         <p class="upsell-banner__text">
-          行動パターンだけを見る診断とは違い、KAKUは今の行動（QUESTION）から導いた「${type.nameJp}」に、
-          生まれ持った資質（BIRTH）と今の状態（STATE）を掛け合わせて分析します。だからこそ、
-          "本来のあなた"と"今使っている力"のズレ、そして今のあなたに合った次の一歩まで見えてくる。
-          PERSONAL BOOKでは、その3つを統合した分析に加えて、強みの活かし方・気づきにくい盲点、
-          そして恋愛・結婚・仕事における相性まで、あなた専用の1冊にまとめました。
+          ここまでの結果は、まだ入り口です。「${type.nameJp}」であるあなたが、なぜ今のように感じるのか、
+          どんな環境で輝き、どんな環境で止まるのか、そして人や仕事とどう向き合えばいいのか。
+          PERSONAL BOOKでは、それを"あなた専用"の物語として、行動につながるところまで掘り下げます。
         </p>
         <button class="btn btn--cta" data-nav="personal-book">より詳細を見たい方はこちら →</button>
       </div>
@@ -886,15 +975,15 @@
           const score = scores[a.id];
           const badges = [];
           if (a.id === birth.axis) {
-            badges.push('<span class="axis-badge axis-badge--birth">BIRTH｜生まれ持った資質</span>');
+            badges.push('<span class="axis-badge axis-badge--birth">生まれ持った資質</span>');
           }
           if (a.id === topAxisId) {
-            badges.push('<span class="axis-badge axis-badge--question">QUESTION｜今よく使っている力</span>');
+            badges.push('<span class="axis-badge axis-badge--question">今よく使っている力</span>');
           }
           return `
           <div class="book-axis-row">
             <div class="book-axis-row__label">
-              <span>${a.nameEn}｜${a.nameJp}</span>
+              <span>${AXIS_POWER_NAMES[a.id]}<span class="axis-en">（${a.nameEn}）</span></span>
               <span>${score}点</span>
             </div>
             <div class="core6-grid__bar"><div class="core6-grid__bar-fill" style="width:${score}%"></div></div>
@@ -910,7 +999,7 @@
           return `
           <div class="book-axis-row book-axis-row--compact">
             <div class="book-axis-row__label">
-              <span>${a.nameEn}｜${a.nameJp}</span>
+              <span>${AXIS_POWER_NAMES[a.id]}<span class="axis-en">（${a.nameEn}）</span></span>
               <span>${score}点</span>
             </div>
             <div class="core6-grid__bar"><div class="core6-grid__bar-fill" style="width:${score}%"></div></div>
@@ -968,6 +1057,74 @@
       const primaryGift = AXIS_GIFT_PHRASES[session.core6.topAxis];
       const openingLine = STATE_OPENING_LINES[state.key] || "";
 
+      // 第2章用: CORE6のうち特に高い3つの力（英語の軸名ではなく「力の名前」で見せる）
+      const top3Axes = session.core6.ranking.slice(0, 3);
+
+      // 第5章（KAKU GAP）用: 「なぜそう判断したのか」を、STATEの実際の回答から具体的に示す。
+      // 数値そのものは見せず、特に低かった項目だけを言葉にする（点数を見せるよりも伝わるため）。
+      const stateEntries = state.byKey
+        ? Object.keys(state.byKey).map((k) => ({ key: k, val: state.byKey[k] }))
+        : [];
+      stateEntries.sort((a, b) => a.val - b.val);
+      const lowestStateLabels = stateEntries
+        .slice(0, 3)
+        .filter((e) => e.val <= 3)
+        .map((e) => STATE_ITEM_LABELS[e.key])
+        .filter(Boolean);
+
+      let gapNarrative;
+      if (!gap.matched) {
+        gapNarrative = `現在のあなたは、本来持っている「${AXIS_POWER_NAMES[birth.axis]}」を、十分に使えていない可能性があります。`;
+      } else if (!isGoodState) {
+        gapNarrative = `本来の「${AXIS_POWER_NAMES[birth.axis]}」をそのまま使えているにもかかわらず、今の状態は万全とは言えないようです。`;
+      } else {
+        gapNarrative = `現在のあなたは、本来の「${AXIS_POWER_NAMES[birth.axis]}」を、そのまま活かせているようです。`;
+      }
+
+      const gapWhyHtml =
+        !isGoodState && lowestStateLabels.length
+          ? `<p>特に現在の回答では、「${lowestStateLabels.join("」「")}」が、本来あなたが求める状態より低くなっています。</p>`
+          : "";
+
+      let gapClosing;
+      if (!gap.matched) {
+        gapClosing = "だから最近、「できないわけじゃない。でも、やりたいと思えない。」という感覚がありませんか？";
+      } else if (!isGoodState) {
+        gapClosing = "だから最近、「悪くないはずなのに、なぜか力が出ない。」と感じていませんか？";
+      } else {
+        gapClosing = "今のあなたは、素のままの力を発揮できています。まずはこの調子を大切にしてください。";
+      }
+
+      // 第9章用: 「減らす／取り戻す／試す」の3ステップ行動プラン。
+      // 第4章（統合分析）の integratedActions と同じ4パターン（GAP一致×状態良好）のロジックを使い、
+      // 診断ロジックそのものは変えずに、行動を「減らす・取り戻す・試す」という一貫した型に言い換える。
+      let actionPlan;
+      if (gap.matched && isGoodState) {
+        actionPlan = {
+          reduce: `特に減らすべきものはありません。ただし、${birthLabel}を使わずに済ませている場面があれば、それを見直してください。`,
+          restore: `今の${state.label}な状態そのものが、あなたが本来取り戻すべきものです。今のルーティンを、最低3週間はそのまま保ってください。`,
+          try: `${topMove}`,
+        };
+      } else if (gap.matched && !isGoodState) {
+        actionPlan = {
+          reduce: `${birthLabel}を使う場面を、今週意図的に1つ減らしてください。資質と行動が一致しているからこそ、頑張りすぎてしまいます。`,
+          restore: `十分な休息の予定を、今日中にカレンダーへ1つ入れてください。今のあなたが取り戻すべきなのは、新しい力ではなく余白です。`,
+          try: `3日後、状態に変化があったかを振り返ってください。変わっていなければ、原因を「役割」「環境」「人間関係」のどれか1つに絞って書き出してみましょう。`,
+        };
+      } else if (!gap.matched && isGoodState) {
+        actionPlan = {
+          reduce: `特にありません。今のやり方でうまくいっているので、無理に変える必要はありません。`,
+          restore: `本来の${birthLabel}を使う場面が、今は減っています。今週中に、${birthLabel}を使う場面を自分から1つ作って、取り戻してください。`,
+          try: `${birthMove}`,
+        };
+      } else {
+        actionPlan = {
+          reduce: `${questionLabel}を使う場面を、今週1つだけ減らしてください。減らすだけで、余力が生まれます。`,
+          restore: `本来の${birthLabel}を発揮しにくくしている原因を、「役割」「人間関係」「業務量」のどれか1つに絞って書き出し、そこから${birthLabel}を取り戻す一歩を考えてください。`,
+          try: `${birthMove}`,
+        };
+      }
+
       // CONTEXT（購入前に答えてもらった3つの追加質問）を反映した、この人だけの補足解説
       const contextInsight = session.context
         ? generateContextInsight(session.context, type, {
@@ -984,7 +1141,7 @@
           <p class="form-note">※ ここから先は購入前の内容サンプルです。実際の購入版では、全16タイプぶんの書き下ろし解説がさらに続きます。</p>
 
           <div class="book-cover" style="background: linear-gradient(160deg, ${type.color} 0%, #14161f 100%);">
-            <p class="book-cover__label">PERSONAL BOOK｜SAMPLE</p>
+            <p class="book-cover__label">PERSONAL BOOK｜サンプル</p>
             <img src="${type.image}" alt="${type.nameJp}" class="book-cover__image" />
             <p class="book-cover__title">${coverTitle}</p>
             <div class="book-cover__rule"></div>
@@ -1008,16 +1165,20 @@
           </div>
 
           <div class="book-tabs no-print" role="tablist">
-            <button type="button" class="book-tab is-active" data-tab="1">第1章</button>
-            <button type="button" class="book-tab" data-tab="2">第2章</button>
-            <button type="button" class="book-tab" data-tab="3">第3章</button>
-            <button type="button" class="book-tab" data-tab="4">第4章</button>
-            <button type="button" class="book-tab" data-tab="5">第5章</button>
+            <button type="button" class="book-tab is-active" data-tab="1">1</button>
+            <button type="button" class="book-tab" data-tab="2">2</button>
+            <button type="button" class="book-tab" data-tab="3">3</button>
+            <button type="button" class="book-tab" data-tab="4">4</button>
+            <button type="button" class="book-tab" data-tab="5">5</button>
+            <button type="button" class="book-tab" data-tab="6">6</button>
+            <button type="button" class="book-tab" data-tab="7">7</button>
+            <button type="button" class="book-tab" data-tab="8">8</button>
+            <button type="button" class="book-tab" data-tab="9">9</button>
           </div>
 
           <div class="result-block book-tabpanel" data-tabpanel="1">
             <p class="book-chapter">第1章</p>
-            <h3>あなたのKAKU（核）の全体像</h3>
+            <h3>あなたは、何者なのか。</h3>
             <p>${type.personalBookInsight}</p>
             <p>
               そしてもう一つ。「${type.blindSpot}」——これは弱点ではなく、「${type.weapon}」という、あなたの
@@ -1026,7 +1187,7 @@
             </p>
             <p class="result-block__mini-title">もう一つの隠れた才能</p>
             <p>
-              QUESTIONの回答から見ると、あなたの一番の力は<strong>${primaryGift}</strong>ですが、
+              普段の行動の傾向から見ると、あなたの一番の力は<strong>${primaryGift}</strong>ですが、
               実はその次に、<strong>${secondAxisGift}</strong>という2つ目の力も強く持っています。
               ${type.nameJp}は本来この2つの力が掛け合わさって初めて成立するタイプなので、同じ${type.nameJp}の
               中でも、この2つ目の力の強さは人によって違います。あなたの場合はこれが強く出ている、という点が、
@@ -1045,97 +1206,182 @@
 
           <div class="result-block book-tabpanel" data-tabpanel="2" hidden>
             <p class="book-chapter">第2章</p>
-            <h3>核をどう活かすか｜WORK・CAREER</h3>
-            <p class="result-block__mini-title">WORK｜向いている仕事・役割・働き方</p>
-            <p>${WORK_BY_AXIS[topAxisId]}</p>
-            <p class="result-block__mini-title">CAREER｜会社員・管理職・専門職・起業の適性傾向</p>
-            <p>${CAREER_BY_AXIS[topAxisId]}</p>
-            <p class="result-block__mini-title">AWAKEN｜具体的にどんな環境で能力が最大化するか</p>
-            <p><strong>${type.awaken.keywords.join(" × ")}</strong>――${type.awaken.sentence}
-              こういった条件が揃う環境ほど、あなたの${primaryGift}が最大化します。</p>
-            <p class="result-block__mini-title">SHUTDOWN｜どんな環境で能力が落ちるか</p>
-            <p><strong>${type.shutdown.keywords.join(" × ")}</strong>――${type.shutdown.sentence}
-              こうした環境が続いているなら、能力が足りないのではなく、環境とのミスマッチを疑ってみてください。</p>
+            <h3>なぜ、あなたはそうなるのか。</h3>
+            <p>
+              あなたという人間は、6つの力の組み合わせでできています。中でも特に強く出ているのが、次の3つです。
+            </p>
+            <div class="book-power-list">
+              ${top3Axes
+                .map(
+                  (r, i) => `
+              <div class="book-power-item">
+                <div class="book-power-item__head">
+                  <span class="book-power-item__rank">${i + 1}</span>
+                  <span class="book-power-item__name">${AXIS_POWER_NAMES[r.axis]}</span>
+                  <span class="book-power-item__score">${r.score}</span>
+                </div>
+                <p class="book-power-item__desc">${AXIS_POWER_DESC[r.axis]}</p>
+              </div>`
+                )
+                .join("")}
+            </div>
+            <div class="radar-wrap">${buildRadarSVG(scores, "dark")}</div>
+            <p class="result-block__mini-title">主軸2つの実際の数値</p>
+            ${primaryAxesHtml}
+            <p class="result-block__mini-title">残り4つの軸のバランス</p>
+            ${otherAxesHtml}
+            <p>${otherAxesInsight}</p>
           </div>
 
           <div class="result-block book-tabpanel" data-tabpanel="3" hidden>
             <p class="book-chapter">第3章</p>
-            <h3>人との関わり方と、伸びしろ｜RELATION・GROWTH</h3>
-            <p class="result-block__mini-title">RELATION｜人間関係での特徴</p>
-            <p>${type.relationStyle}</p>
-            <p class="result-block__mini-title">GROWTH｜伸ばすべき力</p>
+            <h3>あなたが輝くとき。</h3>
             <p>
-              残り4軸の中で一歩リードしている<strong>${helperAxis.nameJp}</strong>（${scores[helperAxis.id]}点）を意識的に
-              使う場面を増やすと、一番の力である${primaryGift}をさらに支える土台になります。まずはここを伸ばすのが、
-              一番コストパフォーマンスの良い成長のしかたです。
+              思い出してみてください。「${type.awaken.keywords.join("」「")}」——こうした条件が揃っていたとき、
+              あなたは驚くほど自然に力を発揮できていたはずです。${type.awaken.sentence}
             </p>
-            <p class="result-block__mini-title">GROWTH｜無理に直さなくていい弱点</p>
             <p>
-              「${type.blindSpot}」は、直すべき欠点ではありません。${type.weapon}という武器の裏側にある特性なので、
-              なくそうとするより、「今それが出ているな」と気づけるようになることの方が、ずっと現実的で効果的です。
+              それは運や気合いの問題ではなく、あなたという人間が、そういう環境でこそ最大化するようにできている、
+              ということです。もし今、そのどれかが欠けているなら、能力の問題ではなく環境の問題だと考えてみてください。
             </p>
           </div>
 
           <div class="result-block book-tabpanel" data-tabpanel="4" hidden>
             <p class="book-chapter">第4章</p>
-            <h3>CORE6 全軸解説｜BIRTH × QUESTION × STATE 統合分析</h3>
-            <p class="form-note">
-              ここからは、CORE6の6つの軸それぞれの実際の数値を見ていきます。数値はすべて0〜100点で、
-              大きいほどその力を強く使っている（BIRTHの場合は生まれ持っている）ことを表します。
-            </p>
-            <div class="radar-wrap">${buildRadarSVG(scores, "dark")}</div>
-            <p class="result-block__mini-title">主軸2つの実際の数値</p>
-            ${primaryAxesHtml}
+            <h3>あなたが止まるとき。</h3>
             <p>
-              この2つが、第1章で触れたあなたの一番の力（${CORE6_LABELS[topAxisId]}）と、
-              もう一つの隠れた才能（${CORE6_LABELS[secondAxisId]}）です。
+              反対に、「${type.shutdown.keywords.join("」「")}」——こうした状況が続くと、あなたは急に力を失います。
+              ${type.shutdown.sentence}
             </p>
-            <p class="result-block__mini-title">残り4つの軸のバランス</p>
-            ${otherAxesHtml}
-            <p>${otherAxesInsight}</p>
-            <p class="result-block__mini-title">統合分析｜生まれ持った資質と、今の行動・状態の関係</p>
             <p>
-              生まれ持った資質は<strong>${birthLabel}</strong>ですが、今いちばんよく使っている力は
-              <strong>${questionLabel}</strong>です。${gap.matched ? "この2つは一致しており、素の自分をそのまま発揮できていると言えます。" : "この2つにはズレがあり、今の環境が本来の資質を発揮しにくい状況になっている可能性があります。"}
-              さらに、今の状態は<strong>${state.label}</strong>です。この「資質」「行動」「状態」の3つを掛け合わせると、
-              今のあなたに合った次の一歩が見えてきます。
+              これは弱さではなく、あなたの一番の力（${primaryGift}）が、そういう環境では機能しにくいというだけの
+              ことです。もし最近しんどさを感じているなら、まずこの条件に当てはまっていないか、振り返ってみてください。
             </p>
-            ${integratedActionsHtml}
-            <p class="result-block__mini-title">LIFE STRATEGY｜人生で何を優先すると満足しやすいか</p>
-            <p>${LIFE_STRATEGY_BY_AXIS[topAxisId]}</p>
           </div>
 
           <div class="result-block book-tabpanel" data-tabpanel="5" hidden>
             <p class="book-chapter">第5章</p>
-            <h3>KAKU（核）を活かす3ステップ｜ACTION</h3>
+            <h3>なぜ、今のあなたはこうなのか。</h3>
             <p>
-              まず伝えておきたいのは、あなたはすでに「${type.weapon}」を持っている、ということです。
-              ここから先は、それを失くしたり直したりするための話ではなく、すでにあるものを、
-              もっと周りに気づいてもらうための3ステップです。
+              ここまでで見てきたのは、生まれ持ったあなたと、普段のあなたです。ここからは、今のあなたを見ていきます。
             </p>
+            <div class="gap-hero">
+              <div class="gap-hero__compare">
+                <div class="gap-hero__before">
+                  <p class="gap-hero__tag">本来のあなた</p>
+                  <p>${gap.beforeText}</p>
+                </div>
+                <div class="gap-hero__arrow" aria-hidden="true">→</div>
+                <div class="gap-hero__after">
+                  <p class="gap-hero__tag">今のあなた</p>
+                  <p>${gap.afterText}</p>
+                </div>
+              </div>
+              <div class="gap-hero__score">
+                <div class="gap-hero__score-number gap-hero__score-number--${gap.tier.key}">${gap.score}</div>
+                <div class="gap-hero__score-body">
+                  <p class="gap-hero__score-tier">KAKU GAP｜${gap.tier.label}</p>
+                  <div class="gap-hero__meter"><div class="gap-hero__meter-fill gap-hero__meter-fill--${gap.tier.key}" style="width:${gap.score}%"></div></div>
+                </div>
+              </div>
+            </div>
+            <p>${gapNarrative}</p>
+            ${gapWhyHtml}
+            <p class="book-gap-closing"><strong>${gapClosing}</strong></p>
+            <details class="book-accordion">
+              <summary>この分析について、詳しく見る</summary>
+              <p>
+                KAKU GAPは、「生まれ持った資質（${AXIS_POWER_NAMES[birth.axis]}）」と「普段よく使っている力
+                （${AXIS_POWER_NAMES[topAxisId]}）」の差、そして「今の状態」に関する回答を組み合わせて算出しています。
+                占いのような当てずっぽうではなく、あなた自身が答えた内容から機械的に導いた数値です。
+              </p>
+            </details>
+          </div>
+
+          <div class="result-block book-tabpanel" data-tabpanel="6" hidden>
+            <p class="book-chapter">第6章</p>
+            <h3>あなたの取扱説明書。</h3>
+            <div class="manual-grid">
+              <div class="manual-card">
+                <p class="manual-card__title">私を動かすもの</p>
+                <p>${type.weapon}</p>
+              </div>
+              <div class="manual-card manual-card--warn">
+                <p class="manual-card__title">私を止めるもの</p>
+                <p>${type.shutdown.sentence}</p>
+              </div>
+              <div class="manual-card">
+                <p class="manual-card__title">私に任せてほしいこと</p>
+                <p>${type.teamRole}</p>
+              </div>
+              <div class="manual-card">
+                <p class="manual-card__title">私に求めすぎないでほしいこと</p>
+                <p>${quietAxis.nameJp}を無理に求めないでください。それは、${primaryGift}を存分に発揮するために、あなたが自然と手放している部分です。</p>
+              </div>
+              <div class="manual-card">
+                <p class="manual-card__title">調子がいい時のサイン</p>
+                <p class="book-condition-list">${AXIS_GOOD_SIGNS[topAxisId].join(" / ")}</p>
+              </div>
+              <div class="manual-card manual-card--warn">
+                <p class="manual-card__title">危険信号</p>
+                <p class="book-condition-list book-condition-list--shutdown">${AXIS_DANGER_SIGNS[topAxisId].join(" / ")}</p>
+              </div>
+              <div class="manual-card">
+                <p class="manual-card__title">戻るために必要なこと</p>
+                <p class="book-condition-list">${AXIS_RECOVERY[topAxisId].join(" / ")}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-block book-tabpanel" data-tabpanel="7" hidden>
+            <p class="book-chapter">第7章</p>
+            <h3>仕事で、どう活かすか。</h3>
+            <p class="result-block__mini-title">力を発揮しやすい仕事</p>
+            <p>${WORK_BY_AXIS[topAxisId]}</p>
+            <p class="result-block__mini-title">力を失いやすい仕事</p>
+            <p>「${type.shutdown.keywords.join("」「")}」が常態化している仕事は、あなたの${primaryGift}を発揮しにくくします。能力が足りないのではなく、環境とのミスマッチを疑ってみてください。</p>
+            <p class="result-block__mini-title">リーダーになった場合</p>
+            <p>${CAREER_BY_AXIS[topAxisId]}</p>
+          </div>
+
+          <div class="result-block book-tabpanel" data-tabpanel="8" hidden>
+            <p class="book-chapter">第8章</p>
+            <h3>人と、どう付き合うか。</h3>
+            <p>${type.relationStyle}</p>
+            <p>${RELATION_ADVICE_BY_AXIS[topAxisId]}</p>
+          </div>
+
+          <div class="result-block book-tabpanel" data-tabpanel="9" hidden>
+            <p class="book-chapter">第9章</p>
+            <h3>これから、どうするか。</h3>
+            <p>今のあなたが、まず変えるべき3つ。</p>
             <ol class="book-steps">
               <li class="book-step">
-                <span class="book-step__num">1</span>
+                <span class="book-step__num">01</span>
                 <div class="book-step__body">
-                  <p class="book-step__when">今週</p>
-                  <p>${type.personalBookAction}</p>
+                  <p class="book-step__when">減らす</p>
+                  <p>${actionPlan.reduce}</p>
                 </div>
               </li>
               <li class="book-step">
-                <span class="book-step__num">2</span>
+                <span class="book-step__num">02</span>
                 <div class="book-step__body">
-                  <p class="book-step__when">1か月後</p>
-                  <p>「${type.weapon}」が発揮できた場面を、3つ書き出してみましょう。書き出すことで、それが偶然ではなく、あなたの再現性のある力だと自分自身で確認できます。</p>
+                  <p class="book-step__when">取り戻す</p>
+                  <p>${actionPlan.restore}</p>
                 </div>
               </li>
               <li class="book-step">
-                <span class="book-step__num">3</span>
+                <span class="book-step__num">03</span>
                 <div class="book-step__body">
-                  <p class="book-step__when">3か月後</p>
-                  <p>「${type.blindSpot}」が出そうになった瞬間に、一呼吸だけ置いてみましょう。なくす必要はありません。気づけるようになるだけで、周囲の受け取り方は大きく変わります。</p>
+                  <p class="book-step__when">試す</p>
+                  <p>${actionPlan.try}</p>
                 </div>
               </li>
             </ol>
+            <p class="book-final-message">
+              あなたに足りないものを探し続ける必要はありません。大切なのは、「自分の核が活きる選択」を
+              増やしていくこと。これが、今のあなたのKAKUです。
+            </p>
           </div>
 
           <div class="result-block book-match-promo no-print">
@@ -1209,7 +1455,7 @@
       introEl.innerHTML = `
         <p class="context-intro__title">深掘り診断｜3つだけ質問させてください</p>
         <p class="body-text">プレビューを見るには、先に無料診断でKAKUタイプを診断してください。</p>
-        <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+        <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
       `;
       return;
     }
@@ -1279,7 +1525,7 @@
       introEl.innerHTML = `
         <p class="context-intro__title">先に無料診断を受けてください</p>
         <p class="body-text">KAKU MATCHを試すには、先に無料診断であなたのKAKUタイプを診断してください。</p>
-        <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+        <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
       `;
       return;
     }
@@ -1350,6 +1596,7 @@
   // ---------------------------------------------------------------------
   // 初期化
   // ---------------------------------------------------------------------
+  renderHeroCast();
   renderAboutCore6();
   renderTypesGallery();
   showView("top");

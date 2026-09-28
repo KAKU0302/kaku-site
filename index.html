@@ -25,29 +25,53 @@
   <!-- ===================== TOP ===================== -->
   <section class="view" id="view-top">
     <div class="hero">
-      <p class="hero__kicker">性格だけでは、本当のあなたは分からない。</p>
-      <h1 class="hero__title">あなたの核を、<br />解き明かす。</h1>
-      <p class="hero__formula">行動 × 生まれ持った資質 × 今の状態</p>
+      <h1 class="hero__title">あなたの「核」は、<br />何者だ。</h1>
       <p class="hero__lead">
-        3つの異なる視点からあなたを重ね合わせることで、単純な性格診断や占いだけでは見えてこない、
-        あなたという人の「核（KAKU）」を解き明かします。
+        人には、自分でもまだ気づいていない強み、弱さ、そして力を発揮する条件があります。<br />
+        KAKUは、「生まれ持った資質」「普段の行動」「今の状態」から、あなたという人間の
+        「取扱説明書」をつくる自己理解診断です。
       </p>
-      <button class="btn btn--primary btn--lg" data-action="start-diagnosis">無料でKAKUを診断する</button>
-      <p class="hero__meta">約3分・完全無料</p>
-      <button class="btn btn--text" data-nav="about">KAKUについてもっと知る</button>
+      <button class="btn btn--primary btn--lg" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
+      <p class="hero__meta">完全無料</p>
+    </div>
+
+    <div class="hero-cast">
+      <p class="hero-cast__caption">この中に、自分がいるかもしれない。</p>
+      <div class="hero-cast__grid" id="hero-cast-grid"></div>
     </div>
 
     <div class="hero-questions">
-      <p class="eyebrow hero-questions__eyebrow">KAKUを受けると、何がわかる？</p>
+      <p class="eyebrow hero-questions__eyebrow">こんなこと、思ったことはありませんか？</p>
       <div class="hero-questions__grid">
-        <p class="hero-questions__item">なぜ、やる気が出る仕事と出ない仕事があるのか。</p>
-        <p class="hero-questions__item">なぜ、自然体でいられる人と、なぜか疲れる人がいるのか。</p>
-        <p class="hero-questions__item">自分は、どんな環境で最も力を発揮するのか。</p>
-        <p class="hero-questions__item">自分の一番強い武器は、何なのか。</p>
-        <p class="hero-questions__item">どんな役割を任されたときに、力を発揮するのか。</p>
-        <p class="hero-questions__item">今の自分は、本来の自分をどれくらい活かせているのか。</p>
+        <p class="hero-questions__item">「なぜ、頑張れる時と頑張れない時があるんだろう？」</p>
+        <p class="hero-questions__item">「仕事はできる。でも、なぜか最近やる気が出ない。」</p>
+        <p class="hero-questions__item">「なぜ、この人とは自然に話せるのに、あの人とは疲れるんだろう？」</p>
+        <p class="hero-questions__item">「自分の一番の武器って、結局なんだろう？」</p>
+        <p class="hero-questions__item">「自分は、どんな環境なら本当に力を発揮できる？」</p>
+        <p class="hero-questions__item">「今の自分は、本来の自分を活かせている？」</p>
       </div>
-      <button class="btn btn--primary" data-action="start-diagnosis">無料でKAKUを診断する</button>
+    </div>
+
+    <div class="hero-explainer">
+      <p class="hero-explainer__lead">KAKUは、その感覚に「核」という視点を与えます。</p>
+      <div class="hero-explainer__grid">
+        <div class="hero-explainer__step">
+          <p class="hero-explainer__label">普段のあなた</p>
+          <p class="hero-explainer__desc">普段どんなことを考え、どんな選択や行動をするのか。</p>
+        </div>
+        <div class="hero-explainer__arrow" aria-hidden="true">×</div>
+        <div class="hero-explainer__step">
+          <p class="hero-explainer__label">生まれ持ったあなた</p>
+          <p class="hero-explainer__desc">生年月日という別の視点から、あなたの資質を読み解く。</p>
+        </div>
+        <div class="hero-explainer__arrow" aria-hidden="true">×</div>
+        <div class="hero-explainer__step">
+          <p class="hero-explainer__label">今のあなた</p>
+          <p class="hero-explainer__desc">仕事、人間関係、充実感などから、今置かれている状態を見る。</p>
+        </div>
+      </div>
+      <p class="hero-explainer__result">↓<br /><strong>あなたの「核」</strong></p>
+      <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
     </div>
   </section>
 
@@ -63,31 +87,32 @@
         自分の活かし方と、人との組み方まで。
       </p>
       <p class="body-text">
-        KAKUは、「QUESTION（今の行動パターン）」「BIRTH（生まれ持った資質）」「STATE（今の状態）」という
-        3つの異なる視点からあなたを見つめ、その掛け合わせであなたの core＝「核」を解き明かす自己理解診断です。
+        KAKUは、「普段のあなた（今の行動パターン）」「生まれ持ったあなた（生年月日から見る資質）」
+        「今のあなた（仕事や人間関係、充実感などから見る、今の状態）」という3つの異なる視点からあなたを
+        見つめ、その掛け合わせであなたの「核」を解き明かす自己理解診断です。
       </p>
       <p class="body-text">
         多くの診断は「今のあなた」か「生まれ持ったあなた」のどちらか一方しか見ません。
         KAKUは、この2つに加えて「今の環境・状態」を組み合わせることで、
-        <strong>本来の資質が、今の環境でどれだけ発揮できているか（KAKU GAP）</strong>まで見えるようにしています。
+        <strong>本来のあなたが、今の環境でどれだけ発揮できているか（KAKU GAP）</strong>まで見えるようにしています。
       </p>
       <p class="form-note">
         ※ 生年月日を使うことで診断の精度が科学的・統計的に高まる、というような検証されていないことは
-        お伝えしていません。質問だけでは捉えきれない自分を、異なる角度から見つめるための一つの視点として
+        お伝えしていません。質問だけでは決めつけず、複数の視点から自分を見つめるための一つとして
         使っています。
       </p>
       <h3 class="subsection-title">他の診断サービスとの違い</h3>
       <ul class="feature-list">
         <li><strong>性格診断ではない：</strong>あなたを型にはめるのではなく、今の状態と資質のズレを見る診断です。</li>
         <li><strong>占いではない：</strong>生年月日は「生まれ持った傾向」を語る一つの視点として使うだけで、運勢や吉凶は扱いません。</li>
-        <li><strong>一度きりで終わらない：</strong>STATE（今の状態）は変化するものとして設計されており、繰り返し受け直すことを前提にしています。</li>
-        <li><strong>1種類の質問だけに頼らない：</strong>行動パターンを聞くQUESTIONだけで判定を終えず、生まれ持った資質（BIRTH）・今の状態（STATE）という性質の異なる2つの視点をかけ合わせることで、質問数以上の解像度でKAKUを解析します。</li>
+        <li><strong>一度きりで終わらない：</strong>「今のあなた」は変化するものとして設計されており、繰り返し受け直すことを前提にしています。</li>
+        <li><strong>1種類の質問だけに頼らない：</strong>行動パターンを聞く質問だけで判定を終えず、生まれ持った資質・今の状態という性質の異なる2つの視点をかけ合わせることで、質問数以上の解像度でKAKUを解析します。</li>
       </ul>
       <div class="core6-explainer">
-        <h3 class="subsection-title">CORE 6｜あなたを構成する6つの力</h3>
+        <h3 class="subsection-title">あなたを構成する6つの力<span class="label-en">CORE6</span></h3>
         <div class="core6-grid" id="about-core6-grid"></div>
       </div>
-      <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+      <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
     </div>
   </section>
 
@@ -96,8 +121,8 @@
     <div class="container container--narrow">
       <h2 class="section-title">16のKAKU TYPE</h2>
       <p class="body-text">
-        KAKUでは、CORE6の組み合わせから16のタイプが導き出されます。それぞれのタイプをタップすると、
-        WEAPON（強み）・BLIND SPOT（盲点）・TEAM ROLE・RELATION STYLE・AWAKENの詳細が見られます。
+        KAKUでは、あなたを構成する6つの力の組み合わせから16のタイプが導き出されます。それぞれのタイプを
+        タップすると、武器・陥りやすい罠・組織で輝く役割・人との向き合い方・覚醒する条件の詳細が見られます。
       </p>
       <div class="types-grid" id="types-grid"></div>
     </div>
@@ -117,8 +142,8 @@
           <span>生年月日</span>
           <input type="date" id="input-birthdate" required />
         </label>
-        <p class="form-note">生年月日は「生まれ持った資質（BIRTH）」の参考として使用します。運勢や吉凶の判定には使用しません。</p>
-        <button type="submit" class="btn btn--primary">次へ（QUESTION診断へ）</button>
+        <p class="form-note">生年月日は、生まれ持った資質を見るための参考として使用します。運勢や吉凶の判定には使用しません。</p>
+        <button type="submit" class="btn btn--primary">次へ（質問へ）</button>
       </form>
     </div>
   </section>
@@ -126,11 +151,11 @@
   <!-- ===================== QUESTION診断 ===================== -->
   <section class="view" id="view-question" hidden>
     <div class="container container--narrow">
-      <p class="step-indicator">STEP 2 / 3｜QUESTION診断</p>
+      <p class="step-indicator">STEP 2 / 3｜あなたについての質問</p>
       <div class="progress-bar"><div class="progress-bar__fill" id="question-progress"></div></div>
       <p class="reassurance-note">
-        QUESTIONだけで判定は終わりません。このあとの生年月日（BIRTH）・今の状態（STATE）と掛け合わせて、
-        3つの視点から総合的にあなたのKAKUを解析します。
+        この質問だけで、あなたを決めつけることはありません。この後の生まれ持った資質・今の状態と
+        掛け合わせて、3つの視点から総合的にあなたのKAKUを読み解きます。
       </p>
       <div id="question-card"></div>
     </div>
@@ -139,7 +164,7 @@
   <!-- ===================== STATE診断 ===================== -->
   <section class="view" id="view-state" hidden>
     <div class="container container--narrow">
-      <p class="step-indicator">STEP 3 / 3｜STATE診断（今の状態）</p>
+      <p class="step-indicator">STEP 3 / 3｜今のあなたについて</p>
       <h2 class="section-title">今のあなたに、当てはまる度合いを教えてください</h2>
       <form id="form-state" class="form"></form>
     </div>
@@ -149,7 +174,7 @@
   <section class="view" id="view-analyzing" hidden>
     <div class="analyzing">
       <div class="analyzing__spinner" aria-hidden="true"></div>
-      <p class="analyzing__text" id="analyzing-text">QUESTIONを解析しています…</p>
+      <p class="analyzing__text" id="analyzing-text">普段のあなたを読み解いています…</p>
     </div>
   </section>
 
@@ -162,12 +187,13 @@
   <section class="view" id="view-personal-book" hidden>
     <div class="container container--narrow">
       <p class="eyebrow">PERSONAL BOOK｜USE｜自分を活かす</p>
-      <h2 class="section-title">自分を知るだけで終わらない。「活かし方」まで。</h2>
+      <h2 class="section-title">診断結果の「詳しい版」ではありません。<br />あなただけの、自分の攻略本です。</h2>
       <p class="body-text">
-        無料診断でわかったKAKU TYPEをベースに、向いている仕事・キャリアの適性傾向（WORK・CAREER）、
-        人との関わり方と伸ばすべき力（RELATION・GROWTH）、能力が最大化・低下する条件（AWAKEN・SHUTDOWN）、
-        人生で優先すべきこと（LIFE STRATEGY）、そして今週からの具体的な行動（ACTION）まで。
-        「この特性を現実でどう使えばいいのか」を1冊に落とし込んだ、あなた専用のコンテンツです。
+        なぜ自分はそうなるのか、なぜ今こう感じているのか、そして自分をどう扱えばうまくいくのか。
+        無料診断だけでは見えなかったところまで、9つの章に分けて掘り下げます。
+        あなたが輝く条件、力を失う条件、本来の自分と今の自分のズレ（KAKU GAP）、
+        持ち歩きたくなる「取扱説明書」、仕事・人間関係での活かし方、そしてこれから何をすればいいか。
+        読み終える頃には、「自分は、こういう人間なんだ。だったら、こう生きてみよう。」と思えるはずです。
       </p>
       <div class="price-tag">¥980（買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>

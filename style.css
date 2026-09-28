@@ -168,11 +168,64 @@ img { max-width: 100%; display: block; }
   font-size: 15px;
 }
 
-/* ---------- 「KAKUで何がわかる？」（TOP） ---------- */
+/* ---------- キャラクターの見本市（TOP）｜「この中に自分がいるかもしれない」 ---------- */
+.hero-cast {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 8px 24px 56px;
+  text-align: center;
+}
+.hero-cast__caption {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  margin: 0 0 20px;
+}
+.hero-cast__grid {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.hero-cast__card {
+  width: 118px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+.hero-cast__card:nth-child(3n+1) { transform: rotate(-2deg); }
+.hero-cast__card:nth-child(3n+2) { transform: rotate(1.5deg); }
+.hero-cast__card:nth-child(3n) { transform: rotate(-1deg); }
+.hero-cast__card:hover {
+  transform: translateY(-6px) rotate(0deg);
+  box-shadow: 0 12px 24px rgba(28, 29, 33, 0.12);
+}
+.hero-cast__card img {
+  width: 100%;
+  height: 148px;
+  object-fit: cover;
+  display: block;
+}
+.hero-cast__card p {
+  margin: 0;
+  padding: 7px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-soft);
+}
+@media (max-width: 480px) {
+  .hero-cast__card { width: 96px; }
+  .hero-cast__card img { height: 122px; }
+}
+
+/* ---------- 自分事化の問いかけ（TOP） ---------- */
 .hero-questions {
   max-width: 720px;
   margin: 0 auto;
-  padding: 24px 24px 96px;
+  padding: 24px 24px 56px;
   text-align: center;
 }
 .hero-questions__eyebrow {
@@ -183,7 +236,6 @@ img { max-width: 100%; display: block; }
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
-  margin-bottom: 32px;
   text-align: left;
 }
 .hero-questions__item {
@@ -199,6 +251,71 @@ img { max-width: 100%; display: block; }
 }
 @media (max-width: 640px) {
   .hero-questions__grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- 仕組みのミニ説明（TOP・最後に軽く） ---------- */
+.hero-explainer {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 24px 88px;
+  text-align: center;
+}
+.hero-explainer__lead {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 24px;
+}
+.hero-explainer__grid {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.hero-explainer__step {
+  flex: 1 1 160px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 18px 16px;
+}
+.hero-explainer__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin: 0 0 8px;
+}
+.hero-explainer__desc {
+  font-size: 12px;
+  color: var(--color-text-soft);
+  margin: 0;
+  line-height: 1.7;
+}
+.hero-explainer__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-soft);
+  opacity: 0.5;
+  font-size: 14px;
+}
+.hero-explainer__result {
+  font-size: 13px;
+  color: var(--color-text-soft);
+  margin: 8px 0 28px;
+  line-height: 1.8;
+}
+.hero-explainer__result strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 20px;
+  color: var(--color-text);
+  font-family: var(--font-serif);
+}
+@media (max-width: 640px) {
+  .hero-explainer__grid { flex-direction: column; }
+  .hero-explainer__arrow { transform: rotate(90deg); }
 }
 
 /* ---------- ブランドメッセージ（ABOUT） ---------- */
@@ -459,6 +576,18 @@ img { max-width: 100%; display: block; }
 .core6-grid__label { font-size: 12px; color: var(--color-text-soft); }
 /* 文中で「構想力（VISION）」のように英語表記を添えるときの、英語部分の弱め表示 */
 .axis-en { opacity: 0.55; font-weight: 400; }
+/* 見出しの末尾に「WEAPON」のような英語の補助ラベルを小さく添えるとき用（日本語を主役にするため） */
+.label-en {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-text-soft);
+  opacity: 0.5;
+  margin-left: 8px;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
 .core6-grid__bar {
   height: 6px;
   background: var(--color-border);
@@ -1033,17 +1162,19 @@ img { max-width: 100%; display: block; }
   flex-wrap: wrap;
 }
 .book-tab {
-  flex: 1 1 auto;
-  min-width: 88px;
-  padding: 12px 10px;
-  border-radius: 999px;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
   border: 1px solid rgba(94, 200, 242, 0.3);
   background: rgba(255, 255, 255, 0.04);
   color: var(--book-text-soft);
   font-size: 13px;
   font-weight: 700;
-  font-family: inherit;
+  font-family: var(--font-serif);
   cursor: pointer;
+  text-align: center;
   transition: background 0.15s ease, color 0.15s ease;
 }
 .book-tab.is-active {
@@ -1179,6 +1310,125 @@ img { max-width: 100%; display: block; }
   background: rgba(217, 179, 108, 0.14);
   color: var(--book-gold);
   border: 1px solid rgba(217, 179, 108, 0.5);
+}
+
+/* ---------- PERSONAL BOOK 第2章: 特に高い3つの力 ---------- */
+.book-power-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 18px 0 26px;
+}
+.book-power-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(217, 179, 108, 0.28);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.book-power-item__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.book-power-item__rank {
+  flex: none;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--book-gold);
+}
+.book-power-item__name {
+  flex: 1 1 auto;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--book-text);
+}
+.book-power-item__score {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-glow);
+}
+.book-power-item__desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--book-text-soft);
+}
+
+/* ---------- PERSONAL BOOK 第5章: KAKU GAPの補足アコーディオン ---------- */
+.book-gap-closing {
+  font-size: 15px;
+  line-height: 1.8;
+}
+.book-accordion {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.book-accordion summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-glow);
+  list-style: none;
+}
+.book-accordion summary::-webkit-details-marker { display: none; }
+.book-accordion summary::after { content: "　＋"; }
+.book-accordion[open] summary::after { content: "　－"; }
+.book-accordion p {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--book-text-soft);
+}
+
+/* ---------- PERSONAL BOOK 第6章: 取扱説明書スコアカード ---------- */
+.manual-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 18px 0;
+}
+@media (min-width: 640px) {
+  .manual-grid { grid-template-columns: 1fr 1fr; }
+}
+.manual-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--book-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.manual-card--warn {
+  border-color: rgba(224, 86, 140, 0.4);
+}
+.manual-card__title {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--book-gold);
+  margin: 0 0 8px;
+}
+.manual-card--warn .manual-card__title { color: #F2789F; }
+.manual-card p:not(.manual-card__title) {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--book-text-soft);
+}
+.book-condition-list--shutdown { color: #F2B4C9; }
+
+/* ---------- PERSONAL BOOK 第9章: 締めのメッセージ ---------- */
+.book-final-message {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(217, 179, 108, 0.3);
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--book-text);
 }
 
 /* ---------- PERSONAL BOOK: CORE6バー（本ページ内はダーク基調） ---------- */
