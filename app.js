@@ -4,12 +4,14 @@
  *
  * サイトマップ / ユーザー導線（設計書 3章・4章）に沿って、以下の順で画面を切り替える:
  * TOP → KAKUについて / タイプ一覧 / 基本情報入力 → QUESTION診断 → STATE診断 → 解析演出 → 無料診断結果
- * → (PERSONAL BOOK / KAKU TEAM 紹介 / 料金ページ はナビゲーションからいつでも遷移可)
+ * → (PERSONAL BOOK / KAKU MATCH / KAKU TEAM 紹介 / 料金ページ はナビゲーションからいつでも遷移可)
  *
- * KAKU MATCH（相性）は、単体の有料ページではなく PERSONAL BOOK の「第4章」として統合している
- * （ユーザーからのフィードバックにより、980円の単体コンテンツとしては見つけにくく・薄く感じられたため統合）。
+ * KAKU MATCH（相性）は、以前はPERSONAL BOOKの「第4章」として統合していたが、
+ * PERSONAL BOOK単体で価値が完結する内容に育ったため、¥480の独立サービス（view-kaku-match）として
+ * 切り出している。恋愛・結婚・仕事のカテゴリごとに、スコア・「なぜこの数字？」・「気をつけたいポイント」を
+ * 詳しく見せる仕様。
  *
- * PERSONAL BOOK・KAKU TEAM の実際の決済・レポート生成は
+ * PERSONAL BOOK・KAKU MATCH・KAKU TEAM の実際の決済・レポート生成は
  * 設計書12章により「今回実装せず将来拡張するもの」に分類されているため、
  * このMVPでは紹介ページ＋非活性の「Coming soon」ボタンのみを実装する。
  */
@@ -47,6 +49,21 @@
     stability: "着実に積み上げ、支える力",
   };
 
+  // 第2章のアクションプランを「抽象的な提案」で終わらせず、その場で決めきれる具体的な
+  // 一手に落とし込むための、軸ごとの実行イメージ。診断を受ける人は自分で決めるのが苦手な
+  // ことが多い、という前提に立ち、曖昧な「〜してみましょう」ではなく、今日・今週単位で
+  // 実行できる具体的な行動を1つ断言する形にしている。
+  // すべて「〜してください」で終わる命令形にしておき、呼び出し側では
+  // 末尾に句点を足すだけで自然な1文になるようにしている。
+  const AXIS_CONCRETE_MOVE = {
+    vision: "会議や1on1の最初に「もし制約が一切なかったら」を1分だけ話してみてください",
+    logic: "次の判断を下す前に、根拠を3行だけ書き出してから結論を口にしてください",
+    drive: "今日中に、先延ばしにしていたタスクを1つ選び、着手ではなく完了まで終わらせてください",
+    influence: "次のミーティングで、自分の意見を一番最初に発言してください",
+    bond: "今週中に、身近な1人に感謝や承認の言葉を直接伝えてください",
+    stability: "重要な決定の前に「これだけは変えない」を1つ決めてから進めてください",
+  };
+
   // STATEごとに「まず気持ちを受け止める」ための書き出し文
   const STATE_OPENING_LINES = {
     FLOW: "今のあなたは、これ以上ないくらい波に乗れている状態です。ここまで積み上げてきたものが、きちんと形になり始めています。",
@@ -61,7 +78,7 @@
   // ---------------------------------------------------------------------
   const VIEW_IDS = [
     "top", "about", "types", "basic", "question", "state", "analyzing",
-    "result", "personal-book", "kaku-team", "pricing",
+    "result", "personal-book", "kaku-match", "kaku-team", "pricing",
   ];
 
   function showView(id) {
@@ -71,6 +88,7 @@
     });
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     if (id === "personal-book") initPersonalBookView();
+    if (id === "kaku-match") initKakuMatchView();
   }
 
   document.addEventListener("click", (e) => {
@@ -302,9 +320,9 @@
   // CORE6 レーダーチャート（外部ライブラリなし・インラインSVG）
   // ---------------------------------------------------------------------
   function buildRadarSVG(scores, theme) {
-    const size = 260;
+    const size = 320;
     const center = size / 2;
-    const maxR = 95;
+    const maxR = 118;
     const axes = CORE6_AXES.map((a) => a.id);
     const n = axes.length;
     const isDark = theme === "dark";
@@ -333,9 +351,9 @@
     axes.forEach((axisId, i) => {
       const [x, y] = pointFor(i, 100);
       axisLines += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="${palette.grid}" stroke-width="1" />`;
-      const labelPoint = pointFor(i, 118);
+      const labelPoint = pointFor(i, 122);
       const axisMeta = CORE6_AXES[i];
-      labels += `<text x="${labelPoint[0]}" y="${labelPoint[1]}" font-size="10" fill="${palette.label}" text-anchor="middle" dominant-baseline="middle">${axisMeta.nameJp}</text>`;
+      labels += `<text x="${labelPoint[0]}" y="${labelPoint[1]}" font-size="12" font-weight="700" fill="${palette.label}" text-anchor="middle" dominant-baseline="middle">${axisMeta.nameJp}</text>`;
     });
 
     // データポリゴン
@@ -344,10 +362,10 @@
       .join(" ");
 
     return `
-      <svg viewBox="0 0 ${size} ${size}" width="260" height="260" role="img" aria-label="CORE6レーダーチャート">
+      <svg class="radar-svg" viewBox="0 0 ${size} ${size}" role="img" aria-label="CORE6レーダーチャート">
         ${gridPolys}
         ${axisLines}
-        <polygon points="${dataPts}" fill="${palette.fill}" fill-opacity="${palette.fillOpacity}" stroke="${palette.stroke}" stroke-width="2" />
+        <polygon class="radar-fill-anim" points="${dataPts}" fill="${palette.fill}" fill-opacity="${palette.fillOpacity}" stroke="${palette.stroke}" stroke-width="2.5" style="transform-origin:${center}px ${center}px;" />
         ${labels}
       </svg>
     `;
@@ -818,38 +836,38 @@
 
       // BIRTH（生まれ持った資質）× QUESTION（今の行動）× STATE（今の状態）の統合分析。
       // GAPが一致しているか／今の状態が良好か、の2軸4パターンで行動プランを出し分ける。
+      // ここは「〜かもしれません」「〜してみましょう」で終わらせず、今日・今週単位で
+      // 実行できる具体的な一手を断言する（診断結果を読んでも自分で決められない、を防ぐため）。
+      const topMove = AXIS_CONCRETE_MOVE[session.core6.topAxis];
+      const birthMove = AXIS_CONCRETE_MOVE[birth.axis];
       let integratedActions;
       if (gap.matched && isGoodState) {
         integratedActions = [
-          `生まれ持った${birthLabel}を、今の行動でもそのまま使えている状態です。この一致は今のあなたの土台になっています。`,
-          `${birthLabel}をより意図的に使う場面を、今週の中で1つ選んで試してみましょう。`,
-          `${state.label}の状態を保つために、今のやり方や環境を大きく変えず、継続することを優先しましょう。`,
+          `生まれ持った資質と今の行動が一致していて、これがあなたの土台です。変える必要はありません。今週は、${topMove}。`,
+          `${state.label}の状態を保つために、新しいやり方は試さず、今のルーティンを最低3週間はそのまま続けてください。`,
+          `${birthLabel}が発揮できた場面を、今日中に1つだけメモに残してください。次に迷ったときの判断材料になります。`,
         ];
       } else if (gap.matched && !isGoodState) {
         integratedActions = [
-          `資質（${birthLabel}）と行動は一致していますが、今の状態（${state.label}）はやや揺らいでいるようです。`,
-          `力の使い方そのものよりも、休息の取り方や環境の負荷を見直すタイミングかもしれません。`,
-          `${birthLabel}を無理に発揮し続けていないか、今週はペースを落として振り返ってみましょう。`,
+          `資質と行動は一致していますが、今の状態（${state.label}）は本来の力を発揮しにくい状態です。今週は新しいことを始めず、休息の予定を1つ先にカレンダーへ入れてください。`,
+          `${birthLabel}を無理に発揮し続けると消耗します。今週、${birthLabel}を使う場面を意図的に1つ減らしてください。`,
+          `3日後、状態に変化があったかを振り返ってください。変わっていなければ、負荷の原因を「役割」「環境」「人間関係」のどれか1つに絞って書き出してください。`,
         ];
       } else if (!gap.matched && isGoodState) {
         integratedActions = [
-          `本来の${birthLabel}とは違う${questionLabel}を、今の環境ではうまく使えているようです。`,
-          `ただし本来の資質を使う機会が少ないままだと、いずれ物足りなさや違和感につながることもあります。`,
-          `${birthLabel}を活かせる小さな場面を、意識的に1つつくってみましょう。`,
+          `本来の${birthLabel}とは違う${questionLabel}を、今の環境ではうまく使えています。今のやり方を変える必要はありません。`,
+          `ただし${birthLabel}を使う機会がないままだと、いずれ物足りなさにつながります。今週中に、${birthLabel}を使う場面を自分から1つ作ってください。`,
+          `具体的には、今週のどこかで${birthMove}。`,
         ];
       } else {
         integratedActions = [
-          `本来の${birthLabel}から離れた${questionLabel}を、${state.label}の状態のまま使い続けている可能性があります。`,
-          `まずは今の環境や役割が、${birthLabel}を発揮しにくい構造になっていないか振り返ってみましょう。`,
-          `小さくても構わないので、${birthLabel}を使える機会を意識的につくることが、状態の回復にもつながりそうです。`,
+          `本来の${birthLabel}から離れた${questionLabel}を、${state.label}のまま使い続けています。今週はまず、${questionLabel}を使う場面を1つ減らしてください。`,
+          `今の環境や役割が${birthLabel}を発揮しにくい構造になっていないか、今日中に原因を「役割」「人間関係」「業務量」のどれか1つに絞って書き出してください。`,
+          `小さくて構いません。今週、${birthMove}。それが、状態の回復につながります。`,
         ];
       }
       const integratedActionsHtml = integratedActions
         .map((text, i) => `<p><strong>アクション${i + 1}：</strong>${text}</p>`)
-        .join("");
-
-      const partnerOptions = Object.values(KAKU_TYPES)
-        .map((t) => `<option value="${t.id}">${t.nameEn}｜${t.nameJp}</option>`)
         .join("");
 
       // 第1章用: 副軸を「もう一つの隠れた才能」として開示する演出
@@ -866,6 +884,8 @@
           })
         : null;
 
+      const coverTitle = session.name ? `${session.name}さんのPERSONAL BOOK` : "あなたのPERSONAL BOOK";
+
       target.innerHTML = `
         <div class="book-preview">
           <p class="form-note">※ ここから先は購入前の内容サンプルです。実際の購入版では、全16タイプぶんの書き下ろし解説がさらに続きます。</p>
@@ -873,7 +893,7 @@
           <div class="book-cover" style="background: linear-gradient(160deg, ${type.color} 0%, #14161f 100%);">
             <p class="book-cover__label">PERSONAL BOOK｜SAMPLE</p>
             <img src="${type.image}" alt="${type.nameJp}" class="book-cover__image" />
-            <p class="book-cover__title">${type.nameJp}のための取扱説明書</p>
+            <p class="book-cover__title">${coverTitle}</p>
             <div class="book-cover__rule"></div>
           </div>
 
@@ -894,9 +914,15 @@
             </p>
           </div>
 
-          <div class="result-block">
+          <div class="book-tabs no-print" role="tablist">
+            <button type="button" class="book-tab is-active" data-tab="1">第1章</button>
+            <button type="button" class="book-tab" data-tab="2">第2章</button>
+            <button type="button" class="book-tab" data-tab="3">第3章</button>
+          </div>
+
+          <div class="result-block book-tabpanel" data-tabpanel="1">
             <p class="book-chapter">第1章</p>
-            <h3>あなたの核の全体像</h3>
+            <h3>あなたのKAKU（核）の全体像</h3>
             <p>${type.personalBookInsight}</p>
             <p>
               そしてもう一つ。「${type.blindSpot}」——これは弱点ではなく、「${type.weapon}」という、あなたの
@@ -914,7 +940,7 @@
             ${
               contextInsight
                 ? `
-            <p class="result-block__mini-title">今のあなたに合わせて｜CONTEXT</p>
+            <p class="result-block__mini-title">たとえば、今のあなたなら</p>
             <p>${contextInsight.roleText}</p>
             <p>${contextInsight.valueText}</p>
             <p>${contextInsight.relationshipText}</p>`
@@ -922,17 +948,20 @@
             }
           </div>
 
-          <div class="result-block">
+          <div class="result-block book-tabpanel" data-tabpanel="2" hidden>
             <p class="book-chapter">第2章</p>
             <h3>CORE6 全軸解説｜BIRTH × QUESTION × STATE 統合分析</h3>
             <p class="form-note">
-              まずは、あなたの一番の力ともう一つの隠れた才能（第1章で触れた2軸）の実際の数値を確認し、
-              続けて残り4軸のバランスを見ていきます。数値はすべて0〜100点で、大きいほどその力を強く
-              使っている（BIRTHの場合は生まれ持っている）ことを表します。
+              ここからは、CORE6の6つの軸それぞれの実際の数値を見ていきます。数値はすべて0〜100点で、
+              大きいほどその力を強く使っている（BIRTHの場合は生まれ持っている）ことを表します。
             </p>
             <div class="radar-wrap">${buildRadarSVG(scores, "dark")}</div>
             <p class="result-block__mini-title">主軸2つの実際の数値</p>
             ${primaryAxesHtml}
+            <p>
+              この2つが、第1章で触れたあなたの一番の力（${CORE6_LABELS[topAxisId]}）と、
+              もう一つの隠れた才能（${CORE6_LABELS[secondAxisId]}）です。
+            </p>
             <p class="result-block__mini-title">残り4つの軸のバランス</p>
             ${otherAxesHtml}
             <p>${otherAxesInsight}</p>
@@ -946,32 +975,47 @@
             ${integratedActionsHtml}
           </div>
 
-          <div class="result-block">
+          <div class="result-block book-tabpanel" data-tabpanel="3" hidden>
             <p class="book-chapter">第3章</p>
-            <h3>核を活かす3ステップ・アクションプラン</h3>
+            <h3>KAKU（核）を活かす3ステップ</h3>
             <p>
               まず伝えておきたいのは、あなたはすでに「${type.weapon}」を持っている、ということです。
               ここから先は、それを失くしたり直したりするための話ではなく、すでにあるものを、
               もっと周りに気づいてもらうための3ステップです。
             </p>
-            <p><strong>Step 1（今週）：</strong>${type.personalBookAction}</p>
-            <p><strong>Step 2（1か月後）：</strong>「${type.weapon}」が発揮できた場面を、3つ書き出してみましょう。書き出すことで、それが偶然ではなく、あなたの再現性のある力だと自分自身で確認できます。</p>
-            <p><strong>Step 3（3か月後）：</strong>「${type.blindSpot}」が出そうになった瞬間に、一呼吸だけ置いてみましょう。なくす必要はありません。気づけるようになるだけで、周囲の受け取り方は大きく変わります。</p>
+            <ol class="book-steps">
+              <li class="book-step">
+                <span class="book-step__num">1</span>
+                <div class="book-step__body">
+                  <p class="book-step__when">今週</p>
+                  <p>${type.personalBookAction}</p>
+                </div>
+              </li>
+              <li class="book-step">
+                <span class="book-step__num">2</span>
+                <div class="book-step__body">
+                  <p class="book-step__when">1か月後</p>
+                  <p>「${type.weapon}」が発揮できた場面を、3つ書き出してみましょう。書き出すことで、それが偶然ではなく、あなたの再現性のある力だと自分自身で確認できます。</p>
+                </div>
+              </li>
+              <li class="book-step">
+                <span class="book-step__num">3</span>
+                <div class="book-step__body">
+                  <p class="book-step__when">3か月後</p>
+                  <p>「${type.blindSpot}」が出そうになった瞬間に、一呼吸だけ置いてみましょう。なくす必要はありません。気づけるようになるだけで、周囲の受け取り方は大きく変わります。</p>
+                </div>
+              </li>
+            </ol>
           </div>
 
-          <div class="result-block">
-            <p class="book-chapter">第4章</p>
-            <h3>気になる相手との相性（KAKU MATCH）</h3>
-            <p class="form-note">
-              本来は相手にもQUESTION・BIRTH・STATEを診断してもらい、2人分のデータから相性を算出する章です。
-              サンプルでは「お相手のタイプ」を選ぶだけの簡易版を試せます。
+          <div class="result-block book-match-promo no-print">
+            <p class="book-chapter">KAKU MATCH</p>
+            <h3>気になる相手との相性は、別サービスでもっと詳しく</h3>
+            <p>
+              恋愛・結婚・仕事、それぞれの相性をより詳しく見られる「KAKU MATCH」を、PERSONAL BOOKとは
+              独立したサービスとしてご用意しています。
             </p>
-            <label class="form-field no-print" style="max-width:320px;margin:16px 0;text-align:left;">
-              <span>お相手のKAKUタイプ（サンプル選択）</span>
-              <select id="match-partner-select">${partnerOptions}</select>
-            </label>
-            <button class="btn no-print" id="btn-preview-match">この相性を見る</button>
-            <div id="kaku-match-preview"></div>
+            <button class="btn no-print" data-nav="kaku-match">KAKU MATCHを見る →</button>
           </div>
 
           <div class="closing-note">
@@ -1010,41 +1054,17 @@
         }
       });
 
-      const matchSelect = document.getElementById("match-partner-select");
-      const matchPreviewBtn = document.getElementById("btn-preview-match");
-      matchPreviewBtn.addEventListener("click", () => {
-        const matchTarget = document.getElementById("kaku-match-preview");
-        const partnerId = matchSelect.value || Object.keys(KAKU_TYPES)[0];
-        const typeB = KAKU_TYPES[partnerId];
-        const insight = generateMatchInsight(session.core6.scores, typeB);
-
-        const categoryRows = insight.categories
-          .map((c) => {
-            const reasonLabel = CORE6_LABELS[c.reasonAxis];
-            const reasonText =
-              c.score >= 70
-                ? `2人とも${reasonLabel}が近く、この相性の良さの核になっています。`
-                : `${reasonLabel}の噛み合い方が、このスコアに一番効いています。`;
-            return `
-          <div class="match-category">
-            <div class="match-category__head">
-              <span class="match-category__label">${c.label}</span>
-              <span class="match-category__score">${c.score}<span class="match-category__score-unit">%</span></span>
-            </div>
-            <div class="match-category__bar"><div class="match-category__bar-fill match-category__bar-fill--${c.key}" style="width:${c.score}%"></div></div>
-            <p class="match-category__comment">${c.commentary}</p>
-            <p class="match-category__reason">なぜこの数字？｜${reasonText}</p>
-          </div>`;
-          })
-          .join("");
-
-        matchTarget.innerHTML = `
-          <div class="result-block match-result">
-            <h3>${type.nameJp} × ${typeB.nameJp} の相性</h3>
-            <p class="form-note">恋愛・結婚・仕事の3つの軸で、それぞれ相性の傾向をスコア化しました。</p>
-            ${categoryRows}
-          </div>
-        `;
+      const bookTabButtons = target.querySelectorAll(".book-tab");
+      const bookTabPanels = target.querySelectorAll(".book-tabpanel");
+      bookTabButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const key = btn.getAttribute("data-tab");
+          bookTabButtons.forEach((b) => b.classList.toggle("is-active", b === btn));
+          bookTabPanels.forEach((p) => {
+            p.hidden = p.getAttribute("data-tabpanel") !== key;
+          });
+          target.closest(".container").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
       });
   }
 
@@ -1111,6 +1131,90 @@
       introEl.hidden = true;
       renderPersonalBookPreview();
     });
+  }
+
+  // ---------------------------------------------------------------------
+  // KAKU MATCH（独立サービス）｜以前はPERSONAL BOOK第4章だったが、
+  // 「PERSONAL BOOKだけでも価値が完結するように」という方針で別サービスとして切り出した。
+  // 恋愛・結婚・仕事それぞれについて、「なぜこの数字？」に加えて「気をつけたいポイント」まで見せる。
+  // ---------------------------------------------------------------------
+  function initKakuMatchView() {
+    const introEl = document.getElementById("kaku-match-intro");
+    const previewTarget = document.getElementById("kaku-match-standalone-preview");
+    if (previewTarget) previewTarget.innerHTML = "";
+    if (!introEl) return;
+
+    if (!session.typeId) {
+      introEl.hidden = false;
+      introEl.innerHTML = `
+        <p class="context-intro__title">先に無料診断を受けてください</p>
+        <p class="body-text">KAKU MATCHを試すには、先に無料診断であなたのKAKUタイプを診断してください。</p>
+        <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+      `;
+      return;
+    }
+
+    const partnerOptions = Object.values(KAKU_TYPES)
+      .map((t) => `<option value="${t.id}">${t.nameEn}｜${t.nameJp}</option>`)
+      .join("");
+
+    introEl.hidden = false;
+    introEl.innerHTML = `
+      <p class="context-intro__title">お相手のKAKUタイプを選んでください</p>
+      <p class="body-text">
+        本来はお相手にもQUESTION・BIRTH・STATEを診断してもらい、2人分のデータから算出します。
+        サンプルでは「お相手のタイプ」を選ぶだけの簡易版を試せます。
+      </p>
+      <label class="form-field" style="max-width:320px;">
+        <span>お相手のKAKUタイプ（サンプル選択）</span>
+        <select id="match-partner-select">${partnerOptions}</select>
+      </label>
+      <button class="btn btn--primary" id="btn-preview-match">この相性を見る</button>
+    `;
+
+    document.getElementById("btn-preview-match").addEventListener("click", () => {
+      const partnerId = document.getElementById("match-partner-select").value;
+      renderKakuMatchStandalone(partnerId);
+    });
+  }
+
+  function renderKakuMatchStandalone(partnerId) {
+    const target = document.getElementById("kaku-match-standalone-preview");
+    if (!target || !session.typeId) return;
+    const type = KAKU_TYPES[session.typeId];
+    const typeB = KAKU_TYPES[partnerId] || KAKU_TYPES[Object.keys(KAKU_TYPES)[0]];
+    const insight = generateMatchInsight(session.core6.scores, typeB);
+
+    const categoryRows = insight.categories
+      .map((c) => {
+        const reasonLabel = CORE6_LABELS[c.reasonAxis];
+        const reasonText =
+          c.score >= 70
+            ? `2人とも${reasonLabel}が近く、この相性の良さの核になっています。`
+            : `${reasonLabel}の噛み合い方が、このスコアに一番効いています。`;
+        return `
+          <div class="match-category">
+            <div class="match-category__head">
+              <span class="match-category__label">${c.label}</span>
+              <span class="match-category__score">${c.score}<span class="match-category__score-unit">%</span></span>
+            </div>
+            <div class="match-category__bar"><div class="match-category__bar-fill match-category__bar-fill--${c.key}" style="width:${c.score}%"></div></div>
+            <p class="match-category__comment">${c.commentary}</p>
+            <p class="match-category__reason">なぜこの数字？｜${reasonText}</p>
+            ${c.advice ? `<p class="match-category__advice">気をつけたいポイント｜${c.advice}</p>` : ""}
+          </div>`;
+      })
+      .join("");
+
+    target.innerHTML = `
+      <div class="book-preview match-standalone-preview">
+        <div class="result-block match-result">
+          <h3>${type.nameJp} × ${typeB.nameJp} の相性</h3>
+          <p class="form-note">恋愛・結婚・仕事の3つのカテゴリで、それぞれ相性の傾向を詳しく見ていきます。</p>
+          ${categoryRows}
+        </div>
+      </div>
+    `;
   }
 
   // ---------------------------------------------------------------------

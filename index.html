@@ -132,14 +132,14 @@
     <div class="container container--narrow" id="result-container"></div>
   </section>
 
-  <!-- ===================== PERSONAL BOOK（KAKU MATCH統合） ===================== -->
+  <!-- ===================== PERSONAL BOOK ===================== -->
   <section class="view" id="view-personal-book" hidden>
     <div class="container container--narrow">
       <p class="eyebrow">PERSONAL BOOK</p>
       <h2 class="section-title">あなただけの「核」を、1冊にまとめる。</h2>
       <p class="body-text">
         無料診断でわかったKAKU TYPEをベースに、WEAPON（強み）・BLIND SPOT（盲点）・CORE6全軸の詳細解説・
-        アクションプランに加えて、気になる相手との相性まで。あなた専用の診断結果を1冊のブックとして読めるようになる予定のコンテンツです。
+        アクションプランまで。あなた専用の診断結果を1冊のブックとして読めるようになる予定のコンテンツです。
       </p>
       <div class="price-tag">¥980（買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
@@ -155,6 +155,24 @@
         <button class="btn" id="btn-preview-personal-book" disabled>この内容でプレビューを見る</button>
       </div>
       <div id="personal-book-preview"></div>
+    </div>
+  </section>
+
+  <!-- ===================== KAKU MATCH（独立サービス） ===================== -->
+  <section class="view" id="view-kaku-match" hidden>
+    <div class="container container--narrow">
+      <p class="eyebrow">KAKU MATCH</p>
+      <h2 class="section-title">気になるあの人との「核」の相性を見る。</h2>
+      <p class="body-text">
+        恋愛・結婚・仕事、それぞれの相性を診断します。あなたのKAKUをベースに気になる相手のタイプを選ぶと、
+        カテゴリごとの相性スコアに加えて「なぜこの数字なのか」「気をつけたいポイント」まで詳しく確認できます。
+      </p>
+      <div class="price-tag">¥480（1組ごとの買い切り）</div>
+      <button class="btn btn--primary" disabled>Coming soon</button>
+      <p class="form-note">※ 実際の購入・お相手の診断機能は今後実装予定です。下でお相手のタイプを選ぶと、購入前の内容サンプルを確認できます。</p>
+
+      <div class="context-intro" id="kaku-match-intro"></div>
+      <div id="kaku-match-standalone-preview"></div>
     </div>
   </section>
 
@@ -187,8 +205,14 @@
         <div class="pricing-card">
           <h3>PERSONAL BOOK</h3>
           <p class="pricing-card__price">¥980</p>
-          <p>あなた専用の詳細な診断結果に加え、気になる相手との相性まで、1冊のブックとして。</p>
+          <p>あなた専用の詳細な診断結果を、1冊のブックとして。CORE6全軸の解説とアクションプラン付き。</p>
           <button class="btn" data-nav="personal-book">詳しく見る</button>
+        </div>
+        <div class="pricing-card">
+          <h3>KAKU MATCH</h3>
+          <p class="pricing-card__price">¥480</p>
+          <p>気になる相手との相性を、恋愛・結婚・仕事のカテゴリごとに詳しく診断します。</p>
+          <button class="btn" data-nav="kaku-match">詳しく見る</button>
         </div>
         <div class="pricing-card">
           <h3>KAKU TEAM</h3>

@@ -11,13 +11,15 @@
  * メッセージを動的に生成するテンプレートロジック。将来的にはより多面的な比較ロジックに拡張可能。
  */
 
+// 表記は「日本語（英語）」の順（英語部分は本文中では薄いグレーで表示するため、
+// 呼び出し側のCSS（.axis-en）が効くよう<span>で囲んでいる）。
 const CORE6_LABELS = {
-  vision: "VISION（構想力）",
-  logic: "LOGIC（解析力）",
-  drive: "DRIVE（突破力）",
-  influence: "INFLUENCE（影響力）",
-  bond: "BOND（共鳴力）",
-  stability: "STABILITY（安定力）",
+  vision: '構想力<span class="axis-en">（VISION）</span>',
+  logic: '解析力<span class="axis-en">（LOGIC）</span>',
+  drive: '突破力<span class="axis-en">（DRIVE）</span>',
+  influence: '影響力<span class="axis-en">（INFLUENCE）</span>',
+  bond: '共鳴力<span class="axis-en">（BOND）</span>',
+  stability: '安定力<span class="axis-en">（STABILITY）</span>',
 };
 
 const GOOD_STATES = ["FLOW", "STABLE"];
@@ -39,7 +41,7 @@ function computeGap(questionTopAxis, birthAxis, stateKey) {
   if (matched) {
     const headline = "GAPは小さめ｜資質と行動が一致しています";
     let message =
-      `生まれ持った資質（${birthLabel}）と、今いちばんよく使っている力（${questionLabel}）が一致しています。` +
+      `生まれ持った資質は${birthLabel}、今いちばんよく使っている力も${questionLabel}で、両者が一致しています。` +
       `素の自分をそのまま発揮できている状態と言えます。`;
     if (isGoodState) {
       message += " 今の環境は、その資質を活かしやすい環境になっているようです。";
@@ -52,7 +54,7 @@ function computeGap(questionTopAxis, birthAxis, stateKey) {
 
   const headline = "GAPが見られます｜資質と行動にズレがあります";
   let message =
-    `生まれ持った資質（${birthLabel}）と、今いちばんよく使っている力（${questionLabel}）にズレがあります。` +
+    `生まれ持った資質は${birthLabel}ですが、今いちばんよく使っている力は${questionLabel}で、両者にズレがあります。` +
     `これは能力が足りないという意味ではなく、今の環境が本来の資質を発揮しにくい状況になっている可能性を示しています。`;
   if (isGoodState) {
     message +=
