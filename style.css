@@ -1592,6 +1592,13 @@ img { max-width: 100%; display: block; }
   .match-category { page-break-inside: avoid; }
 }
 
+/* ---------- PERSONAL BOOK: PDFダウンロード用のキャプチャモード ----------
+   「PDFとして保存する」クリック時、html2canvasで#personal-book-previewを撮影する直前に
+   .pdf-export-modeを付与し、@media printと同じ考え方で「章タブを全部展開」「no-printを隠す」
+   状態にしてから撮影する（撮影後にこのクラスは外し、画面表示は元の状態に戻す）。 */
+.pdf-export-mode .no-print { display: none !important; }
+.pdf-export-mode .book-tabpanel[hidden] { display: block !important; }
+
 /* ---------- Footer ---------- */
 .site-footer {
   text-align: center;

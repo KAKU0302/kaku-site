@@ -697,6 +697,82 @@
     }
   }
 
+  // PERSONAL BOOKの「PDFとして保存する」をワンクリックのPDFダウンロードにする処理。
+  // html2canvas + jsPDF（index.htmlでCDNから読み込み）が使える場合は、
+  //   1) 章タブを全部展開してno-printを隠す（.pdf-export-mode）
+  //   2) #personal-book-preview を撮影
+  //   3) A4サイズにスライスしてjsPDFに流し込み、ダウンロード
+  //   4) 画面の表示状態（開いていたタブ・非表示要素）を元に戻す
+  // という流れでPDFファイルを直接生成する。ライブラリが読み込めていない場合（オフライン等）は、
+  // ブラウザの印刷機能（window.print、送信先で「PDFに保存」を選べる）にフォールバックする。
+  async function exportBookAsPdf(previewEl, fileName, statusEl, btn) {
+    if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
+      statusEl.textContent = "PDF生成の準備ができていないため、印刷画面を開きます（送信先で「PDFに保存」を選んでください）。";
+      window.print();
+      return;
+    }
+
+    const tabButtons = previewEl.querySelectorAll(".book-tab");
+    const tabPanels = previewEl.querySelectorAll(".book-tabpanel");
+    const previouslyActiveTab = previewEl.querySelector(".book-tab.is-active");
+    const previousHiddenState = Array.from(tabPanels).map((p) => p.hidden);
+
+    btn.disabled = true;
+    statusEl.textContent = "PDFを作成しています…（章の数によっては少し時間がかかります）";
+    previewEl.classList.add("pdf-export-mode");
+
+    try {
+      // 少し待って、レイアウトの再計算（全章展開）を確実にブラウザに反映させてから撮影する
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const canvas = await window.html2canvas(previewEl, {
+        scale: Math.min(2, window.devicePixelRatio || 1.5),
+        useCORS: true,
+        backgroundColor: "#0A0D1C",
+      });
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidthMm = pdf.internal.pageSize.getWidth();
+      const pageHeightMm = pdf.internal.pageSize.getHeight();
+      const pxPerMm = canvas.width / pageWidthMm;
+      const pageHeightPx = Math.floor(pageHeightMm * pxPerMm);
+
+      let renderedPx = 0;
+      let isFirstPage = true;
+      const pageCanvas = document.createElement("canvas");
+      pageCanvas.width = canvas.width;
+      const pageCtx = pageCanvas.getContext("2d");
+
+      while (renderedPx < canvas.height) {
+        const sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedPx);
+        pageCanvas.height = sliceHeightPx;
+        pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+        pageCtx.drawImage(
+          canvas,
+          0, renderedPx, canvas.width, sliceHeightPx,
+          0, 0, canvas.width, sliceHeightPx
+        );
+        const imgData = pageCanvas.toDataURL("image/jpeg", 0.92);
+        if (!isFirstPage) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, 0, pageWidthMm, sliceHeightPx / pxPerMm);
+        renderedPx += sliceHeightPx;
+        isFirstPage = false;
+      }
+
+      pdf.save(fileName);
+      statusEl.textContent = "PDFを保存しました。";
+    } catch (err) {
+      statusEl.textContent = "PDFの作成に失敗したため、印刷画面を開きます（送信先で「PDFに保存」を選んでください）。";
+      window.print();
+    } finally {
+      previewEl.classList.remove("pdf-export-mode");
+      tabPanels.forEach((p, i) => (p.hidden = previousHiddenState[i]));
+      tabButtons.forEach((b) => b.classList.toggle("is-active", b === previouslyActiveTab));
+      btn.disabled = false;
+    }
+  }
+
   // PERSONAL BOOKの「表紙」だけを見せるシェア画像（中身の解説文は含めない・プライバシー配慮）
   function buildBookCoverShareCanvas(type, session) {
     return new Promise((resolve, reject) => {
@@ -1406,7 +1482,10 @@
       `;
 
       document.getElementById("btn-book-pdf").addEventListener("click", () => {
-        window.print();
+        const btn = document.getElementById("btn-book-pdf");
+        const statusEl = document.getElementById("book-share-status");
+        const previewEl = target.querySelector(".book-preview");
+        exportBookAsPdf(previewEl, `KAKU_PERSONAL_BOOK_${type.nameEn}.pdf`, statusEl, btn);
       });
 
       document.getElementById("btn-book-share-x").addEventListener("click", () => {
