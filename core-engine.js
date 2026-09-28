@@ -115,94 +115,106 @@ const QUESTIONS = [
   {
     id: "q16",
     prompt: "休日に何かを学ぶとしたら？",
-    optionA: { axis: "vision", text: "まだ誰も答えを出していないテーマに惹かれる" },
-    optionB: { axis: "logic", text: "体系立てて学べる分野を選びたい" },
+    optionA: { axis: "logic", text: "体系立てて学べる分野を選びたい" },
+    optionB: { axis: "vision", text: "まだ誰も答えを出していないテーマに惹かれる" },
   },
   {
     id: "q17",
     prompt: "5年後の理想を聞かれたら？",
-    optionA: { axis: "vision", text: "具体的な理想像をイメージするのが好き" },
-    optionB: { axis: "drive", text: "考えるよりまず動いて、道を切り拓いていたい" },
+    optionA: { axis: "drive", text: "考えるよりまず動いて、道を切り拓いていたい" },
+    optionB: { axis: "vision", text: "具体的な理想像をイメージするのが好き" },
   },
   {
     id: "q18",
     prompt: "自分のアイデアが認められたとき、うれしいのは？",
-    optionA: { axis: "vision", text: "頭の中にあった構想が形になったこと" },
-    optionB: { axis: "influence", text: "そのアイデアに人が共感し、動いてくれたこと" },
+    optionA: { axis: "influence", text: "そのアイデアに人が共感し、動いてくれたこと" },
+    optionB: { axis: "vision", text: "頭の中にあった構想が形になったこと" },
   },
   {
     id: "q19",
     prompt: "休みの日、心が満たされるのは？",
-    optionA: { axis: "vision", text: "新しい可能性についてじっくり考える時間" },
-    optionB: { axis: "bond", text: "大切な人と過ごす時間" },
+    optionA: { axis: "bond", text: "大切な人と過ごす時間" },
+    optionB: { axis: "vision", text: "新しい可能性についてじっくり考える時間" },
   },
   {
     id: "q20",
     prompt: "5年後の自分を考えるとき？",
-    optionA: { axis: "vision", text: "今とは全く違う可能性にワクワクする" },
-    optionB: { axis: "stability", text: "今の積み重ねの延長線上にいたい" },
+    optionA: { axis: "stability", text: "今の積み重ねの延長線上にいたい" },
+    optionB: { axis: "vision", text: "今とは全く違う可能性にワクワクする" },
   },
   {
     id: "q21",
     prompt: "何か新しいことを始めるとき、あなたは？",
-    optionA: { axis: "logic", text: "まず情報を集めて理解してから動きたい" },
-    optionB: { axis: "drive", text: "考えるより先にやってみたい" },
+    optionA: { axis: "drive", text: "考えるより先にやってみたい" },
+    optionB: { axis: "logic", text: "まず情報を集めて理解してから動きたい" },
   },
   {
     id: "q22",
     prompt: "自分の考えを人に伝えるとき、あなたは？",
-    optionA: { axis: "logic", text: "根拠やデータを示して納得してもらいたい" },
-    optionB: { axis: "influence", text: "情熱や言葉の力で心を動かしたい" },
+    optionA: { axis: "influence", text: "情熱や言葉の力で心を動かしたい" },
+    optionB: { axis: "logic", text: "根拠やデータを示して納得してもらいたい" },
   },
   {
     id: "q23",
     prompt: "友人が悩んでいるとき、あなたは？",
-    optionA: { axis: "logic", text: "一緒に原因を整理して、解決策を考えたい" },
-    optionB: { axis: "bond", text: "まず話を聞いて、寄り添ってあげたい" },
+    optionA: { axis: "bond", text: "まず話を聞いて、寄り添ってあげたい" },
+    optionB: { axis: "logic", text: "一緒に原因を整理して、解決策を考えたい" },
   },
   {
     id: "q24",
     prompt: "仕事を任されたとき、あなたは？",
-    optionA: { axis: "logic", text: "もっと良いやり方がないか工夫したい" },
-    optionB: { axis: "stability", text: "決められた手順を確実にこなしたい" },
+    optionA: { axis: "stability", text: "決められた手順を確実にこなしたい" },
+    optionB: { axis: "logic", text: "もっと良いやり方がないか工夫したい" },
   },
   {
     id: "q25",
     prompt: "チームで成果を出したいとき、あなたは？",
-    optionA: { axis: "drive", text: "誰よりも早く行動して結果を出したい" },
-    optionB: { axis: "influence", text: "みんなを鼓舞して巻き込みたい" },
+    optionA: { axis: "influence", text: "みんなを鼓舞して巻き込みたい" },
+    optionB: { axis: "drive", text: "誰よりも早く行動して結果を出したい" },
   },
   {
     id: "q26",
     prompt: "困難な状況に直面したとき、あなたは？",
-    optionA: { axis: "drive", text: "とにかく突破口を見つけて前に進みたい" },
-    optionB: { axis: "bond", text: "仲間と支え合いながら乗り越えたい" },
+    optionA: { axis: "bond", text: "仲間と支え合いながら乗り越えたい" },
+    optionB: { axis: "drive", text: "とにかく突破口を見つけて前に進みたい" },
   },
   {
     id: "q27",
     prompt: "スケジュールを立てるとき、あなたは？",
-    optionA: { axis: "drive", text: "多少無理してでも一気に終わらせたい" },
-    optionB: { axis: "stability", text: "無理のないペースで着実に進めたい" },
+    optionA: { axis: "stability", text: "無理のないペースで着実に進めたい" },
+    optionB: { axis: "drive", text: "多少無理してでも一気に終わらせたい" },
   },
   {
     id: "q28",
     prompt: "人から相談を受けたとき、あなたは？",
-    optionA: { axis: "influence", text: "自分の考えをはっきり伝えてあげたい" },
-    optionB: { axis: "bond", text: "相手の気持ちにそっと寄り添いたい" },
+    optionA: { axis: "bond", text: "相手の気持ちにそっと寄り添いたい" },
+    optionB: { axis: "influence", text: "自分の考えをはっきり伝えてあげたい" },
   },
   {
     id: "q29",
     prompt: "自分が誇りに思うのは？",
-    optionA: { axis: "influence", text: "周りを巻き込み、場を動かせること" },
-    optionB: { axis: "stability", text: "どんな時も変わらず信頼されること" },
+    optionA: { axis: "stability", text: "どんな時も変わらず信頼されること" },
+    optionB: { axis: "influence", text: "周りを巻き込み、場を動かせること" },
   },
   {
     id: "q30",
     prompt: "居心地の良さを感じるのは？",
-    optionA: { axis: "bond", text: "気持ちが通じ合う相手といるとき" },
-    optionB: { axis: "stability", text: "予定通り、安定した日常を送れているとき" },
+    optionA: { axis: "stability", text: "予定通り、安定した日常を送れているとき" },
+    optionB: { axis: "bond", text: "気持ちが通じ合う相手といるとき" },
   },
 ];
+
+// 文字列から決定的な32bit整数を作る簡易ハッシュ（FNV-1a）。
+// 同点タイブレークの最終手段として、「回答内容＋軸id」から一意な値を作るのに使う。
+// 乱数(Math.random)ではないので、同じ回答なら何度計算しても必ず同じ値になる。
+function hashString(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
 
 /**
  * answers: { q1: "A"|"B", q2: "A"|"B", ... } 形式
@@ -217,10 +229,26 @@ function computeCore6(answers) {
   const raw = {};
   CORE6_AXES.forEach((a) => (raw[a.id] = 0));
 
+  // 軸ペアごとの直接対決の勝敗数（同点タイブレークに使用）。
+  // 30問は6軸の全ペア(6C2=15通り)を2問ずつ比較する構成になっているため、
+  // 総合点が同点でも「その2軸を直接比べた質問でどちらを多く選んだか」で優劣を決められる。
+  const headToHead = {};
+  CORE6_AXES.forEach((a) => {
+    headToHead[a.id] = {};
+    CORE6_AXES.forEach((b) => {
+      headToHead[a.id][b.id] = 0;
+    });
+  });
+
   QUESTIONS.forEach((q) => {
     const choice = answers[q.id];
-    if (choice === "A") raw[q.optionA.axis] += 1;
-    else if (choice === "B") raw[q.optionB.axis] += 1;
+    if (choice === "A") {
+      raw[q.optionA.axis] += 1;
+      headToHead[q.optionA.axis][q.optionB.axis] += 1;
+    } else if (choice === "B") {
+      raw[q.optionB.axis] += 1;
+      headToHead[q.optionB.axis][q.optionA.axis] += 1;
+    }
   });
 
   const scores = {};
@@ -228,9 +256,19 @@ function computeCore6(answers) {
     scores[axis] = raw[axis] * 10; // 0-10点 → 0-100
   });
 
+  // 直接対決（2問）の勝敗も1-1で決着がつかないケースが多いため、それでも同点が残る場合は
+  // 最後に「回答内容＋軸id」から作った決定的な値（乱数ではない）で優劣をつける。
+  // これにより、CORE6_AXESの配列順（vision→logic→…）に固定で偏る（同点なら毎回visionが
+  // 主軸になり、「ARCHITECTばかり出る」といった結果につながる）ことを防いでいる。
+  const answerKey = QUESTIONS.map((q) => answers[q.id] || "-").join("");
   const ranking = Object.keys(scores)
     .map((axis) => ({ axis, score: scores[axis] }))
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      const h2h = headToHead[b.axis][a.axis] - headToHead[a.axis][b.axis];
+      if (h2h !== 0) return h2h;
+      return hashString(b.axis + "|" + answerKey) - hashString(a.axis + "|" + answerKey);
+    });
 
   return {
     scores,
