@@ -12,6 +12,16 @@
   --color-border: #E4E4E0;
   --color-accent: #2C2F6B;      /* 深いインディゴ: ブランドのメインカラー */
   --color-accent-soft: #EFEFF7;
+  --color-glow: #5EC8F2;        /* シアン系アクセント: 近未来感を出したい箇所（誘導バナー等）で使用 */
+  --font-mono: "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
+  --font-serif: "Hiragino Mincho ProN", "Noto Serif JP", "Yu Mincho", serif; /* PERSONAL BOOKの「本らしさ」演出に使用 */
+  --book-bg-a: #0A0D1C;
+  --book-bg-b: #10142C;
+  --book-panel: #12172E;
+  --book-text: #ECEEF7;
+  --book-text-soft: rgba(236, 238, 247, 0.68);
+  --book-border: rgba(94, 200, 242, 0.22);
+  --book-gold: #D9B36C;
   --radius: 12px;
   --radius-sm: 8px;
   --max-width: 880px;
@@ -317,7 +327,18 @@ img { max-width: 100%; display: block; }
 }
 .kaku-card__image {
   width: 100%;
+  display: block;
   background: var(--color-accent-soft);
+}
+.kaku-card__poster-tag {
+  margin: 0;
+  padding: 16px 20px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-align: center;
 }
 .kaku-card__body { padding: 24px; }
 .kaku-card__type-en {
@@ -418,6 +439,104 @@ img { max-width: 100%; display: block; }
   margin-top: 24px;
 }
 
+/* ---------- PERSONAL BOOK 誘導バナー（近未来HUD風） ---------- */
+.upsell-banner {
+  position: relative;
+  margin: 32px 0 8px;
+  padding: 40px 28px 36px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0px, rgba(255, 255, 255, 0.045) 1px, transparent 1px, transparent 28px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0px, rgba(255, 255, 255, 0.045) 1px, transparent 1px, transparent 28px),
+    linear-gradient(135deg, #0B0E1E 0%, #171C3C 55%, #202B5C 100%);
+  color: #fff;
+  text-align: center;
+  border: 1px solid rgba(94, 200, 242, 0.35);
+  box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.08) inset, 0 10px 32px rgba(6, 8, 20, 0.45);
+  animation: upsellGlow 3.6s ease-in-out infinite;
+}
+.upsell-banner::before,
+.upsell-banner::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-glow);
+  opacity: 0.75;
+  pointer-events: none;
+}
+.upsell-banner::before {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+}
+.upsell-banner::after {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+  border-bottom-right-radius: 4px;
+}
+.upsell-banner__formula {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 22px;
+}
+.upsell-banner__chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-glow);
+  background: rgba(94, 200, 242, 0.1);
+  border: 1px solid rgba(94, 200, 242, 0.5);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+.upsell-banner__times {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  font-weight: 700;
+}
+.upsell-banner__title {
+  position: relative;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.6;
+  margin: 0 0 18px;
+  text-shadow: 0 0 20px rgba(94, 200, 242, 0.4);
+}
+.upsell-banner__text {
+  position: relative;
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: left;
+  margin: 0 0 28px;
+}
+.btn--cta {
+  position: relative;
+  background: #fff;
+  border-color: #fff;
+  color: #14183A;
+  padding: 16px 40px;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.45), 0 6px 22px rgba(94, 200, 242, 0.4);
+}
+.btn--cta:hover { transform: translateY(-2px) scale(1.02); }
+@keyframes upsellGlow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.08) inset, 0 10px 32px rgba(6, 8, 20, 0.45); }
+  50% { box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.22) inset, 0 10px 42px rgba(94, 200, 242, 0.3); }
+}
+
 /* ---------- Pricing ---------- */
 .pricing-grid {
   display: grid;
@@ -472,6 +591,16 @@ img { max-width: 100%; display: block; }
   display: block;
   background: var(--color-accent-soft);
 }
+.type-card__poster-tag {
+  margin: 0;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
 .type-card__body { padding: 16px; }
 .type-card__type-en {
   font-size: 11px;
@@ -523,43 +652,183 @@ img { max-width: 100%; display: block; }
 }
 .type-card--open .type-card__image { filter: brightness(1.02); }
 
-/* ---------- PERSONAL BOOK preview ---------- */
+/* ---------- PERSONAL BOOK: CONTEXT（深掘り）質問フォーム ---------- */
+.context-intro {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  padding: 24px;
+  margin: 20px 0 24px;
+  text-align: left;
+}
+.context-intro__title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin: 0 0 8px;
+}
+.context-item { margin: 20px 0; }
+.context-item__prompt {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.context-item__options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.context-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  font-size: 13.5px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--color-text);
+}
+.context-option:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+.context-option.is-selected {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* ---------- PERSONAL BOOK preview（表紙から先も「データ感・近未来感・本感」を統一） ---------- */
 .book-preview {
   text-align: left;
   margin-top: 8px;
+  padding: 22px 16px 34px;
+  border-radius: var(--radius);
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 26px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 26px),
+    linear-gradient(180deg, var(--book-bg-a) 0%, var(--book-bg-b) 100%);
+  box-shadow: inset 0 0 0 1px rgba(94, 200, 242, 0.1);
 }
+.book-preview > .form-note:first-child {
+  color: var(--book-text-soft);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--book-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 0 0 20px;
+}
+
+/* ---------- PERSONAL BOOK: 本のような見た目 ---------- */
 .book-cover {
-  background: var(--color-accent);
+  position: relative;
   color: #fff;
   border-radius: var(--radius);
-  padding: 32px 24px;
+  padding: 40px 28px 34px 40px;
   text-align: center;
   margin-bottom: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(10, 10, 16, 0.3);
+}
+.book-cover::before {
+  /* 背表紙（スパイン） */
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset -3px 0 6px rgba(0, 0, 0, 0.3);
+}
+.book-cover::after {
+  /* 表紙の縁取り（箔押し風） */
+  content: "";
+  position: absolute;
+  inset: 10px 10px 10px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: calc(var(--radius) - 4px);
+  pointer-events: none;
 }
 .book-cover__label {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  opacity: 0.75;
-  margin-bottom: 16px;
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  opacity: 0.8;
+  margin-bottom: 18px;
 }
 .book-cover__image {
-  width: 160px;
+  position: relative;
+  width: 148px;
   border-radius: var(--radius-sm);
-  margin: 0 auto 16px;
+  margin: 0 auto 18px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
 }
 .book-cover__title {
-  font-size: 20px;
-  font-weight: 800;
+  position: relative;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.book-cover__rule {
+  position: relative;
+  width: 36px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.55);
+  margin: 16px auto 0;
+}
+.book-preview .result-block {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%), var(--book-panel);
+  border: 1px solid var(--book-border);
+  box-shadow: 0 12px 28px rgba(3, 5, 14, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+.book-preview .result-block h3 {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(217, 179, 108, 0.3);
+  color: var(--book-text);
+}
+.book-preview .result-block p {
+  color: var(--book-text-soft);
+  margin: 0 0 14px;
+}
+.book-preview .result-block p:last-child { margin-bottom: 0; }
+.book-preview .result-block strong { color: var(--book-text); }
+.book-preview .result-block p.result-block__mini-title {
+  color: var(--color-glow);
+  letter-spacing: 0.04em;
+}
+.book-preview .form-note {
+  color: var(--book-text-soft);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
 }
 .book-chapter {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--color-accent);
-  font-weight: 800;
-  margin: 0 0 4px;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  color: var(--book-gold);
+  font-weight: 700;
+  margin: 0 0 6px;
+  text-shadow: 0 0 16px rgba(217, 179, 108, 0.35);
+}
+.book-share-row {
+  margin-bottom: 8px;
 }
 .book-axis-row {
   margin: 20px 0;
+}
+.book-axis-row--compact {
+  margin: 14px 0;
 }
 .book-axis-row__label {
   display: flex;
@@ -567,11 +836,44 @@ img { max-width: 100%; display: block; }
   font-size: 13px;
   font-weight: 700;
   margin-bottom: 6px;
+  color: var(--book-text);
 }
 .book-axis-row__comment {
   font-size: 13px;
-  color: var(--color-text-soft);
+  color: var(--book-text-soft);
   margin: 8px 0 0;
+}
+.axis-badge-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.axis-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.axis-badge--birth {
+  background: rgba(94, 200, 242, 0.14);
+  color: var(--color-glow);
+  border: 1px solid rgba(94, 200, 242, 0.5);
+}
+.axis-badge--question {
+  background: rgba(217, 179, 108, 0.14);
+  color: var(--book-gold);
+  border: 1px solid rgba(217, 179, 108, 0.5);
+}
+
+/* ---------- PERSONAL BOOK: CORE6バー（本ページ内はダーク基調） ---------- */
+.book-preview .core6-grid__bar {
+  background: rgba(255, 255, 255, 0.1);
+}
+.book-preview .core6-grid__bar-fill {
+  background: var(--color-glow);
 }
 
 /* ---------- KAKU MATCH（PERSONAL BOOK 第4章）相性グラフ ---------- */
@@ -579,7 +881,7 @@ img { max-width: 100%; display: block; }
 .match-category {
   margin: 24px 0;
   padding-top: 20px;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .match-category:first-of-type {
   margin-top: 16px;
@@ -595,11 +897,12 @@ img { max-width: 100%; display: block; }
 .match-category__label {
   font-size: 14px;
   font-weight: 800;
+  color: var(--book-text);
 }
 .match-category__score {
   font-size: 22px;
   font-weight: 800;
-  color: var(--color-accent);
+  color: var(--book-gold);
 }
 .match-category__score-unit {
   font-size: 12px;
@@ -608,23 +911,111 @@ img { max-width: 100%; display: block; }
 }
 .match-category__bar {
   height: 10px;
-  background: var(--color-border);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   overflow: hidden;
 }
 .match-category__bar-fill {
   height: 100%;
   border-radius: 5px;
-  background: var(--color-accent);
+  background: var(--color-glow);
   transition: width 0.6s ease;
 }
-.match-category__bar-fill--romance { background: #E0568C; }
-.match-category__bar-fill--marriage { background: #2C2F6B; }
-.match-category__bar-fill--work { background: #2F9E6B; }
+.match-category__bar-fill--romance { background: #F2789F; }
+.match-category__bar-fill--marriage { background: #8C93F5; }
+.match-category__bar-fill--work { background: #4FCE93; }
 .match-category__comment {
   font-size: 13px;
-  color: var(--color-text-soft);
+  color: var(--book-text-soft);
   margin: 10px 0 0;
+}
+.book-preview .result-block p.match-category__reason {
+  font-size: 12px;
+  color: var(--color-glow);
+  background: rgba(94, 200, 242, 0.1);
+  border: 1px solid rgba(94, 200, 242, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: 10px 0 0;
+}
+
+/* ---------- PERSONAL BOOK: KAKU MATCH のフォーム部品（画面上のみ・印刷時は非表示） ---------- */
+.book-preview .form-field {
+  color: var(--book-text-soft);
+}
+
+/* ---------- PERSONAL BOOK: 冒頭の手紙／結びの一言 ---------- */
+.opening-letter {
+  background: rgba(94, 200, 242, 0.08);
+  border-left: 3px solid var(--color-glow);
+  border-radius: var(--radius-sm);
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--book-text-soft);
+}
+.opening-letter p { margin: 0 0 12px; }
+.opening-letter p:last-child { margin-bottom: 0; }
+.opening-letter__to {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--book-gold);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+.closing-note {
+  text-align: center;
+  padding: 28px 20px;
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: var(--book-text-soft);
+}
+.closing-note__sign {
+  margin-top: 12px;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--book-gold);
+  font-size: 13px;
+}
+.book-share-row.btn--text,
+.book-share-row .btn--text {
+  color: rgba(236, 238, 247, 0.75);
+}
+
+/* ---------- PDF保存（印刷）用スタイル ---------- */
+@media print {
+  /* ダーク基調のブックデザインを、そのままPDFにも反映させる
+     （背景色を印刷対象にするための指定。指定がないとブラウザによって背景が白抜きになる） */
+  html, body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body * { visibility: hidden; }
+  #personal-book-preview,
+  #personal-book-preview * {
+    visibility: visible;
+  }
+  #personal-book-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+  }
+  .no-print { display: none !important; }
+  .book-preview .result-block {
+    box-shadow: none;
+    border: 1px solid rgba(94, 200, 242, 0.35);
+    page-break-inside: avoid;
+  }
+  .opening-letter,
+  .closing-note,
+  .book-cover {
+    page-break-inside: avoid;
+  }
+  .match-category { page-break-inside: avoid; }
 }
 
 /* ---------- Footer ---------- */

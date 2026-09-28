@@ -31,6 +31,29 @@
     state: null,
     typeId: null,
     gap: null,
+    context: null,   // PERSONAL BOOK限定の追加入力 { role, value, relationship }
+  };
+
+  // ---------------------------------------------------------------------
+  // PERSONAL BOOK: 承認・肯定を軸にしたコピー生成用データ
+  // ---------------------------------------------------------------------
+  // 各軸を「隠れた才能」として言い換えるための短い言葉（副軸の解禁演出などで使用）
+  const AXIS_GIFT_PHRASES = {
+    vision: "まだ見えていない可能性を思い描く力",
+    logic: "物事を筋道立てて理解する力",
+    drive: "迷わず動き出す力",
+    influence: "人を巻き込み、動かす力",
+    bond: "人の気持ちに寄り添う力",
+    stability: "着実に積み上げ、支える力",
+  };
+
+  // STATEごとに「まず気持ちを受け止める」ための書き出し文
+  const STATE_OPENING_LINES = {
+    FLOW: "今のあなたは、これ以上ないくらい波に乗れている状態です。ここまで積み上げてきたものが、きちんと形になり始めています。",
+    STABLE: "浮き沈みに振り回されず、自分のペースを保てている。それができている人は、実はそう多くありません。",
+    SEARCHING: "まだ答えが見えていないとしても、それは立ち止まっているのではなく、探し続けているということです。今のあなたに必要なのは焦りではなく、時間です。",
+    STAGNATION: "今、思うように前へ進めていないと感じているとしたら、それはあなたの力が足りないからではありません。今の環境が、あなたの資質を発揮しにくい形になっているだけです。",
+    OVERLOAD: "ここまで頑張ってこられたのは、決して当たり前のことではありません。踏ん張り続けてきたこと自体が、すでにあなたの強さの証明です。",
   };
 
   // ---------------------------------------------------------------------
@@ -47,6 +70,7 @@
       if (el) el.hidden = v !== id;
     });
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+    if (id === "personal-book") initPersonalBookView();
   }
 
   document.addEventListener("click", (e) => {
@@ -103,11 +127,11 @@
         (type) => `
         <div class="type-card" data-type-id="${type.id}">
           <button type="button" class="type-card__summary">
-            <img src="${type.image}" alt="${type.nameEn} ${type.nameJp}" class="type-card__image" />
+            <img src="${type.image}" alt="${type.nameEn} ${type.nameJp}" class="type-card__image" loading="lazy" />
+            <p class="type-card__poster-tag" style="background:${type.color}">${type.catchcopy}</p>
             <div class="type-card__body">
               <p class="type-card__type-en">${type.nameEn}</p>
               <p class="type-card__type-jp">${type.nameJp}</p>
-              <p class="type-card__catchcopy">${type.catchcopy}</p>
               <p class="type-card__rarity">出現率 ${type.rarity}</p>
             </div>
             <span class="type-card__toggle" aria-hidden="true">＋</span>
@@ -277,12 +301,16 @@
   // ---------------------------------------------------------------------
   // CORE6 レーダーチャート（外部ライブラリなし・インラインSVG）
   // ---------------------------------------------------------------------
-  function buildRadarSVG(scores) {
+  function buildRadarSVG(scores, theme) {
     const size = 260;
     const center = size / 2;
     const maxR = 95;
     const axes = CORE6_AXES.map((a) => a.id);
     const n = axes.length;
+    const isDark = theme === "dark";
+    const palette = isDark
+      ? { grid: "rgba(255,255,255,0.16)", label: "rgba(233,236,245,0.72)", fill: "#5EC8F2", fillOpacity: "0.22", stroke: "#5EC8F2" }
+      : { grid: "#E4E4E0", label: "#5B5E68", fill: "#2C2F6B", fillOpacity: "0.18", stroke: "#2C2F6B" };
 
     function pointFor(index, value) {
       const angle = (Math.PI * 2 * index) / n - Math.PI / 2;
@@ -296,7 +324,7 @@
       const pts = axes
         .map((_, i) => pointFor(i, 100 * frac).join(","))
         .join(" ");
-      gridPolys += `<polygon points="${pts}" fill="none" stroke="#E4E4E0" stroke-width="1" />`;
+      gridPolys += `<polygon points="${pts}" fill="none" stroke="${palette.grid}" stroke-width="1" />`;
     });
 
     // 軸線 + ラベル
@@ -304,10 +332,10 @@
     let labels = "";
     axes.forEach((axisId, i) => {
       const [x, y] = pointFor(i, 100);
-      axisLines += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="#E4E4E0" stroke-width="1" />`;
+      axisLines += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="${palette.grid}" stroke-width="1" />`;
       const labelPoint = pointFor(i, 118);
       const axisMeta = CORE6_AXES[i];
-      labels += `<text x="${labelPoint[0]}" y="${labelPoint[1]}" font-size="10" fill="#5B5E68" text-anchor="middle" dominant-baseline="middle">${axisMeta.nameJp}</text>`;
+      labels += `<text x="${labelPoint[0]}" y="${labelPoint[1]}" font-size="10" fill="${palette.label}" text-anchor="middle" dominant-baseline="middle">${axisMeta.nameJp}</text>`;
     });
 
     // データポリゴン
@@ -319,7 +347,7 @@
       <svg viewBox="0 0 ${size} ${size}" width="260" height="260" role="img" aria-label="CORE6レーダーチャート">
         ${gridPolys}
         ${axisLines}
-        <polygon points="${dataPts}" fill="#2C2F6B" fill-opacity="0.18" stroke="#2C2F6B" stroke-width="2" />
+        <polygon points="${dataPts}" fill="${palette.fill}" fill-opacity="${palette.fillOpacity}" stroke="${palette.stroke}" stroke-width="2" />
         ${labels}
       </svg>
     `;
@@ -343,21 +371,22 @@
       <div class="kaku-card kaku-card--reveal" id="kaku-card-share">
         <div class="kaku-card__rarity">出現率 ${type.rarity}｜16タイプ中</div>
         <img class="kaku-card__image" src="${type.image}" alt="${type.nameEn} ${type.nameJp}" />
+        <p class="kaku-card__poster-tag" style="background:${type.color}">${type.catchcopy}</p>
         <div class="kaku-card__body">
           <p class="kaku-card__type-en">${type.nameEn}</p>
           <p class="kaku-card__type-jp">${type.nameJp}</p>
           <p class="kaku-card__praise">${type.praise}</p>
-          <p class="kaku-card__catchcopy">${type.catchcopy}</p>
         </div>
       </div>
 
       <h3 class="subsection-title">CORE 6｜あなたを構成する6つの力</h3>
+      <p class="form-note">6つの軸はそれぞれ0〜100点。数字が大きいほど、今の行動パターン（QUESTION）でその力を強く使っていることを表します。</p>
       <div class="radar-wrap">${buildRadarSVG(core6.scores)}</div>
       <div class="core6-grid">
         ${CORE6_AXES.map(
           (a) => `
           <div class="core6-grid__item">
-            <div class="core6-grid__label">${a.nameEn}｜${a.nameJp}（${core6.scores[a.id]}）</div>
+            <div class="core6-grid__label">${a.nameEn}｜${a.nameJp}（${core6.scores[a.id]}点）</div>
             <div class="core6-grid__bar"><div class="core6-grid__bar-fill" style="width:${core6.scores[a.id]}%"></div></div>
           </div>`
         ).join("")}
@@ -402,10 +431,28 @@
         <p>${gap.message}</p>
       </div>
 
+      <div class="upsell-banner">
+        <div class="upsell-banner__formula" aria-hidden="true">
+          <span class="upsell-banner__chip">QUESTION</span>
+          <span class="upsell-banner__times">×</span>
+          <span class="upsell-banner__chip">BIRTH</span>
+          <span class="upsell-banner__times">×</span>
+          <span class="upsell-banner__chip">STATE</span>
+        </div>
+        <h3 class="upsell-banner__title">あなただけのPERSONAL BOOKで<br />自己理解をより深める。</h3>
+        <p class="upsell-banner__text">
+          行動パターンだけを見る診断とは違い、KAKUは今の行動（QUESTION）から導いた「${type.nameJp}」に、
+          生まれ持った資質（BIRTH）と今の状態（STATE）を掛け合わせて分析します。だからこそ、
+          "本来のあなた"と"今使っている力"のズレ、そして今のあなたに合った次の一歩まで見えてくる。
+          PERSONAL BOOKでは、その3つを統合した分析に加えて、強みの活かし方・気づきにくい盲点、
+          そして恋愛・結婚・仕事における相性まで、あなた専用の1冊にまとめました。
+        </p>
+        <button class="btn btn--cta" data-nav="personal-book">より詳細を見たい方はこちら →</button>
+      </div>
+
       <div class="share-row">
         <button class="btn btn--primary" id="btn-save-image">シェア画像を保存する</button>
         <button class="btn" id="btn-share-x">Xでシェア</button>
-        <button class="btn" data-nav="personal-book">PERSONAL BOOKを見る</button>
         <button class="btn btn--text" data-action="start-diagnosis">もう一度診断する</button>
       </div>
       <p class="form-note" id="share-image-status" aria-live="polite"></p>
@@ -424,28 +471,13 @@
       statusEl.textContent = "画像を作成しています…";
       try {
         const canvas = await buildShareCardCanvas(type);
-        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-        const fileName = `kaku-${type.id}.png`;
-        const file = new File([blob], fileName, { type: "image/png" });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: "KAKU診断結果",
-            text: `私のKAKUは「${type.nameEn}（${type.nameJp}）」でした。 #KAKU核診断`,
-          });
-          statusEl.textContent = "";
-        } else {
-          const objectUrl = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = objectUrl;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(objectUrl);
-          statusEl.textContent = "画像を保存しました。SNSに投稿してシェアしてください。";
-        }
+        await shareOrDownloadCanvas(
+          canvas,
+          `kaku-${type.id}.png`,
+          "KAKU診断結果",
+          `私のKAKUは「${type.nameEn}（${type.nameJp}）」でした。 #KAKU核診断`,
+          statusEl
+        );
       } catch (err) {
         statusEl.textContent = "画像の作成に失敗しました。時間をおいて再度お試しください。";
       } finally {
@@ -472,6 +504,150 @@
     if (line) lines.push(line);
     lines.forEach((l, i) => ctx.fillText(l, centerX, startY + i * lineHeight));
     return lines.length * lineHeight;
+  }
+
+  // canvasを画像化して、Web Share APIが使える環境ではシェアシートを、
+  // 使えない環境ではダウンロードを実行する共通処理（結果ページ／PERSONAL BOOK共通）。
+  async function shareOrDownloadCanvas(canvas, fileName, shareTitle, shareText, statusEl) {
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+    const file = new File([blob], fileName, { type: "image/png" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: shareTitle, text: shareText });
+      if (statusEl) statusEl.textContent = "";
+    } else {
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+      if (statusEl) statusEl.textContent = "画像を保存しました。SNSに投稿してシェアしてください。";
+    }
+  }
+
+  // PERSONAL BOOKの「表紙」だけを見せるシェア画像（中身の解説文は含めない・プライバシー配慮）
+  function buildBookCoverShareCanvas(type, session) {
+    return new Promise((resolve, reject) => {
+      const W = 900;
+      const H = 1200;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, type.color);
+      grad.addColorStop(1, "#14161f");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 上部の「PERSONAL BOOK」ロゴ演出：グロー付きバッジ＋レタースペーシングで
+      // ワクワク感のある“特別な1冊”感を強調する（単なるプレーンテキストにしない）。
+      ctx.textAlign = "left";
+      const labelChars = "PERSONAL BOOK".split("");
+      const labelLetterSpacing = 7;
+      ctx.font = "800 38px sans-serif";
+      let labelWidth = 0;
+      labelChars.forEach((ch) => {
+        labelWidth += ctx.measureText(ch).width + labelLetterSpacing;
+      });
+      labelWidth -= labelLetterSpacing;
+
+      const badgeW = labelWidth + 80;
+      const badgeH = 78;
+      const badgeX = W / 2 - badgeW / 2;
+      const badgeY = 60;
+      ctx.save();
+      ctx.shadowColor = "rgba(94, 200, 242, 0.9)";
+      ctx.shadowBlur = 36;
+      ctx.fillStyle = "rgba(94, 200, 242, 0.14)";
+      ctx.strokeStyle = "rgba(94, 200, 242, 0.95)";
+      ctx.lineWidth = 2;
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 999);
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.font = "800 38px sans-serif";
+      ctx.fillStyle = "#FFFFFF";
+      ctx.shadowColor = "rgba(94, 200, 242, 0.95)";
+      ctx.shadowBlur = 18;
+      let labelX = W / 2 - labelWidth / 2;
+      const labelBaselineY = badgeY + badgeH / 2 + 13;
+      labelChars.forEach((ch) => {
+        ctx.fillText(ch, labelX, labelBaselineY);
+        labelX += ctx.measureText(ch).width + labelLetterSpacing;
+      });
+      ctx.restore();
+
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.font = "13px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("― あなただけの、たった1冊 ―", W / 2, badgeY + badgeH + 30);
+
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const boxW = 420;
+          const boxH = 610;
+          const boxX = (W - boxW) / 2;
+          const boxY = 210;
+          const scale = Math.min(boxW / img.width, boxH / img.height);
+          const drawW = img.width * scale;
+          const drawH = img.height * scale;
+          const drawX = boxX + (boxW - drawW) / 2;
+          const drawY = boxY + (boxH - drawH) / 2;
+
+          ctx.save();
+          ctx.shadowColor = "rgba(0,0,0,0.4)";
+          ctx.shadowBlur = 30;
+          ctx.fillStyle = "#000";
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(boxX, boxY, boxW, boxH, 16);
+            ctx.fill();
+          }
+          ctx.restore();
+
+          ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+          let y = boxY + boxH + 66;
+          ctx.textAlign = "center";
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 33px sans-serif";
+          const name = session && session.name ? session.name + "さんの" : "私の";
+          y += wrapCanvasText(ctx, `${name}PERSONAL BOOKが完成しました`, W / 2, y, W - 140, 42);
+          y += 14;
+
+          ctx.fillStyle = "rgba(255,255,255,0.72)";
+          ctx.font = "19px sans-serif";
+          ctx.fillText(`${type.nameJp}｜出現率 ${type.rarity}`, W / 2, y);
+
+          ctx.strokeStyle = "rgba(255,255,255,0.3)";
+          ctx.beginPath();
+          ctx.moveTo(80, H - 90);
+          ctx.lineTo(W - 80, H - 90);
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(255,255,255,0.7)";
+          ctx.font = "18px sans-serif";
+          ctx.fillText("行動 × 資質 × 状態 ＝ あなたの核　#KAKU核診断", W / 2, H - 55);
+
+          resolve(canvas);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = reject;
+      img.src = type.image;
+    });
   }
 
   function buildShareCardCanvas(type) {
@@ -574,67 +750,213 @@
   // ---------------------------------------------------------------------
   // PERSONAL BOOK プレビュー（購入前サンプル・仮実装）
   // ---------------------------------------------------------------------
-  const personalBookPreviewBtn = document.getElementById("btn-preview-personal-book");
-  if (personalBookPreviewBtn) {
-    personalBookPreviewBtn.addEventListener("click", () => {
+  function renderPersonalBookPreview() {
       const target = document.getElementById("personal-book-preview");
-      if (!session.typeId) {
-        target.innerHTML = `
-          <div class="result-block">
-            <p>プレビューを見るには、先に無料診断でKAKUタイプを診断してください。</p>
-            <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
-          </div>`;
-        return;
-      }
+      if (!session.typeId) return;
       const type = KAKU_TYPES[session.typeId];
       const scores = session.core6.scores;
+      const birth = session.birth;
+      const state = session.state;
+      const gap = session.gap;
+      const birthLabel = CORE6_LABELS[birth.axis];
+      const questionLabel = CORE6_LABELS[session.core6.topAxis];
+      const isGoodState = GOOD_STATES.includes(state.key);
 
-      const axisSection = CORE6_AXES.map((a) => {
-        const score = scores[a.id];
-        return `
+      // 第2章｜CORE6全軸解説の再設計：
+      // 上位2軸（主軸・副軸）はすでに第1章で物語として展開済みのため、ここでは数値の再確認に留め、
+      // 汎用的な三段階コメントを重複させない。残り4軸は個別に4段落を並べず、1つの文章に統合することで、
+      // 「スコアを日本語に変換しただけ」の退屈な羅列にならないようにしている。
+      const topAxisId = session.core6.topAxis;
+      const secondAxisId = session.core6.secondAxis;
+      const primaryAxisIds = [topAxisId, secondAxisId];
+
+      const primaryAxesHtml = CORE6_AXES.filter((a) => primaryAxisIds.includes(a.id))
+        .map((a) => {
+          const score = scores[a.id];
+          const badges = [];
+          if (a.id === birth.axis) {
+            badges.push('<span class="axis-badge axis-badge--birth">BIRTH｜生まれ持った資質</span>');
+          }
+          if (a.id === topAxisId) {
+            badges.push('<span class="axis-badge axis-badge--question">QUESTION｜今よく使っている力</span>');
+          }
+          return `
           <div class="book-axis-row">
             <div class="book-axis-row__label">
               <span>${a.nameEn}｜${a.nameJp}</span>
-              <span>${score}</span>
+              <span>${score}点</span>
             </div>
             <div class="core6-grid__bar"><div class="core6-grid__bar-fill" style="width:${score}%"></div></div>
-            <p class="book-axis-row__comment">${getAxisCommentary(a.id, score)}</p>
+            ${badges.length ? `<div class="axis-badge-row">${badges.join("")}</div>` : ""}
           </div>`;
-      }).join("");
+        })
+        .join("");
+
+      const otherAxes = CORE6_AXES.filter((a) => !primaryAxisIds.includes(a.id));
+      const otherAxesHtml = otherAxes
+        .map((a) => {
+          const score = scores[a.id];
+          return `
+          <div class="book-axis-row book-axis-row--compact">
+            <div class="book-axis-row__label">
+              <span>${a.nameEn}｜${a.nameJp}</span>
+              <span>${score}点</span>
+            </div>
+            <div class="core6-grid__bar"><div class="core6-grid__bar-fill" style="width:${score}%"></div></div>
+          </div>`;
+        })
+        .join("");
+
+      const sortedOtherAxes = otherAxes.slice().sort((x, y) => scores[y.id] - scores[x.id]);
+      const helperAxis = sortedOtherAxes[0];
+      const quietAxis = sortedOtherAxes[sortedOtherAxes.length - 1];
+      const primaryLabelForAxes = CORE6_LABELS[topAxisId];
+      const otherAxesInsight =
+        scores[helperAxis.id] === scores[quietAxis.id]
+          ? `残り4つの軸は、特にどれかが突出することなく、まんべんなく備わっています。これは、状況に応じてどの力も一定水準で使える、地に足のついたバランス感覚があるということです。だからこそ、${primaryLabelForAxes}という一番の力を、迷いなく前面に出せているのだと思います。`
+          : `残り4つの軸の中では、<strong>${helperAxis.nameJp}</strong>（${scores[helperAxis.id]}点）が一歩リードしていて、${AXIS_GIFT_PHRASES[helperAxis.id]}という形で、あなたの${primaryLabelForAxes}をそっと支えています。逆に<strong>${quietAxis.nameJp}</strong>（${scores[quietAxis.id]}点）は控えめですが、これは弱点ではなく、${primaryLabelForAxes}に力を集中させるために自然と手放している部分だと捉えると納得できるはずです。`;
+
+      // BIRTH（生まれ持った資質）× QUESTION（今の行動）× STATE（今の状態）の統合分析。
+      // GAPが一致しているか／今の状態が良好か、の2軸4パターンで行動プランを出し分ける。
+      let integratedActions;
+      if (gap.matched && isGoodState) {
+        integratedActions = [
+          `生まれ持った${birthLabel}を、今の行動でもそのまま使えている状態です。この一致は今のあなたの土台になっています。`,
+          `${birthLabel}をより意図的に使う場面を、今週の中で1つ選んで試してみましょう。`,
+          `${state.label}の状態を保つために、今のやり方や環境を大きく変えず、継続することを優先しましょう。`,
+        ];
+      } else if (gap.matched && !isGoodState) {
+        integratedActions = [
+          `資質（${birthLabel}）と行動は一致していますが、今の状態（${state.label}）はやや揺らいでいるようです。`,
+          `力の使い方そのものよりも、休息の取り方や環境の負荷を見直すタイミングかもしれません。`,
+          `${birthLabel}を無理に発揮し続けていないか、今週はペースを落として振り返ってみましょう。`,
+        ];
+      } else if (!gap.matched && isGoodState) {
+        integratedActions = [
+          `本来の${birthLabel}とは違う${questionLabel}を、今の環境ではうまく使えているようです。`,
+          `ただし本来の資質を使う機会が少ないままだと、いずれ物足りなさや違和感につながることもあります。`,
+          `${birthLabel}を活かせる小さな場面を、意識的に1つつくってみましょう。`,
+        ];
+      } else {
+        integratedActions = [
+          `本来の${birthLabel}から離れた${questionLabel}を、${state.label}の状態のまま使い続けている可能性があります。`,
+          `まずは今の環境や役割が、${birthLabel}を発揮しにくい構造になっていないか振り返ってみましょう。`,
+          `小さくても構わないので、${birthLabel}を使える機会を意識的につくることが、状態の回復にもつながりそうです。`,
+        ];
+      }
+      const integratedActionsHtml = integratedActions
+        .map((text, i) => `<p><strong>アクション${i + 1}：</strong>${text}</p>`)
+        .join("");
 
       const partnerOptions = Object.values(KAKU_TYPES)
         .map((t) => `<option value="${t.id}">${t.nameEn}｜${t.nameJp}</option>`)
         .join("");
 
+      // 第1章用: 副軸を「もう一つの隠れた才能」として開示する演出
+      const secondAxisGift = AXIS_GIFT_PHRASES[session.core6.secondAxis];
+      const primaryGift = AXIS_GIFT_PHRASES[session.core6.topAxis];
+      const openingLine = STATE_OPENING_LINES[state.key] || "";
+
+      // CONTEXT（購入前に答えてもらった3つの追加質問）を反映した、この人だけの補足解説
+      const contextInsight = session.context
+        ? generateContextInsight(session.context, type, {
+            stateLabel: state.label,
+            birthLabel: birthLabel,
+            bondScore: scores.bond,
+          })
+        : null;
+
       target.innerHTML = `
         <div class="book-preview">
           <p class="form-note">※ ここから先は購入前の内容サンプルです。実際の購入版では、全16タイプぶんの書き下ろし解説がさらに続きます。</p>
 
-          <div class="book-cover">
+          <div class="book-cover" style="background: linear-gradient(160deg, ${type.color} 0%, #14161f 100%);">
             <p class="book-cover__label">PERSONAL BOOK｜SAMPLE</p>
             <img src="${type.image}" alt="${type.nameJp}" class="book-cover__image" />
             <p class="book-cover__title">${type.nameJp}のための取扱説明書</p>
+            <div class="book-cover__rule"></div>
+          </div>
+
+          <div class="book-share-row share-row no-print">
+            <button class="btn" id="btn-book-pdf">📄 PDFとして保存する</button>
+            <button class="btn" id="btn-book-cover-share">表紙画像を保存する</button>
+            <button class="btn btn--text" id="btn-book-share-x">Xでシェア</button>
+          </div>
+          <p class="form-note no-print" id="book-share-status" aria-live="polite"></p>
+
+          <div class="opening-letter">
+            <p class="opening-letter__to">${session.name ? session.name + "さんへ" : "あなたへ"}</p>
+            <p>${openingLine}</p>
+            <p>
+              これは、16タイプ中<strong>${type.rarity}</strong>という少数派である「${type.nameJp}」のあなたのために
+              書かれたページです。同じ${type.nameJp}であっても、あなたと全く同じ資質・行動・状態の組み合わせを
+              持つ人は、そう多くはいません。
+            </p>
           </div>
 
           <div class="result-block">
             <p class="book-chapter">第1章</p>
             <h3>あなたの核の全体像</h3>
             <p>${type.personalBookInsight}</p>
+            <p>
+              そしてもう一つ。「${type.blindSpot}」——これは弱点ではなく、「${type.weapon}」という、あなたの
+              一番の武器が生んでいる影のようなものです。強い光には、必ず影ができます。この影を消そうとするより、
+              光の方を自覚して使う方が、あなたはずっと生きやすくなります。
+            </p>
+            <p class="result-block__mini-title">もう一つの隠れた才能</p>
+            <p>
+              QUESTIONの回答から見ると、あなたの一番の力は<strong>${primaryGift}</strong>ですが、
+              実はその次に、<strong>${secondAxisGift}</strong>という2つ目の力も強く持っています。
+              ${type.nameJp}は本来この2つの力が掛け合わさって初めて成立するタイプなので、同じ${type.nameJp}の
+              中でも、この2つ目の力の強さは人によって違います。あなたの場合はこれが強く出ている、という点が、
+              数ある${type.nameJp}の中でもあなたを特徴づけている部分です。
+            </p>
+            ${
+              contextInsight
+                ? `
+            <p class="result-block__mini-title">今のあなたに合わせて｜CONTEXT</p>
+            <p>${contextInsight.roleText}</p>
+            <p>${contextInsight.valueText}</p>
+            <p>${contextInsight.relationshipText}</p>`
+                : ""
+            }
           </div>
 
           <div class="result-block">
             <p class="book-chapter">第2章</p>
-            <h3>CORE6 全軸解説</h3>
-            <div class="radar-wrap">${buildRadarSVG(scores)}</div>
-            ${axisSection}
+            <h3>CORE6 全軸解説｜BIRTH × QUESTION × STATE 統合分析</h3>
+            <p class="form-note">
+              まずは、あなたの一番の力ともう一つの隠れた才能（第1章で触れた2軸）の実際の数値を確認し、
+              続けて残り4軸のバランスを見ていきます。数値はすべて0〜100点で、大きいほどその力を強く
+              使っている（BIRTHの場合は生まれ持っている）ことを表します。
+            </p>
+            <div class="radar-wrap">${buildRadarSVG(scores, "dark")}</div>
+            <p class="result-block__mini-title">主軸2つの実際の数値</p>
+            ${primaryAxesHtml}
+            <p class="result-block__mini-title">残り4つの軸のバランス</p>
+            ${otherAxesHtml}
+            <p>${otherAxesInsight}</p>
+            <p class="result-block__mini-title">統合分析｜生まれ持った資質と、今の行動・状態の関係</p>
+            <p>
+              生まれ持った資質は<strong>${birthLabel}</strong>ですが、今いちばんよく使っている力は
+              <strong>${questionLabel}</strong>です。${gap.matched ? "この2つは一致しており、素の自分をそのまま発揮できていると言えます。" : "この2つにはズレがあり、今の環境が本来の資質を発揮しにくい状況になっている可能性があります。"}
+              さらに、今の状態は<strong>${state.label}</strong>です。この「資質」「行動」「状態」の3つを掛け合わせると、
+              今のあなたに合った次の一歩が見えてきます。
+            </p>
+            ${integratedActionsHtml}
           </div>
 
           <div class="result-block">
             <p class="book-chapter">第3章</p>
             <h3>核を活かす3ステップ・アクションプラン</h3>
+            <p>
+              まず伝えておきたいのは、あなたはすでに「${type.weapon}」を持っている、ということです。
+              ここから先は、それを失くしたり直したりするための話ではなく、すでにあるものを、
+              もっと周りに気づいてもらうための3ステップです。
+            </p>
             <p><strong>Step 1（今週）：</strong>${type.personalBookAction}</p>
-            <p><strong>Step 2（1か月後）：</strong>「${type.weapon}」を意識して使えた場面を、3つ振り返ってみましょう。</p>
-            <p><strong>Step 3（3か月後）：</strong>「${type.blindSpot}」について、以前より上手く付き合えるようになったか振り返ってみましょう。</p>
+            <p><strong>Step 2（1か月後）：</strong>「${type.weapon}」が発揮できた場面を、3つ書き出してみましょう。書き出すことで、それが偶然ではなく、あなたの再現性のある力だと自分自身で確認できます。</p>
+            <p><strong>Step 3（3か月後）：</strong>「${type.blindSpot}」が出そうになった瞬間に、一呼吸だけ置いてみましょう。なくす必要はありません。気づけるようになるだけで、周囲の受け取り方は大きく変わります。</p>
           </div>
 
           <div class="result-block">
@@ -644,15 +966,49 @@
               本来は相手にもQUESTION・BIRTH・STATEを診断してもらい、2人分のデータから相性を算出する章です。
               サンプルでは「お相手のタイプ」を選ぶだけの簡易版を試せます。
             </p>
-            <label class="form-field" style="max-width:320px;margin:16px 0;text-align:left;">
+            <label class="form-field no-print" style="max-width:320px;margin:16px 0;text-align:left;">
               <span>お相手のKAKUタイプ（サンプル選択）</span>
               <select id="match-partner-select">${partnerOptions}</select>
             </label>
-            <button class="btn" id="btn-preview-match">この相性を見る</button>
+            <button class="btn no-print" id="btn-preview-match">この相性を見る</button>
             <div id="kaku-match-preview"></div>
+          </div>
+
+          <div class="closing-note">
+            <p>
+              この1冊は、${type.nameJp}であるあなたを型にはめたり、否定したりするためのものではありません。
+              すでにあなたの中にある${primaryGift}や${secondAxisGift}に、あなた自身が気づき、
+              もっと自分を大切に扱えるようになるためのものです。
+            </p>
+            <p class="closing-note__sign">— KAKU ～核～</p>
           </div>
         </div>
       `;
+
+      document.getElementById("btn-book-pdf").addEventListener("click", () => {
+        window.print();
+      });
+
+      document.getElementById("btn-book-share-x").addEventListener("click", () => {
+        const shareText = `私だけの「PERSONAL BOOK」（${type.nameJp}のための取扱説明書）ができました。\n#KAKU核診断`;
+        const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText);
+        window.open(url, "_blank", "noopener");
+      });
+
+      document.getElementById("btn-book-cover-share").addEventListener("click", async () => {
+        const statusEl = document.getElementById("book-share-status");
+        const btn = document.getElementById("btn-book-cover-share");
+        btn.disabled = true;
+        statusEl.textContent = "表紙画像を作成しています…";
+        try {
+          const canvas = await buildBookCoverShareCanvas(type, session);
+          await shareOrDownloadCanvas(canvas, `personal-book-${type.id}.png`, "PERSONAL BOOK", `私だけの「PERSONAL BOOK」（${type.nameJp}のための取扱説明書）ができました。 #KAKU核診断`, statusEl);
+        } catch (err) {
+          statusEl.textContent = "画像の作成に失敗しました。時間をおいて再度お試しください。";
+        } finally {
+          btn.disabled = false;
+        }
+      });
 
       const matchSelect = document.getElementById("match-partner-select");
       const matchPreviewBtn = document.getElementById("btn-preview-match");
@@ -663,8 +1019,13 @@
         const insight = generateMatchInsight(session.core6.scores, typeB);
 
         const categoryRows = insight.categories
-          .map(
-            (c) => `
+          .map((c) => {
+            const reasonLabel = CORE6_LABELS[c.reasonAxis];
+            const reasonText =
+              c.score >= 70
+                ? `2人とも${reasonLabel}が近く、この相性の良さの核になっています。`
+                : `${reasonLabel}の噛み合い方が、このスコアに一番効いています。`;
+            return `
           <div class="match-category">
             <div class="match-category__head">
               <span class="match-category__label">${c.label}</span>
@@ -672,8 +1033,9 @@
             </div>
             <div class="match-category__bar"><div class="match-category__bar-fill match-category__bar-fill--${c.key}" style="width:${c.score}%"></div></div>
             <p class="match-category__comment">${c.commentary}</p>
-          </div>`
-          )
+            <p class="match-category__reason">なぜこの数字？｜${reasonText}</p>
+          </div>`;
+          })
           .join("");
 
         matchTarget.innerHTML = `
@@ -684,6 +1046,70 @@
           </div>
         `;
       });
+  }
+
+  function initPersonalBookView() {
+    const introEl = document.getElementById("context-intro");
+    const previewTarget = document.getElementById("personal-book-preview");
+    if (previewTarget) previewTarget.innerHTML = "";
+    if (!introEl) return;
+
+    if (!session.typeId) {
+      introEl.hidden = false;
+      introEl.innerHTML = `
+        <p class="context-intro__title">深掘り診断｜3つだけ質問させてください</p>
+        <p class="body-text">プレビューを見るには、先に無料診断でKAKUタイプを診断してください。</p>
+        <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+      `;
+      return;
+    }
+
+    introEl.hidden = false;
+    introEl.innerHTML = `
+      <p class="context-intro__title">深掘り診断｜3つだけ質問させてください</p>
+      <p class="body-text">
+        今の仕事・役割、大事にしたい価値観、気になっている人間関係を教えてください。
+        この3つを踏まえて、あなたの状況によりフィットしたプレビューを作成します（選択式・30秒程度です）。
+      </p>
+      <div id="context-form"></div>
+      <button class="btn" id="btn-preview-personal-book" disabled>この内容でプレビューを見る</button>
+    `;
+
+    const formEl = document.getElementById("context-form");
+    const submitBtn = document.getElementById("btn-preview-personal-book");
+    const answers = {};
+
+    formEl.innerHTML = CONTEXT_QUESTIONS.map(
+      (q) => `
+      <div class="context-item" data-key="${q.key}">
+        <p class="context-item__prompt">${q.prompt}</p>
+        <div class="context-item__options">
+          ${q.options
+            .map(
+              (opt) =>
+                `<button type="button" class="context-option" data-key="${q.key}" data-value="${opt.value}">${opt.label}</button>`
+            )
+            .join("")}
+        </div>
+      </div>`
+    ).join("");
+
+    formEl.querySelectorAll(".context-option").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-key");
+        const value = btn.getAttribute("data-value");
+        answers[key] = value;
+        formEl
+          .querySelectorAll(`.context-option[data-key="${key}"]`)
+          .forEach((b) => b.classList.toggle("is-selected", b === btn));
+        submitBtn.disabled = Object.keys(answers).length < CONTEXT_QUESTIONS.length;
+      });
+    });
+
+    submitBtn.addEventListener("click", () => {
+      session.context = Object.assign({}, answers);
+      introEl.hidden = true;
+      renderPersonalBookPreview();
     });
   }
 

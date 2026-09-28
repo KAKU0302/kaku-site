@@ -143,8 +143,17 @@
       </p>
       <div class="price-tag">¥980（買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
-      <p class="form-note">※ 実際の購入・レポート生成機能は今後実装予定です。下のボタンから、購入前の内容サンプルだけ確認できます。</p>
-      <button class="btn" id="btn-preview-personal-book">プレビューを見る（無料サンプル）</button>
+      <p class="form-note">※ 実際の購入・レポート生成機能は今後実装予定です。下の質問に答えると、購入前の内容サンプルを確認できます。</p>
+
+      <div class="context-intro" id="context-intro">
+        <p class="context-intro__title">深掘り診断｜3つだけ質問させてください</p>
+        <p class="body-text">
+          今の仕事・役割、大事にしたい価値観、気になっている人間関係を教えてください。
+          この3つを踏まえて、あなたの状況によりフィットしたプレビューを作成します（選択式・30秒程度）。
+        </p>
+        <div id="context-form"></div>
+        <button class="btn" id="btn-preview-personal-book" disabled>この内容でプレビューを見る</button>
+      </div>
       <div id="personal-book-preview"></div>
     </div>
   </section>
@@ -202,6 +211,7 @@
 <script src="birth-engine.js"></script>
 <script src="state-engine.js"></script>
 <script src="gap-engine.js"></script>
+<script src="context-engine.js"></script>
 <script src="type-engine.js"></script>
 <script src="match-engine.js"></script>
 <script src="app.js"></script>

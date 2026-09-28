@@ -32,17 +32,17 @@ const CATEGORY_COMMENTARY = {
   romance: {
     high: "感情的な波長が近く、自然体で愛情表現ができる相性です。深く分かり合える関係を築きやすいでしょう。",
     mid: "適度な距離感を保てる相性です。お互いのペースを尊重すれば、心地よい関係が続きます。",
-    low: "感情表現のスタイルが大きく異なる相性です。すれ違いを感じたときほど、言葉で気持ちを伝え合うことが鍵になります。",
+    low: "感情表現のスタイルは大きく違いますが、それは自分にない感覚を相手が補ってくれる、ということでもあります。違いを弱点ではなく、2人の幅として見てみましょう。",
   },
   marriage: {
     high: "生活のペースや価値観が近く、長く一緒にいても摩擦が少ない、安定した相性です。",
     mid: "基本的な価値観は合いますが、生活スタイルの細部はすり合わせが必要になりそうです。",
-    low: "生活リズムや安定性への考え方に差がある相性です。役割分担のルールを早めに決めておくと安心です。",
+    low: "生活リズムや安定性への考え方は違いますが、片方が持っていない視点をもう片方が持っている、バランス型の組み合わせとも言えます。役割分担のルールを早めに決めておくと安心です。",
   },
   work: {
     high: "得意分野が補い合い、一緒に仕事をすると高い成果を出しやすい相性です。",
     mid: "重なる部分と異なる部分がバランス良くある、無難に協働できる相性です。",
-    low: "仕事の進め方が大きく異なる相性です。役割をはっきり分けることで、お互いの強みを活かせます。",
+    low: "仕事の進め方は違いますが、同じやり方をする2人よりも、見えている景色が広くなる組み合わせです。役割をはっきり分けることで、お互いの強みを活かせます。",
   },
 };
 
@@ -92,6 +92,24 @@ function computeCategoryScore(category, scoresA, scoresB) {
 }
 
 /**
+ * そのカテゴリのスコアに一番効いている軸（重み×近さが最大）と、
+ * 一番違いが大きい軸（重み×近さが最小）を返す。
+ * 「なぜこの点数なのか」を一言で説明するために使う。
+ */
+function getAxisContributions(category, scoresA, scoresB) {
+  const weights = CATEGORY_WEIGHTS[category];
+  let best = null;
+  let worst = null;
+  MATCH_AXIS_ORDER.forEach((axis) => {
+    const similarity = 100 - Math.abs((scoresA[axis] || 0) - (scoresB[axis] || 0));
+    const weighted = weights[axis] * similarity;
+    if (!best || weighted > best.weighted) best = { axis, weighted, similarity };
+    if (!worst || weighted < worst.weighted) worst = { axis, weighted, similarity };
+  });
+  return { best, worst };
+}
+
+/**
  * scoresA: 診断済みの自分自身のCORE6スコア（session.core6.scores）
  * typeB: お相手として選んだ KAKU_TYPES の値
  * 戻り値: { categories: [{key,label,score,commentary}], typeBProfile }
@@ -102,11 +120,14 @@ function generateMatchInsight(scoresA, typeB) {
   const categories = Object.keys(CATEGORY_META).map((key) => {
     const score = computeCategoryScore(key, scoresA, scoresB);
     const tier = getTier(score);
+    const contributions = getAxisContributions(key, scoresA, scoresB);
     return {
       key,
       label: CATEGORY_META[key].label,
       score,
       commentary: CATEGORY_COMMENTARY[key][tier],
+      reasonAxis: contributions.best.axis,
+      differenceAxis: contributions.worst.axis,
     };
   });
 
@@ -114,5 +135,5 @@ function generateMatchInsight(scoresA, typeB) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { generateMatchInsight, computeCategoryScore, buildAxisProfile, getCanonicalAxes, CATEGORY_WEIGHTS };
+  module.exports = { generateMatchInsight, computeCategoryScore, getAxisContributions, buildAxisProfile, getCanonicalAxes, CATEGORY_WEIGHTS };
 }
