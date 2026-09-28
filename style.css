@@ -130,8 +130,14 @@ img { max-width: 100%; display: block; }
 .hero {
   max-width: 720px;
   margin: 0 auto;
-  padding: 120px 24px 80px;
+  padding: 96px 24px 56px;
   text-align: center;
+}
+.hero__kicker {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  margin: 0 0 16px;
 }
 .hero__formula {
   font-size: 13px;
@@ -144,12 +150,66 @@ img { max-width: 100%; display: block; }
   font-size: 40px;
   font-weight: 800;
   line-height: 1.4;
-  margin: 0 0 24px;
+  margin: 0 0 16px;
 }
 .hero__lead {
   font-size: 15px;
   color: var(--color-text-soft);
-  margin-bottom: 40px;
+  margin-bottom: 28px;
+}
+.hero__meta {
+  font-size: 12px;
+  color: var(--color-text-soft);
+  margin: 4px 0 20px;
+  letter-spacing: 0.04em;
+}
+.btn--lg {
+  padding: 16px 40px;
+  font-size: 15px;
+}
+
+/* ---------- 「KAKUで何がわかる？」（TOP） ---------- */
+.hero-questions {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 24px 96px;
+  text-align: center;
+}
+.hero-questions__eyebrow {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.hero-questions__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+.hero-questions__item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.6;
+}
+@media (max-width: 640px) {
+  .hero-questions__grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- ブランドメッセージ（ABOUT） ---------- */
+.brand-message {
+  font-size: 15px;
+  line-height: 2;
+  color: var(--color-text);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
 }
 
 /* ---------- Buttons ---------- */
@@ -449,6 +509,127 @@ img { max-width: 100%; display: block; }
   margin: 0;
 }
 
+/* ---------- KAKU GAP（本来のあなた × 今のあなた のズレ）｜最大の差別化ポイントなので視覚的に目立たせる ---------- */
+.gap-hero {
+  background: linear-gradient(165deg, var(--color-accent) 0%, #171933 100%);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  margin: 8px 0 32px;
+  color: #F4F5FA;
+}
+.gap-hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-glow);
+  margin: 0 0 16px;
+  font-weight: 700;
+}
+.gap-hero__compare {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.gap-hero__before,
+.gap-hero__after {
+  flex: 1 1 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+.gap-hero__tag {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: rgba(244, 245, 250, 0.6);
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+.gap-hero__before .gap-hero__tag { color: var(--color-glow); }
+.gap-hero__after .gap-hero__tag { color: #F2B84A; }
+.gap-hero__compare p:last-child {
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+  color: rgba(244, 245, 250, 0.92);
+}
+.gap-hero__arrow {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: rgba(244, 245, 250, 0.4);
+}
+.gap-hero__score {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.gap-hero__score-number {
+  flex: none;
+  font-family: var(--font-serif);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 74px;
+  text-align: center;
+}
+.gap-hero__score-number::after {
+  content: "";
+}
+.gap-hero__score-body { flex: 1 1 auto; }
+.gap-hero__score-tier {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.gap-hero__meter {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.gap-hero__meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.gap-hero__meter-fill--small,
+.gap-hero__score-number--small { color: #3AAFA9; }
+.gap-hero__meter-fill--small { background: #3AAFA9; }
+.gap-hero__meter-fill--medium,
+.gap-hero__score-number--medium { color: #E8B930; }
+.gap-hero__meter-fill--medium { background: #E8B930; }
+.gap-hero__meter-fill--large,
+.gap-hero__score-number--large { color: #F2789F; }
+.gap-hero__meter-fill--large { background: #E0568C; }
+.gap-hero__score-caption {
+  font-size: 11px;
+  color: rgba(244, 245, 250, 0.55);
+  margin: 0;
+}
+.gap-hero__message {
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0;
+  color: rgba(244, 245, 250, 0.92);
+}
+.gap-hero__message strong { color: #FFFFFF; }
+.gap-hero__detail-toggle {
+  margin-top: 16px;
+}
+@media (max-width: 480px) {
+  .gap-hero__compare { flex-direction: column; }
+  .gap-hero__arrow { transform: rotate(90deg); }
+}
+
 .share-row {
   display: flex;
   gap: 12px;
@@ -554,6 +735,41 @@ img { max-width: 100%; display: block; }
   50% { box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.22) inset, 0 10px 42px rgba(94, 200, 242, 0.3); }
 }
 
+/* ---------- KNOW→USE→CONNECT→BUILD（KAKU全体のサービス構造） ---------- */
+.journey-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 24px 0 32px;
+  padding: 20px;
+  background: var(--color-accent-soft);
+  border-radius: var(--radius);
+}
+.journey-flow__step {
+  text-align: center;
+  padding: 4px 14px;
+}
+.journey-flow__label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
+  margin: 0 0 4px;
+}
+.journey-flow__desc {
+  font-size: 12px;
+  color: var(--color-text-soft);
+  margin: 0;
+}
+.journey-flow__arrow {
+  color: var(--color-text-soft);
+  opacity: 0.5;
+  font-size: 14px;
+}
+
 /* ---------- Pricing ---------- */
 .pricing-grid {
   display: grid;
@@ -566,6 +782,15 @@ img { max-width: 100%; display: block; }
   padding: 24px;
   background: var(--color-surface);
   text-align: center;
+}
+.pricing-card__step {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-glow-on-light, var(--color-accent));
+  opacity: 0.7;
+  margin: 0 0 6px;
 }
 .pricing-card__price {
   font-size: 22px;

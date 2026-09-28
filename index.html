@@ -25,15 +25,29 @@
   <!-- ===================== TOP ===================== -->
   <section class="view" id="view-top">
     <div class="hero">
-      <p class="hero__formula">行動 × 資質 × 状態 ＝ あなたの核</p>
+      <p class="hero__kicker">性格だけでは、本当のあなたは分からない。</p>
       <h1 class="hero__title">あなたの核を、<br />解き明かす。</h1>
+      <p class="hero__formula">行動 × 生まれ持った資質 × 今の状態</p>
       <p class="hero__lead">
-        性格診断でも、占いでもありません。<br />
-        今の行動、生まれ持った資質、いまの状態。<br />
-        3つを重ね合わせて、あなたという人の核を解き明かす自己理解診断です。
+        3つの異なる視点からあなたを重ね合わせることで、単純な性格診断や占いだけでは見えてこない、
+        あなたという人の「核（KAKU）」を解き明かします。
       </p>
-      <button class="btn btn--primary" data-action="start-diagnosis">無料で診断をはじめる</button>
+      <button class="btn btn--primary btn--lg" data-action="start-diagnosis">無料でKAKUを診断する</button>
+      <p class="hero__meta">約3分・完全無料</p>
       <button class="btn btn--text" data-nav="about">KAKUについてもっと知る</button>
+    </div>
+
+    <div class="hero-questions">
+      <p class="eyebrow hero-questions__eyebrow">KAKUを受けると、何がわかる？</p>
+      <div class="hero-questions__grid">
+        <p class="hero-questions__item">なぜ、やる気が出る仕事と出ない仕事があるのか。</p>
+        <p class="hero-questions__item">なぜ、自然体でいられる人と、なぜか疲れる人がいるのか。</p>
+        <p class="hero-questions__item">自分は、どんな環境で最も力を発揮するのか。</p>
+        <p class="hero-questions__item">自分の一番強い武器は、何なのか。</p>
+        <p class="hero-questions__item">どんな役割を任されたときに、力を発揮するのか。</p>
+        <p class="hero-questions__item">今の自分は、本来の自分をどれくらい活かせているのか。</p>
+      </div>
+      <button class="btn btn--primary" data-action="start-diagnosis">無料でKAKUを診断する</button>
     </div>
   </section>
 
@@ -41,6 +55,13 @@
   <section class="view" id="view-about" hidden>
     <div class="container container--narrow">
       <h2 class="section-title">KAKU ～核～ について</h2>
+      <p class="brand-message">
+        人には、それぞれ「核」がある。<br />
+        得意なこと。苦手なこと。力を発揮できる環境。なぜか惹かれる人。ぶつかってしまう人。<br />
+        KAKUは、診断への回答、生まれ持った資質、そして今のあなたの状態から、あなたの「核」を
+        多面的に読み解く自己理解サービスです。自分を知るだけで終わらない。
+        自分の活かし方と、人との組み方まで。
+      </p>
       <p class="body-text">
         KAKUは、「QUESTION（今の行動パターン）」「BIRTH（生まれ持った資質）」「STATE（今の状態）」という
         3つの異なる視点からあなたを見つめ、その掛け合わせであなたの core＝「核」を解き明かす自己理解診断です。
@@ -49,6 +70,11 @@
         多くの診断は「今のあなた」か「生まれ持ったあなた」のどちらか一方しか見ません。
         KAKUは、この2つに加えて「今の環境・状態」を組み合わせることで、
         <strong>本来の資質が、今の環境でどれだけ発揮できているか（KAKU GAP）</strong>まで見えるようにしています。
+      </p>
+      <p class="form-note">
+        ※ 生年月日を使うことで診断の精度が科学的・統計的に高まる、というような検証されていないことは
+        お伝えしていません。質問だけでは捉えきれない自分を、異なる角度から見つめるための一つの視点として
+        使っています。
       </p>
       <h3 class="subsection-title">他の診断サービスとの違い</h3>
       <ul class="feature-list">
@@ -135,11 +161,13 @@
   <!-- ===================== PERSONAL BOOK ===================== -->
   <section class="view" id="view-personal-book" hidden>
     <div class="container container--narrow">
-      <p class="eyebrow">PERSONAL BOOK</p>
-      <h2 class="section-title">あなただけの「核」を、1冊にまとめる。</h2>
+      <p class="eyebrow">PERSONAL BOOK｜USE｜自分を活かす</p>
+      <h2 class="section-title">自分を知るだけで終わらない。「活かし方」まで。</h2>
       <p class="body-text">
-        無料診断でわかったKAKU TYPEをベースに、WEAPON（強み）・BLIND SPOT（盲点）・CORE6全軸の詳細解説・
-        アクションプランまで。あなた専用の診断結果を1冊のブックとして読めるようになる予定のコンテンツです。
+        無料診断でわかったKAKU TYPEをベースに、向いている仕事・キャリアの適性傾向（WORK・CAREER）、
+        人との関わり方と伸ばすべき力（RELATION・GROWTH）、能力が最大化・低下する条件（AWAKEN・SHUTDOWN）、
+        人生で優先すべきこと（LIFE STRATEGY）、そして今週からの具体的な行動（ACTION）まで。
+        「この特性を現実でどう使えばいいのか」を1冊に落とし込んだ、あなた専用のコンテンツです。
       </p>
       <div class="price-tag">¥980（買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
@@ -161,13 +189,14 @@
   <!-- ===================== KAKU MATCH（独立サービス） ===================== -->
   <section class="view" id="view-kaku-match" hidden>
     <div class="container container--narrow">
-      <p class="eyebrow">KAKU MATCH</p>
+      <p class="eyebrow">KAKU MATCH｜CONNECT｜人との違いを理解する</p>
       <h2 class="section-title">気になるあの人との「核」の相性を見る。</h2>
       <p class="body-text">
-        恋愛・結婚・仕事、それぞれの相性を診断します。あなたのKAKUをベースに気になる相手のタイプを選ぶと、
-        カテゴリごとの相性スコアに加えて「なぜこの数字なのか」「気をつけたいポイント」まで詳しく確認できます。
+        恋人、夫婦、友人、仕事仲間、上司と部下——どんな関係にも使えます。あなたのKAKUをベースに相手のタイプを
+        選ぶと、恋愛・結婚・仕事のカテゴリごとに、惹かれ合うポイントや価値観が一致しやすい部分、衝突しやすい
+        ポイント、意思決定方法の違い、より良い関係を作るためのヒントまで詳しく確認できます。
       </p>
-      <div class="price-tag">¥480（1組ごとの買い切り）</div>
+      <div class="price-tag">¥980（1組ごとの買い切り）</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
       <p class="form-note">※ 実際の購入・お相手の診断機能は今後実装予定です。下でお相手のタイプを選ぶと、購入前の内容サンプルを確認できます。</p>
 
@@ -179,11 +208,15 @@
   <!-- ===================== KAKU TEAM ===================== -->
   <section class="view" id="view-kaku-team" hidden>
     <div class="container container--narrow">
-      <p class="eyebrow">KAKU TEAM</p>
+      <p class="eyebrow">KAKU TEAM｜BUILD｜人を組み合わせる</p>
       <h2 class="section-title">チームの「核」を、可視化する。</h2>
       <p class="body-text">
-        チームメンバー全員のKAKU TYPEをTEAM MAPとして可視化し、チーム全体の得意・偏り・補い合い方を見える化する
-        法人向けの機能です。
+        チームメンバー全員のKAKU TYPEをTEAM MAPとして可視化し、チーム全体のCORE6・強い能力・不足している
+        能力・役割の偏り・補完関係・コミュニケーション上の注意点を見える化する法人向けの機能です。
+      </p>
+      <p class="form-note">
+        ※「このタイプを集めれば最強」というような組み合わせの断定はしません。あくまで、チームの特徴を理解し、
+        配置・役割分担・コミュニケーションを考えるための材料としてご利用いただくものです。
       </p>
       <div class="price-tag">¥9,800〜／月</div>
       <button class="btn btn--primary" disabled>Coming soon</button>
@@ -195,26 +228,55 @@
   <section class="view" id="view-pricing" hidden>
     <div class="container container--narrow">
       <h2 class="section-title">料金プラン</h2>
+      <p class="body-text">
+        KAKUは、4つのサービスがバラバラなのではなく、自己理解が段階的に深まっていく1つの流れとして
+        つながっています。
+      </p>
+      <div class="journey-flow">
+        <div class="journey-flow__step">
+          <p class="journey-flow__label">KNOW</p>
+          <p class="journey-flow__desc">自分を知る</p>
+        </div>
+        <div class="journey-flow__arrow" aria-hidden="true">→</div>
+        <div class="journey-flow__step">
+          <p class="journey-flow__label">USE</p>
+          <p class="journey-flow__desc">自分を活かす</p>
+        </div>
+        <div class="journey-flow__arrow" aria-hidden="true">→</div>
+        <div class="journey-flow__step">
+          <p class="journey-flow__label">CONNECT</p>
+          <p class="journey-flow__desc">人との違いを理解する</p>
+        </div>
+        <div class="journey-flow__arrow" aria-hidden="true">→</div>
+        <div class="journey-flow__step">
+          <p class="journey-flow__label">BUILD</p>
+          <p class="journey-flow__desc">人を組み合わせる</p>
+        </div>
+      </div>
       <div class="pricing-grid">
         <div class="pricing-card">
+          <p class="pricing-card__step">KNOW</p>
           <h3>無料診断</h3>
           <p class="pricing-card__price">¥0</p>
           <p>行動・資質・状態の3つから、あなたのKAKU TYPEとKAKU GAPの概要がわかります。</p>
           <button class="btn btn--primary" data-action="start-diagnosis">はじめる</button>
         </div>
         <div class="pricing-card">
+          <p class="pricing-card__step">USE</p>
           <h3>PERSONAL BOOK</h3>
           <p class="pricing-card__price">¥980</p>
-          <p>あなた専用の詳細な診断結果を、1冊のブックとして。CORE6全軸の解説とアクションプラン付き。</p>
+          <p>あなたの核を、仕事・キャリア・人間関係・人生でどう活かすかまで落とし込んだ、あなた専用の1冊。</p>
           <button class="btn" data-nav="personal-book">詳しく見る</button>
         </div>
         <div class="pricing-card">
+          <p class="pricing-card__step">CONNECT</p>
           <h3>KAKU MATCH</h3>
-          <p class="pricing-card__price">¥480</p>
+          <p class="pricing-card__price">¥980</p>
           <p>気になる相手との相性を、恋愛・結婚・仕事のカテゴリごとに詳しく診断します。</p>
           <button class="btn" data-nav="kaku-match">詳しく見る</button>
         </div>
         <div class="pricing-card">
+          <p class="pricing-card__step">BUILD</p>
           <h3>KAKU TEAM</h3>
           <p class="pricing-card__price">¥9,800〜／月</p>
           <p>チーム全体のKAKUを可視化する法人向けプラン。</p>

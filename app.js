@@ -7,7 +7,7 @@
  * → (PERSONAL BOOK / KAKU MATCH / KAKU TEAM 紹介 / 料金ページ はナビゲーションからいつでも遷移可)
  *
  * KAKU MATCH（相性）は、以前はPERSONAL BOOKの「第4章」として統合していたが、
- * PERSONAL BOOK単体で価値が完結する内容に育ったため、¥480の独立サービス（view-kaku-match）として
+ * PERSONAL BOOK単体で価値が完結する内容に育ったため、¥980の独立サービス（view-kaku-match）として
  * 切り出している。恋愛・結婚・仕事のカテゴリごとに、スコア・「なぜこの数字？」・「気をつけたいポイント」を
  * 詳しく見せる仕様。
  *
@@ -62,6 +62,38 @@
     influence: "次のミーティングで、自分の意見を一番最初に発言してください",
     bond: "今週中に、身近な1人に感謝や承認の言葉を直接伝えてください",
     stability: "重要な決定の前に「これだけは変えない」を1つ決めてから進めてください",
+  };
+
+  // PERSONAL BOOK 第2章｜WORK（向いている仕事・役割・働き方）を、一番の力（topAxis）から導くための
+  // 軸ごとの解説。無料診断の言い換えで終わらせず、「現実でどう使うか」まで落とし込むために新設した。
+  const WORK_BY_AXIS = {
+    vision: "構想力が一番の力のあなたは、ゼロから企画を立てる仕事、新規事業やまだ答えのない課題に取り組む仕事で力を発揮します。決められた手順をなぞる仕事より、「何をやるか」から自分で考えられる裁量のある環境の方が向いています。",
+    logic: "解析力が一番の力のあなたは、データ分析や業務改善など、筋道を立てて考える仕事に向いています。感覚や勢いだけで判断が求められる環境よりも、根拠を積み上げて進められる仕事の方が力を発揮しやすいタイプです。",
+    drive: "突破力が一番の力のあなたは、新規開拓や立ち上げフェーズのプロジェクトなど、動きながら結果を出す仕事に向いています。慎重な合意形成に時間をかける環境より、スピード感のある現場の方が力を発揮します。",
+    influence: "影響力が一番の力のあなたは、営業や広報、人を巻き込むリーダー的な役割に向いています。黙々と一人で完結する仕事より、人と関わりながら進める仕事の方が力を発揮しやすいタイプです。",
+    bond: "共鳴力が一番の力のあなたは、人事やカスタマーサクセスなど、人の気持ちに寄り添う仕事に向いています。効率だけを追う環境より、関係性を大切にできる仕事の方が力を発揮します。",
+    stability: "安定力が一番の力のあなたは、オペレーションや品質管理など、積み重ねと正確さが求められる仕事に向いています。変化の激しい環境より、地に足のついた仕事の方が力を発揮しやすいタイプです。",
+  };
+
+  // PERSONAL BOOK 第2章｜CAREER（会社員・管理職・専門職・起業などの適性傾向）。
+  // 断定的な優劣ではなく「相性が良い傾向」として提示する。
+  const CAREER_BY_AXIS = {
+    vision: "会社員であれば新規事業・企画部門、専門職なら研究職やクリエイターとしての適性が高く、独立するなら「まだない市場」を作るタイプの起業と相性が良い傾向があります。",
+    logic: "会社員であれば分析・戦略部門でのキャリアに、専門職ならコンサルタントのように専門知識を軸にした働き方に適性があります。独立する場合も、専門性で勝負するスタイルと相性が良い傾向があります。",
+    drive: "会社員であれば変化の多い部署やベンチャー気質の環境で、管理職なら現場を動かすタイプのリーダーとして力を発揮します。独立・起業への適性も高い傾向があるタイプです。",
+    influence: "会社員であれば対外折衝の多い部署や広報・営業部門で、管理職なら人を巻き込むタイプのリーダーとして力を発揮します。独立する場合は、発信力を活かした働き方と相性が良い傾向があります。",
+    bond: "会社員であれば人と深く関わる部署（人事・カスタマーサポート等）で、管理職ならメンバーに寄り添うタイプのリーダーとして力を発揮します。独立する場合は、信頼関係を土台にした働き方と相性が良い傾向があります。",
+    stability: "会社員として長期的に専門性を積み上げるキャリアに適性があり、管理職なら仕組みを整えるタイプのリーダーとして力を発揮します。独立する場合は、着実な積み重ねが評価される業種と相性が良い傾向があります。",
+  };
+
+  // PERSONAL BOOK 第4章｜LIFE STRATEGY（人生で何を優先すると満足しやすいか）。
+  const LIFE_STRATEGY_BY_AXIS = {
+    vision: "人生では、「まだ誰もやっていないことに挑戦できているか」が満足度を大きく左右します。安定よりも、可能性を追い続けられる環境を優先すると満たされやすいタイプです。",
+    logic: "人生では、「納得して選んだかどうか」が満足度を左右します。周囲に流されて決めた選択より、自分の頭で筋道を立てて選んだ道の方が、後悔が少なくなります。",
+    drive: "人生では、「自分で動いて手に入れた実感があるか」が満足度を左右します。与えられるのを待つより、自分から動いて掴みにいく生き方の方が満たされやすいタイプです。",
+    influence: "人生では、「自分の言葉や存在が誰かに影響を与えられているか」が満足度を左右します。一人で完結する生き方より、人と関わり発信し続ける生き方の方が満たされやすいタイプです。",
+    bond: "人生では、「大切な人とどれだけ深く関われているか」が満足度を左右します。成果や地位より、信頼できる関係性を優先する生き方の方が満たされやすいタイプです。",
+    stability: "人生では、「積み上げてきたものが揺らがずにあるか」が満足度を左右します。刺激の多さより、着実に積み重ねられる環境を優先する生き方の方が満たされやすいタイプです。",
   };
 
   // STATEごとに「まず気持ちを受け止める」ための書き出し文
@@ -313,7 +345,13 @@
     session.birth = computeBirth(session.birthdate);
     session.state = computeState(session.stateAnswers);
     session.typeId = determineType(session.core6.topAxis, session.core6.secondAxis);
-    session.gap = computeGap(session.core6.topAxis, session.birth.axis, session.state.key);
+    session.gap = computeGap(
+      session.core6.topAxis,
+      session.birth.axis,
+      session.state.key,
+      session.core6.scores,
+      session.state.average
+    );
   }
 
   // ---------------------------------------------------------------------
@@ -427,26 +465,50 @@
         <p>${type.relationStyle}</p>
       </div>
       <div class="result-block">
-        <h3>AWAKEN｜あなたを表す3つの言葉</h3>
+        <h3>AWAKEN｜力を発揮しやすい条件</h3>
         <p><strong>${type.awaken.keywords.join(" × ")}</strong><br />${type.awaken.sentence}</p>
       </div>
-
-      <h3 class="subsection-title">BIRTH｜生まれ持った資質</h3>
       <div class="result-block">
-        <h3>${birth.title}</h3>
+        <h3>SHUTDOWN｜力が出にくくなる条件</h3>
+        <p><strong>${type.shutdown.keywords.join(" × ")}</strong><br />${type.shutdown.sentence}</p>
+      </div>
+
+      <h3 class="subsection-title" id="kaku-gap-title">KAKU GAP｜本来のあなたと、今のあなたのズレ</h3>
+      <p class="form-note">
+        KAKUだけの見方です。「生まれ持った資質（BIRTH）」と「今いちばん使っている力（QUESTION）」を比べることで、
+        今の力の発揮しやすさが見えてきます。能力の優劣を測るものでも、医療的な診断でもありません。
+      </p>
+      <div class="gap-hero">
+        <p class="gap-hero__eyebrow">KAKU GAP</p>
+        <div class="gap-hero__compare">
+          <div class="gap-hero__before">
+            <p class="gap-hero__tag">本来のあなた｜BIRTH</p>
+            <p>${gap.beforeText}</p>
+          </div>
+          <div class="gap-hero__arrow" aria-hidden="true">→</div>
+          <div class="gap-hero__after">
+            <p class="gap-hero__tag">今のあなた｜QUESTION × STATE</p>
+            <p>${gap.afterText}</p>
+          </div>
+        </div>
+        <div class="gap-hero__score">
+          <div class="gap-hero__score-number gap-hero__score-number--${gap.tier.key}">${gap.score}</div>
+          <div class="gap-hero__score-body">
+            <p class="gap-hero__score-tier">KAKU GAP｜${gap.tier.label}</p>
+            <div class="gap-hero__meter"><div class="gap-hero__meter-fill gap-hero__meter-fill--${gap.tier.key}" style="width:${gap.score}%"></div></div>
+            <p class="gap-hero__score-caption">0に近いほど「本来の資質をそのまま活かせている」、100に近いほど「本来の資質と、今使っている力にズレがある」ことを表します。</p>
+          </div>
+        </div>
+        <p class="gap-hero__message"><strong>${gap.headline}。</strong><br />${gap.message}</p>
+      </div>
+
+      <div class="result-block">
+        <h3>BIRTH｜${birth.title}（生まれ持った資質）</h3>
         <p>${birth.description}</p>
       </div>
-
-      <h3 class="subsection-title">STATE｜今のあなたの状態</h3>
       <div class="result-block">
-        <h3>${state.label}</h3>
+        <h3>STATE｜${state.label}（今のあなたの状態）</h3>
         <p>${state.description}</p>
-      </div>
-
-      <h3 class="subsection-title">KAKU GAP｜資質と行動のズレ</h3>
-      <div class="result-block">
-        <h3>${gap.headline}</h3>
-        <p>${gap.message}</p>
       </div>
 
       <div class="upsell-banner">
@@ -488,7 +550,7 @@
       btn.disabled = true;
       statusEl.textContent = "画像を作成しています…";
       try {
-        const canvas = await buildShareCardCanvas(type);
+        const canvas = await buildShareCardCanvas(type, session);
         await shareOrDownloadCanvas(
           canvas,
           `kaku-${type.id}.png`,
@@ -668,7 +730,7 @@
     });
   }
 
-  function buildShareCardCanvas(type) {
+  function buildShareCardCanvas(type, session) {
     return new Promise((resolve, reject) => {
       const W = 900;
       const H = 1200;
@@ -742,7 +804,38 @@
 
           ctx.fillStyle = "#5B5E68";
           ctx.font = "20px sans-serif";
-          wrapCanvasText(ctx, type.catchcopy, W / 2, y, W - 200, 30);
+          y += wrapCanvasText(ctx, type.catchcopy, W / 2, y, W - 200, 30);
+          y += 34;
+
+          // CORE6簡易表示（6軸の値を小さなバーで並べ、プロフィールらしさを出す）
+          const core6ForCard = (session && session.core6 && session.core6.scores) || null;
+          if (core6ForCard) {
+            const barAreaW = W - 200;
+            const barX0 = 100;
+            const barH = 6;
+            const gapY = 26;
+            ctx.textAlign = "left";
+            CORE6_AXES.forEach((a, i) => {
+              const rowY = y + i * gapY;
+              ctx.fillStyle = "#5B5E68";
+              ctx.font = "12px sans-serif";
+              ctx.fillText(a.nameJp, barX0, rowY - 4);
+              ctx.fillStyle = "#E4E4E0";
+              if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(barX0 + 70, rowY - barH, barAreaW - 70, barH, 3);
+                ctx.fill();
+              }
+              const val = core6ForCard[a.id] || 0;
+              ctx.fillStyle = type.color;
+              if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(barX0 + 70, rowY - barH, (barAreaW - 70) * (val / 100), barH, 3);
+                ctx.fill();
+              }
+            });
+            y += CORE6_AXES.length * gapY + 10;
+          }
 
           // フッター
           ctx.strokeStyle = "#E4E4E0";
@@ -918,6 +1011,8 @@
             <button type="button" class="book-tab is-active" data-tab="1">第1章</button>
             <button type="button" class="book-tab" data-tab="2">第2章</button>
             <button type="button" class="book-tab" data-tab="3">第3章</button>
+            <button type="button" class="book-tab" data-tab="4">第4章</button>
+            <button type="button" class="book-tab" data-tab="5">第5章</button>
           </div>
 
           <div class="result-block book-tabpanel" data-tabpanel="1">
@@ -950,6 +1045,39 @@
 
           <div class="result-block book-tabpanel" data-tabpanel="2" hidden>
             <p class="book-chapter">第2章</p>
+            <h3>核をどう活かすか｜WORK・CAREER</h3>
+            <p class="result-block__mini-title">WORK｜向いている仕事・役割・働き方</p>
+            <p>${WORK_BY_AXIS[topAxisId]}</p>
+            <p class="result-block__mini-title">CAREER｜会社員・管理職・専門職・起業の適性傾向</p>
+            <p>${CAREER_BY_AXIS[topAxisId]}</p>
+            <p class="result-block__mini-title">AWAKEN｜具体的にどんな環境で能力が最大化するか</p>
+            <p><strong>${type.awaken.keywords.join(" × ")}</strong>――${type.awaken.sentence}
+              こういった条件が揃う環境ほど、あなたの${primaryGift}が最大化します。</p>
+            <p class="result-block__mini-title">SHUTDOWN｜どんな環境で能力が落ちるか</p>
+            <p><strong>${type.shutdown.keywords.join(" × ")}</strong>――${type.shutdown.sentence}
+              こうした環境が続いているなら、能力が足りないのではなく、環境とのミスマッチを疑ってみてください。</p>
+          </div>
+
+          <div class="result-block book-tabpanel" data-tabpanel="3" hidden>
+            <p class="book-chapter">第3章</p>
+            <h3>人との関わり方と、伸びしろ｜RELATION・GROWTH</h3>
+            <p class="result-block__mini-title">RELATION｜人間関係での特徴</p>
+            <p>${type.relationStyle}</p>
+            <p class="result-block__mini-title">GROWTH｜伸ばすべき力</p>
+            <p>
+              残り4軸の中で一歩リードしている<strong>${helperAxis.nameJp}</strong>（${scores[helperAxis.id]}点）を意識的に
+              使う場面を増やすと、一番の力である${primaryGift}をさらに支える土台になります。まずはここを伸ばすのが、
+              一番コストパフォーマンスの良い成長のしかたです。
+            </p>
+            <p class="result-block__mini-title">GROWTH｜無理に直さなくていい弱点</p>
+            <p>
+              「${type.blindSpot}」は、直すべき欠点ではありません。${type.weapon}という武器の裏側にある特性なので、
+              なくそうとするより、「今それが出ているな」と気づけるようになることの方が、ずっと現実的で効果的です。
+            </p>
+          </div>
+
+          <div class="result-block book-tabpanel" data-tabpanel="4" hidden>
+            <p class="book-chapter">第4章</p>
             <h3>CORE6 全軸解説｜BIRTH × QUESTION × STATE 統合分析</h3>
             <p class="form-note">
               ここからは、CORE6の6つの軸それぞれの実際の数値を見ていきます。数値はすべて0〜100点で、
@@ -973,11 +1101,13 @@
               今のあなたに合った次の一歩が見えてきます。
             </p>
             ${integratedActionsHtml}
+            <p class="result-block__mini-title">LIFE STRATEGY｜人生で何を優先すると満足しやすいか</p>
+            <p>${LIFE_STRATEGY_BY_AXIS[topAxisId]}</p>
           </div>
 
-          <div class="result-block book-tabpanel" data-tabpanel="3" hidden>
-            <p class="book-chapter">第3章</p>
-            <h3>KAKU（核）を活かす3ステップ</h3>
+          <div class="result-block book-tabpanel" data-tabpanel="5" hidden>
+            <p class="book-chapter">第5章</p>
+            <h3>KAKU（核）を活かす3ステップ｜ACTION</h3>
             <p>
               まず伝えておきたいのは、あなたはすでに「${type.weapon}」を持っている、ということです。
               ここから先は、それを失くしたり直したりするための話ではなく、すでにあるものを、
@@ -1034,7 +1164,7 @@
       });
 
       document.getElementById("btn-book-share-x").addEventListener("click", () => {
-        const shareText = `私だけの「PERSONAL BOOK」（${type.nameJp}のための取扱説明書）ができました。\n#KAKU核診断`;
+        const shareText = `私だけの「PERSONAL BOOK」（${type.nameJp}）ができました。\n#KAKU核診断`;
         const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText);
         window.open(url, "_blank", "noopener");
       });
@@ -1046,7 +1176,7 @@
         statusEl.textContent = "表紙画像を作成しています…";
         try {
           const canvas = await buildBookCoverShareCanvas(type, session);
-          await shareOrDownloadCanvas(canvas, `personal-book-${type.id}.png`, "PERSONAL BOOK", `私だけの「PERSONAL BOOK」（${type.nameJp}のための取扱説明書）ができました。 #KAKU核診断`, statusEl);
+          await shareOrDownloadCanvas(canvas, `personal-book-${type.id}.png`, "PERSONAL BOOK", `私だけの「PERSONAL BOOK」（${type.nameJp}）ができました。 #KAKU核診断`, statusEl);
         } catch (err) {
           statusEl.textContent = "画像の作成に失敗しました。時間をおいて再度お試しください。";
         } finally {
