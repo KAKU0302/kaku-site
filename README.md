@@ -1,1615 +1,450 @@
-/* ==========================================================================
-   KAKU ～核～ style.css
-   トーン: 親しみやすい × 知的 × 洗練 × 少し未来的
-   フラットイラスト調に合わせ、影・グラデーションは最小限。占い/スピリチュアル感を避ける。
-   ========================================================================== */
+# KAKU ～核～
 
-:root {
-  --color-bg: #FAFAF8;
-  --color-surface: #FFFFFF;
-  --color-text: #1C1D21;
-  --color-text-soft: #5B5E68;
-  --color-border: #E4E4E0;
-  --color-accent: #2C2F6B;      /* 深いインディゴ: ブランドのメインカラー */
-  --color-accent-soft: #EFEFF7;
-  --color-glow: #5EC8F2;        /* シアン系アクセント: 近未来感を出したい箇所（誘導バナー等）で使用 */
-  --font-mono: "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
-  --font-serif: "Hiragino Mincho ProN", "Noto Serif JP", "Yu Mincho", serif; /* PERSONAL BOOKの「本らしさ」演出に使用 */
-  --book-bg-a: #0A0D1C;
-  --book-bg-b: #10142C;
-  --book-panel: #12172E;
-  --book-text: #ECEEF7;
-  --book-text-soft: rgba(236, 238, 247, 0.68);
-  --book-border: rgba(94, 200, 242, 0.22);
-  --book-gold: #D9B36C;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --max-width: 880px;
-  --font-jp: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
-}
+行動 × 資質 × 状態 ＝ あなたの核
 
-* { box-sizing: border-box; }
+行動パターン（QUESTION）・生まれ持った資質（BIRTH）・今の状態（STATE）の3つから、
+あなたという人の「核＝KAKU」を解き明かす自己理解診断サイトです。
 
-html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-jp);
-  line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-}
+このリポジトリは、サーバーを必要としない静的サイト（HTML / CSS / 素のJavaScript）として実装されています。
+レーダーチャートなどの描画はすべて自前のコードで行っており、外部ライブラリへの依存はありません。
+唯一の例外が、PERSONAL BOOKの「PDFとして保存する」機能で使っているhtml2canvas／jsPDFで、これらは
+CDN（cdnjs.cloudflare.com）から読み込んでいます。インターネットに接続できない環境では、この2つの
+読み込みに失敗し、自動的にブラウザの印刷機能（印刷画面で「PDFに保存」を選ぶ方式）にフォールバック
+します。
 
-a { color: inherit; text-decoration: none; }
+## ファイル構成
 
-img { max-width: 100%; display: block; }
+```
+kaku-site/
+├── index.html         全ページ構成（TOP〜料金ページまで、1ファイルにセクションとしてまとめています）
+├── style.css          デザイン（配色・レイアウト）
+├── app.js             画面遷移・診断フローの制御、結果ページの描画
+├── types-data.js       16 KAKU TYPE のデータ（名前・色・コピー・WEAPON等のテキスト）
+├── core-engine.js      QUESTION診断 30問 → CORE6スコア算出ロジック
+├── birth-engine.js     生年月日 → BIRTH（生まれ持った資質）算出ロジック
+├── state-engine.js     STATE診断 10問 → 今の状態（5分類）算出ロジック
+├── gap-engine.js        KAKU GAP（BIRTHとQUESTIONのズレ）算出ロジック
+├── type-engine.js       CORE6の主軸×副軸 → KAKU TYPE 決定ロジック
+├── match-engine.js      相性コメント生成ロジック（独立サービス KAKU MATCH で使用）
+├── context-engine.js    CONTEXT（PERSONAL BOOK限定の追加質問3問）→ 状況に合わせた解説文生成ロジック
+└── *.jpg（16ファイル）  16タイプ分のキャラクターカード画像（KAKU CARD。ファイル名は各タイプ名の小文字、例: architect.jpg）
+```
 
-/* ---------- Header ---------- */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(250, 250, 248, 0.92);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--color-border);
-}
-.site-header__inner {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.logo {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-.logo span { color: var(--color-accent); }
-.site-nav { display: flex; gap: 24px; font-size: 14px; }
-.site-nav a { color: var(--color-text-soft); }
-.site-nav a:hover { color: var(--color-text); }
+## キャラクター画像について
 
-/* ---------- Layout helpers ---------- */
-.container {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 64px 24px;
-}
-.container--narrow {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 64px 24px;
-}
-.view { min-height: 60vh; }
+以前は16人ぶんを1枚のシートにまとめて生成していたため、1人あたり384×256pxしか解像度がなく、
+カードやシェア画像で大きく表示すると粗さが目立っていました。
 
-.section-title {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 24px;
-  letter-spacing: 0.02em;
-}
-.subsection-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 40px 0 16px;
-}
-.body-text {
-  font-size: 15px;
-  color: var(--color-text-soft);
-  margin-bottom: 16px;
-}
-.eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: var(--color-accent);
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.step-indicator {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--color-text-soft);
-  margin-bottom: 8px;
-}
-.feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 32px;
-}
-.feature-list li {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
-  color: var(--color-text-soft);
-}
-.feature-list li strong { color: var(--color-text); }
+今回、16タイプそれぞれを個別に生成し直した画像（1024×1536pxのポスター調イラスト）に差し替えました。
+1体ずつ生成しているため解像度・描き込みともに大幅に向上しています。サイトには表示用に800×1200pxへ
+軽量化（JPEG）した上で組み込んでいますが、実寸で見ても粗さは出ません。ファイル名は各タイプ名の小文字
+（例: `architect.jpg`）です。
 
-/* ---------- Hero (TOP) ---------- */
-.hero {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 96px 24px 56px;
-  text-align: center;
-}
-.hero__kicker {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text-soft);
-  margin: 0 0 16px;
-}
-.hero__formula {
-  font-size: 13px;
-  letter-spacing: 0.14em;
-  color: var(--color-accent);
-  font-weight: 700;
-  margin-bottom: 24px;
-}
-.hero__title {
-  font-size: 44px;
-  font-weight: 800;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  margin: 0 0 20px;
-}
-.hero__lead {
-  font-size: 15px;
-  color: var(--color-text-soft);
-  margin-bottom: 28px;
-}
-.hero__meta {
-  font-size: 12px;
-  color: var(--color-text-soft);
-  margin: 4px 0 20px;
-  letter-spacing: 0.04em;
-}
-.btn--lg {
-  padding: 16px 40px;
-  font-size: 15px;
-}
+以前使っていた旧デザイン（フラットイラスト調）の16枚は `archive_old_flat_style/` フォルダに保管してあります。
+もし新しいデザイン（写真調・映画ポスター風）よりも旧デザインの方が良ければ、`types-data.js`内の
+`image: "○○.jpg"` を `archive_old_flat_style/○○.png` に書き換えることでいつでも戻せます。
 
-/* ---------- キャラクターの見本市（TOP）｜「この中に自分がいるかもしれない」 ---------- */
-.hero-cast {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 8px 24px 56px;
-  text-align: center;
-}
-.hero-cast__caption {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-text-soft);
-  margin: 0 0 20px;
-}
-.hero-cast__grid {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.hero-cast__card {
-  width: 118px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  text-decoration: none;
-}
-.hero-cast__card:nth-child(3n+1) { transform: rotate(-2deg); }
-.hero-cast__card:nth-child(3n+2) { transform: rotate(1.5deg); }
-.hero-cast__card:nth-child(3n) { transform: rotate(-1deg); }
-.hero-cast__card:hover {
-  transform: translateY(-6px) rotate(0deg);
-  box-shadow: 0 12px 24px rgba(28, 29, 33, 0.12);
-}
-.hero-cast__card img {
-  width: 100%;
-  height: 148px;
-  object-fit: cover;
-  display: block;
-}
-.hero-cast__card p {
-  margin: 0;
-  padding: 7px 4px;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--color-text-soft);
-}
-@media (max-width: 480px) {
-  .hero-cast__card { width: 96px; }
-  .hero-cast__card img { height: 122px; }
-}
+※ 新しい画像は「1枚に複数タイプが写り込む／文字が誤字になる」といった問題がないか主要なもの数枚を
+　 確認しましたが、16枚すべてを1文字単位でチェックしたわけではありません。実際にサイトで見て、
+　 気になる誤字や崩れた文字を見つけた場合は教えてください。
 
-/* ---------- 自分事化の問いかけ（TOP） ---------- */
-.hero-questions {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px 24px 56px;
-  text-align: center;
-}
-.hero-questions__eyebrow {
-  text-align: center;
-  margin-bottom: 20px;
-}
-.hero-questions__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  text-align: left;
-}
-.hero-questions__item {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 18px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0;
-  line-height: 1.6;
-}
-@media (max-width: 640px) {
-  .hero-questions__grid { grid-template-columns: 1fr; }
-}
+## PERSONAL BOOK の「プレビュー」機能について
 
-/* ---------- 仕組みのミニ説明（TOP・最後に軽く） ---------- */
-.hero-explainer {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 8px 24px 88px;
-  text-align: center;
-}
-.hero-explainer__lead {
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0 0 24px;
-}
-.hero-explainer__grid {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.hero-explainer__step {
-  flex: 1 1 160px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 18px 16px;
-}
-.hero-explainer__label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-accent);
-  margin: 0 0 8px;
-}
-.hero-explainer__desc {
-  font-size: 12px;
-  color: var(--color-text-soft);
-  margin: 0;
-  line-height: 1.7;
-}
-.hero-explainer__arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-soft);
-  opacity: 0.5;
-  font-size: 14px;
-}
-.hero-explainer__result {
-  font-size: 13px;
-  color: var(--color-text-soft);
-  margin: 8px 0 28px;
-  line-height: 1.8;
-}
-.hero-explainer__result strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 20px;
-  color: var(--color-text);
-  font-family: var(--font-serif);
-}
-@media (max-width: 640px) {
-  .hero-explainer__grid { flex-direction: column; }
-  .hero-explainer__arrow { transform: rotate(90deg); }
-}
+当初はPERSONAL BOOKとKAKU MATCHを別々の980円コンテンツとして用意していましたが、
+「単体では見つけにくい・内容が薄く感じる」というフィードバックを受け、一度はKAKU MATCH（相性機能）を
+PERSONAL BOOKの「第4章」として統合しました。
 
-/* ---------- ブランドメッセージ（ABOUT） ---------- */
-.brand-message {
-  font-size: 15px;
-  line-height: 2;
-  color: var(--color-text);
-  background: var(--color-accent-soft);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-}
+その後、PERSONAL BOOKの中身（承認・肯定を軸にした構成、CORE6統合分析、断言型のアクションプランなど）を
+何度も磨き込んだ結果、「PERSONAL BOOK単体でも価値を感じられるものになってきた」という判断から、
+KAKU MATCHは再び独立サービス（¥980、`view-kaku-match`）として切り出しています。現在のPERSONAL BOOKは
+第1〜3章の3章構成で、KAKU MATCHへは各章の後に表示される案内カードから遷移できます
+（「PERSONAL BOOK / KAKU MATCH のチャプター構成の変更」の節に詳細）。
 
-/* ---------- Buttons ---------- */
-.btn {
-  display: inline-block;
-  padding: 14px 32px;
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
-  margin: 6px;
-}
-.btn:hover { transform: translateY(-1px); }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-.btn--primary {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #fff;
-}
-.btn--text {
-  border: none;
-  background: none;
-  color: var(--color-text-soft);
-}
+無料診断結果ページの下部には、PERSONAL BOOKへ誘導する目立つバナー（「より詳細を見たい方はこちら」）を
+設置しています。クリックするとPERSONAL BOOKの紹介ページへ遷移します。
 
-/* ---------- Forms ---------- */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 420px;
-}
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--color-text-soft);
-}
-.form-field input,
-.form-field select {
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 15px;
-  font-family: inherit;
-  color: var(--color-text);
-  background: var(--color-surface);
-}
-.form-note {
-  font-size: 12px;
-  color: var(--color-text-soft);
-}
+なお、PERSONAL BOOKプレビューの第2章は、CORE6全軸解説に加えて「BIRTH（生まれ持った資質）×QUESTION（今の
+行動）×STATE（今の状態）」を掛け合わせた統合分析を新たに追加しています（該当する軸にBIRTH/QUESTIONの
+バッジを表示し、資質と行動が一致しているか・今の状態が良好かの組み合わせから、具体的なアクションを3つ
+提示します）。KAKUタイプ自体の判定はQUESTION（行動30問）のみで行われますが、PERSONAL BOOKの中でBIRTHと
+STATEも実際に活用され、誘導バナーの「3つを掛け合わせて分析する」という説明が実態と一致するようにしています。
 
-/* ---------- Progress bar ---------- */
-.progress-bar {
-  height: 4px;
-  background: var(--color-border);
-  border-radius: 2px;
-  margin-bottom: 32px;
-  overflow: hidden;
-}
-.progress-bar__fill {
-  height: 100%;
-  width: 0%;
-  background: var(--color-accent);
-  transition: width 0.3s ease;
-}
+### PERSONAL BOOKの中身（承認・肯定を軸にした構成）
 
-.reassurance-note {
-  font-size: 12px;
-  color: var(--color-text-soft);
-  background: var(--color-accent-soft);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  margin-bottom: 24px;
-}
+実際にエンドユーザーの立場で通しでプレビューを試した結果、「無料ページで見た内容の言い換えに感じる」
+「相性スコアの根拠が見えない」という課題が見つかったため、以下を追加・修正しています。
 
-/* ---------- Question card ---------- */
-.question-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 32px 24px;
-}
-.question-card__prompt {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 24px;
-}
-.question-card__option {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 16px 18px;
-  margin-bottom: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-bg);
-  font-size: 14px;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--color-text);
-}
-.question-card__option:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
-}
+- 第1章の直前に、名前・STATEに応じた書き出し（例:「ここまで頑張ってこられたのは、当たり前のことでは
+  ありません」）と、出現率（rarity）を使って「あなたは少数派である」ことを伝える"手紙"のようなブロックを追加
+- 第1章に、BLIND SPOTを「WEAPONが生む影」として言い換える一文と、CORE6の副軸（secondAxis）を
+  「もう一つの隠れた才能」として開示する演出を追加（無料ページには一切出てこない、PERSONAL BOOK限定の情報）
+- 第3章のアクションプランを「すでに出来ていることを言葉にする」→「弱点は無くすのではなく気づけるようになる」
+  という、否定ではなく肯定から入る言い回しに変更
+- 第4章（当時PERSONAL BOOKに統合していたKAKU MATCH）に「なぜこの数字？」という一言を追加。恋愛・結婚・仕事
+  それぞれのスコアで一番効いているCORE6の軸を名指しし、スコアが低い場合も「違いは弱点ではなく、お互いにない
+  視点を補い合える部分」という肯定的な言い回しに変更（match-engine.jsの重み付け計算自体は変更しておらず、
+  既存の計算結果から一番寄与度の大きい軸を取り出して文章にしているだけです。※このKAKU MATCH機能は、後の
+  変更で独立サービスとして切り出しています。詳細は「PERSONAL BOOK / KAKU MATCH のチャプター構成の変更」の節）
+- 最後に、タイプを否定するためのコンテンツではないことを伝える結びの一文を追加
 
-/* ---------- STATE Likert ---------- */
-.likert-item {
-  padding: 20px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-.likert-item__prompt {
-  font-size: 14px;
-  margin-bottom: 12px;
-}
-.likert-scale {
-  display: flex;
-  gap: 8px;
-}
-.likert-scale button {
-  flex: 1;
-  padding: 10px 0;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 13px;
-}
-.likert-scale button.is-selected {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #fff;
-}
+### PERSONAL BOOKの「本らしさ」・PDF保存・SNSシェア
 
-/* ---------- Analyzing ---------- */
-.analyzing {
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-}
-.analyzing__spinner {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-accent);
-  animation: spin 0.9s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.analyzing__text {
-  font-size: 14px;
-  color: var(--color-text-soft);
-}
+「PERSONAL BOOKという名前にふさわしく、本のような見た目にしてほしい／PDF保存やSNSシェアもできるように
+してほしい」という要望を受けて、以下を追加しています。
 
-/* ---------- Result / KAKU CARD ---------- */
-.kaku-card {
-  position: relative;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 32px;
-  text-align: center;
-}
-.kaku-card__image {
-  width: 100%;
-  display: block;
-  background: var(--color-accent-soft);
-}
-.kaku-card__poster-tag {
-  margin: 0;
-  padding: 16px 20px;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.5;
-  letter-spacing: 0.02em;
-  text-align: center;
-}
-.kaku-card__body { padding: 24px; }
-.kaku-card__type-en {
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-}
-.kaku-card__type-jp {
-  font-size: 24px;
-  font-weight: 800;
-  margin: 4px 0 12px;
-}
-.kaku-card__praise {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--color-accent);
-  line-height: 1.6;
-  margin: 0 0 12px;
-}
-.kaku-card__catchcopy {
-  font-size: 14px;
-  color: var(--color-text-soft);
-}
-.kaku-card__rarity {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--color-accent);
-  font-size: 11px;
-  font-weight: 800;
-  padding: 6px 12px;
-  border-radius: 999px;
-  letter-spacing: 0.01em;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
+- 表紙（book-cover）を、タイプカラーを使ったグラデーション＋背表紙（スパイン）風の縁取り＋明朝体タイトルの
+  「本の表紙」らしいデザインに変更。各章もクリーム色の紙面・明朝体の章番号など、ページらしい見た目に統一
+- 「PDFとして保存する」ボタンを追加。印刷用のスタイル（`@media print`）を用意し、ボタンを押すとブラウザの
+  印刷ダイアログが開き、そこから「PDFとして保存」を選べば、そのままPDFとして保存できます。ヘッダーや
+  ボタンなど画面上だけの要素は印刷時に自動で非表示になります。外部ライブラリを使わずブラウザ標準の印刷機能
+  だけで実現しているため、文字が画像化されずくっきりした仕上がりになります（キャラクター画像の粗さの反省を
+  踏まえ、あえてこの方式にしています）
+- 「表紙画像を保存する」「Xでシェア」ボタンを追加。中身の解説文（第1〜4章の分析内容）は個人的な内容のため
+  含めず、表紙とタイプ名だけを見せる「PERSONAL BOOKが完成しました」という画像を生成してシェアできるように
+  しています（対応環境ではスマホの共有シートから直接SNSアプリに渡せます。それ以外は画像がダウンロードされ
+  ます）
 
-@keyframes kakuCardReveal {
-  0% { opacity: 0; transform: scale(0.88) translateY(14px); }
-  60% { opacity: 1; transform: scale(1.03) translateY(-2px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
-}
-.kaku-card--reveal {
-  animation: kakuCardReveal 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
+実際の決済・本番レポート生成は今回のMVPに含まれませんが、購入前に内容の雰囲気を確認できるよう、
+紹介ページに「プレビューを見る（無料サンプル）」ボタンを追加しています。無料診断で判定されたKAKUタイプを
+もとに、第1〜3章の詳細解説を確認できます（相性診断は、現在は独立サービスのKAKU MATCHページに移動して
+います。「お相手のタイプ」をその場で選ぶと、恋愛・結婚・仕事の3つの軸それぞれについて相性スコア
+（0〜100%）を棒グラフで表示し、軸ごとのコメント・気をつけたいポイントも確認できます。本来は相手にも
+診断してもらう想定ですが、プレビューでは選択式で代用しています）。
+先に無料診断を1回済ませていないと利用できません。
 
-.core6-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-}
-.core6-grid__item {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-}
-.core6-grid__label { font-size: 12px; color: var(--color-text-soft); }
-/* 文中で「構想力（VISION）」のように英語表記を添えるときの、英語部分の弱め表示 */
-.axis-en { opacity: 0.55; font-weight: 400; }
-/* 見出しの末尾に「WEAPON」のような英語の補助ラベルを小さく添えるとき用（日本語を主役にするため） */
-.label-en {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--color-text-soft);
-  opacity: 0.5;
-  margin-left: 8px;
-  vertical-align: middle;
-  text-transform: uppercase;
-}
-.core6-grid__bar {
-  height: 6px;
-  background: var(--color-border);
-  border-radius: 3px;
-  margin-top: 8px;
-  overflow: hidden;
-}
-.core6-grid__bar-fill {
-  height: 100%;
-  background: var(--color-accent);
-}
+### CONTEXT（PERSONAL BOOK限定の深掘り質問・3問）
 
-.radar-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-.radar-svg {
-  width: 100%;
-  max-width: 320px;
-  height: auto;
-}
-.radar-fill-anim {
-  animation: radarGrow 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@keyframes radarGrow {
-  from { transform: scale(0); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-@media print {
-  .radar-fill-anim { animation: none; transform: scale(1); opacity: 1; }
-}
+「有料部分に、より詳細を引き出す追加の質問・入力があると価値が上がるのでは」というアイデアを受けて、
+PERSONAL BOOKのプレビューを見る前に、選択式の追加質問3問（CONTEXT）に答えてもらう導線を追加しました。
 
-.result-block {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-}
-.result-block h3 {
-  font-size: 15px;
-  margin: 0 0 12px;
-}
-.result-block p {
-  font-size: 14px;
-  color: var(--color-text-soft);
-  margin: 0;
-}
+- 質問は「今の仕事・役割」「大事にしたい価値観」「気になっている人間関係」の3つ（`context-engine.js`の
+  `CONTEXT_QUESTIONS`）。既存のQUESTION（行動）・BIRTH（生まれ持った資質）・STATE（今の状態）とは
+  重ならない切り口を選んでいます
+- KAKUタイプ・CORE6の判定には一切影響しません。あくまでPERSONAL BOOKの第1章の解説を、今の状況に
+  よりフィットさせるための追加情報という位置づけです
+- 自由記述ではなく選択式にしているのは、自由記述から意味のある分析文を生成しようとすると外部のAI
+  （ChatGPTのAPIなど）との連携が必要になり、サーバー構築・API利用料・入力データの取り扱い設計といった、
+  今回の「サーバー不要の静的サイト」という前提から外れる規模の開発になってしまうためです。選択式であれば、
+  既存のWEAPON・BLIND SPOT・relationStyle等のテキストと組み合わせるテンプレート方式で、サーバーなしで
+  実現できます
+- 3問すべてに答えると「この内容でプレビューを見る」ボタンが押せるようになり、第1章に「今のあなたに
+  合わせて｜CONTEXT」という新しい段落が追加されます（無料診断・第2章以降の内容には影響しません）
+- 先に無料診断を済ませていない場合は、質問の代わりに「先に無料診断を」という案内が表示されます
 
-/* ---------- KAKU GAP（本来のあなた × 今のあなた のズレ）｜最大の差別化ポイントなので視覚的に目立たせる ---------- */
-.gap-hero {
-  background: linear-gradient(165deg, var(--color-accent) 0%, #171933 100%);
-  border-radius: var(--radius);
-  padding: 32px 24px;
-  margin: 8px 0 32px;
-  color: #F4F5FA;
-}
-.gap-hero__eyebrow {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--color-glow);
-  margin: 0 0 16px;
-  font-weight: 700;
-}
-.gap-hero__compare {
-  display: flex;
-  align-items: stretch;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.gap-hero__before,
-.gap-hero__after {
-  flex: 1 1 0;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-}
-.gap-hero__tag {
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  color: rgba(244, 245, 250, 0.6);
-  margin: 0 0 6px;
-  font-weight: 700;
-}
-.gap-hero__before .gap-hero__tag { color: var(--color-glow); }
-.gap-hero__after .gap-hero__tag { color: #F2B84A; }
-.gap-hero__compare p:last-child {
-  font-size: 13px;
-  line-height: 1.7;
-  margin: 0;
-  color: rgba(244, 245, 250, 0.92);
-}
-.gap-hero__arrow {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: rgba(244, 245, 250, 0.4);
-}
-.gap-hero__score {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: var(--radius-sm);
-  padding: 18px 20px;
-  margin-bottom: 20px;
-}
-.gap-hero__score-number {
-  flex: none;
-  font-family: var(--font-serif);
-  font-size: 44px;
-  font-weight: 700;
-  line-height: 1;
-  min-width: 74px;
-  text-align: center;
-}
-.gap-hero__score-number::after {
-  content: "";
-}
-.gap-hero__score-body { flex: 1 1 auto; }
-.gap-hero__score-tier {
-  font-size: 14px;
-  font-weight: 700;
-  margin: 0 0 8px;
-}
-.gap-hero__meter {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.14);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-.gap-hero__meter-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
-.gap-hero__meter-fill--small,
-.gap-hero__score-number--small { color: #3AAFA9; }
-.gap-hero__meter-fill--small { background: #3AAFA9; }
-.gap-hero__meter-fill--medium,
-.gap-hero__score-number--medium { color: #E8B930; }
-.gap-hero__meter-fill--medium { background: #E8B930; }
-.gap-hero__meter-fill--large,
-.gap-hero__score-number--large { color: #F2789F; }
-.gap-hero__meter-fill--large { background: #E0568C; }
-.gap-hero__score-caption {
-  font-size: 11px;
-  color: rgba(244, 245, 250, 0.55);
-  margin: 0;
-}
-.gap-hero__message {
-  font-size: 14px;
-  line-height: 1.8;
-  margin: 0;
-  color: rgba(244, 245, 250, 0.92);
-}
-.gap-hero__message strong { color: #FFFFFF; }
-.gap-hero__detail-toggle {
-  margin-top: 16px;
-}
-@media (max-width: 480px) {
-  .gap-hero__compare { flex-direction: column; }
-  .gap-hero__arrow { transform: rotate(90deg); }
-}
+将来、自由記述からより深い分析を作りたくなった場合は、外部AIとの連携（サーバーサイドの追加）が必要になる
+ため、その際はあらためて構成を相談させてください。
 
-.share-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 24px;
-}
+### シェア画像の「PERSONAL BOOK」演出強化・タイトルの見直し／本ページ全体のダークデザイン化
 
-/* ---------- PERSONAL BOOK 誘導バナー（近未来HUD風） ---------- */
-.upsell-banner {
-  position: relative;
-  margin: 32px 0 8px;
-  padding: 40px 28px 36px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0px, rgba(255, 255, 255, 0.045) 1px, transparent 1px, transparent 28px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0px, rgba(255, 255, 255, 0.045) 1px, transparent 1px, transparent 28px),
-    linear-gradient(135deg, #0B0E1E 0%, #171C3C 55%, #202B5C 100%);
-  color: #fff;
-  text-align: center;
-  border: 1px solid rgba(94, 200, 242, 0.35);
-  box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.08) inset, 0 10px 32px rgba(6, 8, 20, 0.45);
-  animation: upsellGlow 3.6s ease-in-out infinite;
-}
-.upsell-banner::before,
-.upsell-banner::after {
-  content: "";
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--color-glow);
-  opacity: 0.75;
-  pointer-events: none;
-}
-.upsell-banner::before {
-  top: 10px;
-  left: 10px;
-  border-right: none;
-  border-bottom: none;
-  border-top-left-radius: 4px;
-}
-.upsell-banner::after {
-  bottom: 10px;
-  right: 10px;
-  border-left: none;
-  border-top: none;
-  border-bottom-right-radius: 4px;
-}
-.upsell-banner__formula {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 0 0 22px;
-}
-.upsell-banner__chip {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--color-glow);
-  background: rgba(94, 200, 242, 0.1);
-  border: 1px solid rgba(94, 200, 242, 0.5);
-  border-radius: 999px;
-  padding: 5px 12px;
-}
-.upsell-banner__times {
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 13px;
-  font-weight: 700;
-}
-.upsell-banner__title {
-  position: relative;
-  font-size: 21px;
-  font-weight: 800;
-  line-height: 1.6;
-  margin: 0 0 18px;
-  text-shadow: 0 0 20px rgba(94, 200, 242, 0.4);
-}
-.upsell-banner__text {
-  position: relative;
-  font-size: 13.5px;
-  line-height: 1.9;
-  color: rgba(255, 255, 255, 0.82);
-  text-align: left;
-  margin: 0 0 28px;
-}
-.btn--cta {
-  position: relative;
-  background: #fff;
-  border-color: #fff;
-  color: #14183A;
-  padding: 16px 40px;
-  font-size: 15px;
-  font-weight: 800;
-  box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.45), 0 6px 22px rgba(94, 200, 242, 0.4);
-}
-.btn--cta:hover { transform: translateY(-2px) scale(1.02); }
-@keyframes upsellGlow {
-  0%, 100% { box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.08) inset, 0 10px 32px rgba(6, 8, 20, 0.45); }
-  50% { box-shadow: 0 0 0 1px rgba(94, 200, 242, 0.22) inset, 0 10px 42px rgba(94, 200, 242, 0.3); }
-}
+「シェア画像のPERSONAL BOOK表記をもっと目立たせてワクワク感を出したい」「表紙のあとの中身が
+文字＋白背景で寂しいので、データ感・近未来感・本感が出る配色にしてほしい」というフィードバックを受けて、
+以下を変更しています。
 
-/* ---------- KNOW→USE→CONNECT→BUILD（KAKU全体のサービス構造） ---------- */
-.journey-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin: 24px 0 32px;
-  padding: 20px;
-  background: var(--color-accent-soft);
-  border-radius: var(--radius);
-}
-.journey-flow__step {
-  text-align: center;
-  padding: 4px 14px;
-}
-.journey-flow__label {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--color-accent);
-  margin: 0 0 4px;
-}
-.journey-flow__desc {
-  font-size: 12px;
-  color: var(--color-text-soft);
-  margin: 0;
-}
-.journey-flow__arrow {
-  color: var(--color-text-soft);
-  opacity: 0.5;
-  font-size: 14px;
-}
+- **シェア画像（表紙画像を保存する）**：上部の「PERSONAL BOOK」の文字を、グロー付きの角丸バッジ＋
+  レターごとに間隔をつけた大きめの文字にし、単なるプレーンテキストではなく「特別な1冊」感が伝わる
+  ロゴ風の見せ方に変更しました
+- 同じ画像の中央タイトル（これまで「〇〇のための取扱説明書」としていた部分）を、下にあった
+  「〇〇さんのPERSONAL BOOKが完成しました」に差し替え。PERSONAL BOOKはタイプ診断だけでなく
+  本人の追加情報も組み合わせた1冊であるため、タイプ名だけの説明書ではなく「あなたのために完成した」
+  ことを主役にしています（タイプ名・出現率はその下に小さく添える形にしました）
+- サイト上のPERSONAL BOOKプレビューページについて、表紙（book-cover）から先の各章・冒頭の手紙・
+  結びの一言まで含めたページ全体に、ダークネイビー基調＋薄いグリッド線＋シアン・ゴールドのアクセントカラー
+  という、無料診断ページの「PERSONAL BOOKへの誘導バナー」と共通の近未来HUD風デザインを適用しました。
+  CORE6のレーダーチャートも、この背景で見やすいダーク配色バージョンに切り替えています
+  （無料診断結果ページ自体は、これまで通り明るい配色のままです）
+- 「PDFとして保存する」で出力されるPDFにも、このダークデザインの背景色がそのまま反映されるようにしています
 
-/* ---------- Pricing ---------- */
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-.pricing-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 24px;
-  background: var(--color-surface);
-  text-align: center;
-}
-.pricing-card__step {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--color-glow-on-light, var(--color-accent));
-  opacity: 0.7;
-  margin: 0 0 6px;
-}
-.pricing-card__price {
-  font-size: 22px;
-  font-weight: 800;
-  margin: 8px 0 16px;
-}
-.price-tag {
-  font-size: 20px;
-  font-weight: 800;
-  margin: 16px 0;
-}
+### 第2章「CORE6全軸解説」の文章量を削減（読み疲れの解消）
 
-/* ---------- タイプ一覧 ---------- */
-.types-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-  margin-top: 24px;
-}
-.type-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  overflow: hidden;
-}
-.type-card__summary {
-  display: block;
-  width: 100%;
-  border: none;
-  background: none;
-  padding: 0;
-  text-align: left;
-  cursor: pointer;
-  font-family: inherit;
-  color: inherit;
-  position: relative;
-}
-.type-card__image {
-  width: 100%;
-  display: block;
-  background: var(--color-accent-soft);
-}
-.type-card__poster-tag {
-  margin: 0;
-  padding: 10px 14px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.5;
-  letter-spacing: 0.01em;
-  text-align: center;
-}
-.type-card__body { padding: 16px; }
-.type-card__type-en {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  font-weight: 700;
-  color: var(--color-text-soft);
-}
-.type-card__type-jp {
-  font-size: 18px;
-  font-weight: 800;
-  margin: 2px 0 8px;
-}
-.type-card__catchcopy {
-  font-size: 13px;
-  color: var(--color-text-soft);
-  margin-bottom: 6px;
-}
-.type-card__rarity {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-accent);
-}
-.type-card__toggle {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--color-accent);
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.type-card__detail {
-  padding: 0 16px 20px;
-  border-top: 1px solid var(--color-border);
-  font-size: 13px;
-  color: var(--color-text-soft);
-}
-.type-card__detail p { margin: 6px 0; }
-.result-block__mini-title {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--color-text);
-  margin-top: 14px !important;
-}
-.type-card--open .type-card__image { filter: brightness(1.02); }
+「デザインは良くなったが、全部の文章が承認・気づきになっていないと読むのが疲れる」というフィードバックを
+受けて、第2章の構成を見直しました。
 
-/* ---------- PERSONAL BOOK: CONTEXT（深掘り）質問フォーム ---------- */
-.context-intro {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  padding: 24px;
-  margin: 20px 0 24px;
-  text-align: left;
-}
-.context-intro__title {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--color-accent);
-  margin: 0 0 8px;
-}
-.context-item { margin: 20px 0; }
-.context-item__prompt {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-.context-item__options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.context-option {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-bg);
-  font-size: 13.5px;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--color-text);
-}
-.context-option:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
-}
-.context-option.is-selected {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #fff;
-}
+- これまでは6軸すべてについて、`core-engine.js`の`CORE6_TIER_COMMENTARY`という高い/平均的/控えめの
+  3段階固定テンプレートから生成した解説文を、軸ごとに1段落ずつ（計6段落）並べていました。上位2軸
+  （主軸・副軸）はすでに第1章で物語として展開済みのため内容が重複するうえ、残り4軸は「LOGICは平均的です。
+  必要に応じて分析はできますが、それだけで動くタイプではなさそうです。」のような、スコアを言葉に変換した
+  だけの当たり障りのない文章が4つ続き、読んでいて退屈な部分になっていました
+- 第2章を「①主軸2つの実際の数値（バー＋バッジのみ、解説文は重複させない）」「②残り4軸のバランス
+  （バーのみを並べる）」「③残り4軸をまとめた1つの気づき文」という3ステップに再構成。②の4軸は個別の
+  解説をやめ、4軸の中で一番高い軸と一番低い軸を比較して「一番の力をどう支えているか／どう手放しているか」
+  という1つの文章にまとめることで、読む分量を減らしつつ、すべての文が肯定か気づきを含むようにしました
+  （4軸が同点の場合は「まんべんなく備わっているバランス型」という文章に自動で切り替わります）
+- この変更で使わなくなった`getAxisCommentary`／`CORE6_TIER_COMMENTARY`は、`core-engine.js`にはそのまま
+  残しています（今後、無料診断側などで軸ごとの短評が必要になった場合に再利用できるようにするためです）
 
-/* ---------- PERSONAL BOOK preview（表紙から先も「データ感・近未来感・本感」を統一） ---------- */
-.book-preview {
-  text-align: left;
-  margin-top: 8px;
-  padding: 22px 16px 34px;
-  border-radius: var(--radius);
-  background:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 26px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 26px),
-    linear-gradient(180deg, var(--book-bg-a) 0%, var(--book-bg-b) 100%);
-  box-shadow: inset 0 0 0 1px rgba(94, 200, 242, 0.1);
-}
-.book-preview > .form-note:first-child {
-  color: var(--book-text-soft);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--book-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  margin: 0 0 20px;
-}
+### CORE6の棒グラフが「何のグラフか分からない」問題の修正
 
-/* ---------- PERSONAL BOOK: 本のような見た目 ---------- */
-.book-cover {
-  position: relative;
-  color: #fff;
-  border-radius: var(--radius);
-  padding: 40px 28px 34px 40px;
-  text-align: center;
-  margin-bottom: 24px;
-  overflow: hidden;
-  box-shadow: 0 16px 36px rgba(10, 10, 16, 0.3);
-}
-.book-cover::before {
-  /* 背表紙（スパイン） */
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 14px;
-  background: rgba(0, 0, 0, 0.3);
-  box-shadow: inset -3px 0 6px rgba(0, 0, 0, 0.3);
-}
-.book-cover::after {
-  /* 表紙の縁取り（箔押し風） */
-  content: "";
-  position: absolute;
-  inset: 10px 10px 10px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  border-radius: calc(var(--radius) - 4px);
-  pointer-events: none;
-}
-.book-cover__label {
-  position: relative;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.22em;
-  opacity: 0.8;
-  margin-bottom: 18px;
-}
-.book-cover__image {
-  position: relative;
-  width: 148px;
-  border-radius: var(--radius-sm);
-  margin: 0 auto 18px;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
-}
-.book-cover__title {
-  position: relative;
-  font-family: var(--font-serif);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-}
-.book-cover__rule {
-  position: relative;
-  width: 36px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.55);
-  margin: 16px auto 0;
-}
+上記の第2章リニューアル後に「何の棒グラフか分からない」というフィードバックをもらい、確認したところ
+2つの原因がありました。
 
-/* ---------- PERSONAL BOOK: 章タブ（縦長スクロールを避け、章単位で切り替える） ---------- */
-.book-tabs {
-  display: flex;
-  gap: 8px;
-  margin: 4px 0 20px;
-  flex-wrap: wrap;
-}
-.book-tab {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: 50%;
-  border: 1px solid rgba(94, 200, 242, 0.3);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--book-text-soft);
-  font-size: 13px;
-  font-weight: 700;
-  font-family: var(--font-serif);
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.book-tab.is-active {
-  background: var(--color-glow);
-  border-color: var(--color-glow);
-  color: #0A0D1C;
-}
+- **表示上のバグ**：ダークデザイン化の際、`.book-axis-row__label`（軸名と点数を表示する行）に文字色の
+  指定が抜けており、暗い背景に対してほぼ黒に近い文字色のまま表示されていました。つまり「VISION｜構想力」
+  のような軸名そのものがほとんど見えない状態になっており、これが一番の原因でした。文字色を明るい色に
+  指定し直して解消しています
+- **説明不足**：点数を「50」のように単位なしの数字だけで表示しており、0〜100点というスケールや、数字が
+  何を意味するのかの説明もありませんでした。すべての点数表示に「点」を付け（例：「50点」）、無料診断結果
+  ページ・PERSONAL BOOK第2章の両方に「6つの軸はそれぞれ0〜100点。数字が大きいほど、その力を強く使って
+  いる（BIRTHの場合は生まれ持っている）ことを表します」という説明文を追加しました
 
-/* ---------- PERSONAL BOOK: 第3章のステップ表示（番号バッジ付き） ---------- */
-.book-steps {
-  list-style: none;
-  margin: 20px 0 0;
-  padding: 0;
-}
-.book-step {
-  display: flex;
-  gap: 16px;
-  padding: 18px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-.book-step:first-child { border-top: none; padding-top: 8px; }
-.book-step__num {
-  flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(217, 179, 108, 0.14);
-  border: 1px solid rgba(217, 179, 108, 0.5);
-  color: var(--book-gold);
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.book-step__when {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--color-glow);
-  margin: 0 0 6px;
-  font-weight: 700;
-}
+### PERSONAL BOOK / KAKU MATCH のチャプター構成の変更（タブ化・表現の見直し・KAKU MATCHの独立化）
 
-/* ---------- PERSONAL BOOK: KAKU MATCHへの誘導カード ---------- */
-.book-match-promo {
-  border-color: rgba(224, 86, 140, 0.4) !important;
-}
-.book-match-promo .book-chapter { color: #F2789F; text-shadow: 0 0 16px rgba(224, 86, 140, 0.35); }
+実際にエンドユーザーとして通しでPERSONAL BOOKを試したフィードバックを受けて、表示方法・文言・チャプター
+構成を大きく見直しました。
 
-.book-preview .result-block {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%), var(--book-panel);
-  border: 1px solid var(--book-border);
-  box-shadow: 0 12px 28px rgba(3, 5, 14, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-}
-.book-preview .result-block h3 {
-  font-family: var(--font-serif);
-  font-size: 19px;
-  padding-bottom: 14px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid rgba(217, 179, 108, 0.3);
-  color: var(--book-text);
-}
-.book-preview .result-block p {
-  color: var(--book-text-soft);
-  margin: 0 0 14px;
-}
-.book-preview .result-block p:last-child { margin-bottom: 0; }
-.book-preview .result-block strong { color: var(--book-text); }
-.book-preview .result-block p.result-block__mini-title {
-  color: var(--color-glow);
-  letter-spacing: 0.04em;
-}
-.book-preview .form-note {
-  color: var(--book-text-soft);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-}
-.book-chapter {
-  font-family: var(--font-serif);
-  font-size: 12px;
-  letter-spacing: 0.26em;
-  color: var(--book-gold);
-  font-weight: 700;
-  margin: 0 0 6px;
-  text-shadow: 0 0 16px rgba(217, 179, 108, 0.35);
-}
-.book-share-row {
-  margin-bottom: 8px;
-}
-.book-axis-row {
-  margin: 20px 0;
-}
-.book-axis-row--compact {
-  margin: 14px 0;
-}
-.book-axis-row__label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--book-text);
-}
-.book-axis-row__comment {
-  font-size: 13px;
-  color: var(--book-text-soft);
-  margin: 8px 0 0;
-}
-.axis-badge-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-.axis-badge {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-.axis-badge--birth {
-  background: rgba(94, 200, 242, 0.14);
-  color: var(--color-glow);
-  border: 1px solid rgba(94, 200, 242, 0.5);
-}
-.axis-badge--question {
-  background: rgba(217, 179, 108, 0.14);
-  color: var(--book-gold);
-  border: 1px solid rgba(217, 179, 108, 0.5);
-}
+- **チャプターのタブ化**：これまで第1〜4章を縦に並べて表示していたため「長くて読むのがしんどい」という
+  指摘を受け、画面表示は章ごとのタブ切り替え（クリックした章だけが表示される）に変更しました。PDF保存
+  （`@media print`）では引き続き全章がまとめて出力されるよう、印刷時だけタブの`hidden`指定を無効化する
+  CSSを追加しています
+- 表紙タイトルを「○○さんのPERSONAL BOOK」（名前未入力時は「あなたのPERSONAL BOOK」）に変更し、
+  「〇〇のための取扱説明書」という表記は完全に削除しました
+- 第1章のタイトルを「あなたの核の全体像」→「あなたのKAKU（核）の全体像」に変更。第3章も
+  「核を活かす3ステップ・アクションプラン」→「KAKU（核）を活かす3ステップ」に変更し、いずれも
+  「KAKU」という固有名詞が伝わるようにしています
+- CONTEXT（深掘り質問）に応じた段落の見出しを「今のあなたに合わせて｜CONTEXT」から、英語表記を外した
+  「たとえば、今のあなたなら」に変更しました（英語混じりの見出しが「AI感」につながるという指摘のため）
+- 第2章の構成を「先に数値・グラフを見せてから、その数値が何かを説明する」順番に並べ替えました。
+  「第1章で触れた2軸」という曖昧な言い回しをやめ、実際の軸名（例：「構想力（VISION）」）を明記する
+  文章に変更しています
+- CORE6レーダーチャートを拡大（320px相当・レスポンシブ対応）し、表示時にグラフが中心から広がる
+  アニメーションを追加しました（PDF出力時はアニメーション途中の状態で止まらないよう、印刷時は最終形で
+  固定表示されます）
+- 本文中の軸名表記を「VISION（構想力）」という英語→日本語の順から、「構想力（VISION）」という
+  日本語→英語の順に統一し、英語部分は薄いグレーで表示するよう変更しました（グラフ・バーのラベル表記
+  「VISION｜構想力」はご指定のとおりそのまま維持しています）
+- **統合分析のアクションプランを、断定的・具体的な内容に全面書き換え**：「〜可能性があります」
+  「〜してみましょう」といった曖昧な言い回しをやめ、「今週、○○してください」「今日中に○○して
+  ください」のように期限と行動をセットにした言い切り型の文章に変更しました。診断結果を見る人は
+  自分で次の一手を決めにくいことが多いため、あえてこちらが具体的な行動を1つに絞って提示する方針に
+  しています（`app.js`の`AXIS_CONCRETE_MOVE`）
+- 第3章のステップ表示を、金色の丸番号バッジ＋時期表記（「1週間以内」等）を使ったタイムライン風の
+  デザインに変更し、見た目の完成度を上げました
+- **KAKU MATCHを独立サービスとして切り出し**：PERSONAL BOOKの中身がここまでの改善で単体でも価値を
+  感じられるようになったと判断し、第4章として統合していたKAKU MATCHを再び独立させ、新しい紹介ページ
+  （`view-kaku-match`、¥980）にしました。PERSONAL BOOKの各章の下には、KAKU MATCHへ誘導するクロスセル
+  用のカードを設置しています。独立にあたり、各カテゴリのスコア説明に「なぜこの数字？」に加えて
+  「気をつけたいポイント」という実践的なアドバイス（`match-engine.js`の`CATEGORY_ADVICE`、
+  恋愛・結婚・仕事 × 6軸 = 18パターン）を新たに追加しています
 
-/* ---------- PERSONAL BOOK 第2章: 特に高い3つの力 ---------- */
-.book-power-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin: 18px 0 26px;
-}
-.book-power-item {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(217, 179, 108, 0.28);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-}
-.book-power-item__head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-.book-power-item__rank {
-  flex: none;
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--book-gold);
-}
-.book-power-item__name {
-  flex: 1 1 auto;
-  font-family: var(--font-serif);
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--book-text);
-}
-.book-power-item__score {
-  flex: none;
-  font-family: var(--font-mono);
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--color-glow);
-}
-.book-power-item__desc {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--book-text-soft);
-}
+### サービスコンセプトの再整理（TOP改善・KAKU GAPの数値化・SHUTDOWN追加・PERSONAL BOOK再構成 ほか）
 
-/* ---------- PERSONAL BOOK 第5章: KAKU GAPの補足アコーディオン ---------- */
-.book-gap-closing {
-  font-size: 15px;
-  line-height: 1.8;
-}
-.book-accordion {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-.book-accordion summary {
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-glow);
-  list-style: none;
-}
-.book-accordion summary::-webkit-details-marker { display: none; }
-.book-accordion summary::after { content: "　＋"; }
-.book-accordion[open] summary::after { content: "　－"; }
-.book-accordion p {
-  margin: 12px 0 0;
-  font-size: 13px;
-  line-height: 1.8;
-  color: var(--book-text-soft);
-}
+「KAKUを受けると自分の何が分かるのかが一瞬で伝わるサイトにしたい」という方針を受けて、既存のデザイン・
+世界観・カラー・基本構成は維持したまま、TOPページの見せ方からPERSONAL BOOKの中身まで、コンセプトに
+沿った改善を行いました。
 
-/* ---------- PERSONAL BOOK 第6章: 取扱説明書スコアカード ---------- */
-.manual-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin: 18px 0;
-}
-@media (min-width: 640px) {
-  .manual-grid { grid-template-columns: 1fr 1fr; }
-}
-.manual-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--book-border);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-}
-.manual-card--warn {
-  border-color: rgba(224, 86, 140, 0.4);
-}
-.manual-card__title {
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--book-gold);
-  margin: 0 0 8px;
-}
-.manual-card--warn .manual-card__title { color: #F2789F; }
-.manual-card p:not(.manual-card__title) {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--book-text-soft);
-}
-.book-condition-list--shutdown { color: #F2B4C9; }
+- **TOPページを刷新**：メインメッセージ「あなたの核を、解き明かす。」はそのまま残し、その上に
+  「性格だけでは、本当のあなたは分からない。」という一文を追加。仕組みの説明は増やさず、CTAを
+  「無料でKAKUを診断する」に変更したうえで、その下に「約3分・完全無料」という実際の仕様と一致する
+  補足を添えました。仕組みの理論を先に説明するのではなく、「KAKUを受けると、何がわかる？」という
+  6つの問いかけ（なぜやる気が出る仕事とそうでない仕事があるのか、等）をTOPページに直接配置し、
+  「これ、自分も知りたい」と思ってもらうことを優先する構成にしています
+- **KAKU GAPを数値化し、最大の差別化ポイントとして視覚的に強調**：これまで文章のみだったKAKU GAPに、
+  「本来のあなた（BIRTH）」→「今のあなた（QUESTION × STATE）」→「GAPスコア（0〜96）」→「なぜ」という
+  KAKU独自の体験を新設しました。スコアは指定通りランダム生成ではなく、①QUESTIONで一番使っている軸の
+  スコアと本来の資質（BIRTH）軸のスコアの差、②STATEの平均点の低さ、の2つの実測値から決定的に算出する
+  仕組みにしています（`gap-engine.js`の`computeGapScore`。重み付けは今後の診断ロジック調整に合わせて
+  変更できる構造です）。無料診断結果ページには、この体験をダークトーンのカードで大きく見せる
+  `.gap-hero`という専用のUIを新設しました
+- **SHUTDOWN（力が出にくくなる条件）を全16タイプに追加**：これまでAWAKEN（力を発揮しやすい条件）しか
+  無かったところに、その対になるSHUTDOWNを`types-data.js`に追加し、無料診断結果ページ・PERSONAL BOOKの
+  両方で表示するようにしました
+- **SNSシェア画像にCORE6の簡易表示を追加**：無料診断結果のシェア画像に、6軸の簡易バーグラフを追加し、
+  タイプ名だけでなく「自分のプロフィール」としての情報量を増やしました
+- **PERSONAL BOOKを、WORK・CAREER・RELATION・AWAKEN・SHUTDOWN・GROWTH・LIFE STRATEGY・ACTIONの
+  8つの観点で再構成**：「無料診断より詳しい文章を増やすだけの商品にしない」という方針に沿って、
+  以下の5章構成に再編しました。単なる言い換えではなく、「この特性を現実でどう使うか」まで踏み込んだ
+  内容にしています。
+  - 第1章：あなたのKAKU（核）の全体像（従来通り）
+  - 第2章：核をどう活かすか｜WORK（向いている仕事・役割・働き方）・CAREER（会社員/管理職/専門職/起業の
+    適性傾向）・AWAKEN・SHUTDOWN
+  - 第3章：人との関わり方と、伸びしろ｜RELATION・GROWTH（伸ばすべき力／無理に直さなくていい弱点）
+  - 第4章：CORE6全軸解説・統合分析・LIFE STRATEGY（人生で何を優先すると満足しやすいか）
+  - 第5章：KAKU（核）を活かす3ステップ｜ACTION（従来通り）
 
-/* ---------- PERSONAL BOOK 第9章: 締めのメッセージ ---------- */
-.book-final-message {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(217, 179, 108, 0.3);
-  font-size: 15px;
-  line-height: 1.9;
-  color: var(--book-text);
-}
+  WORK・CAREER・LIFE STRATEGYは、タイプ（16種）ではなく一番の力（CORE6の6軸）を軸にしたテンプレート
+  （`app.js`の`WORK_BY_AXIS`・`CAREER_BY_AXIS`・`LIFE_STRATEGY_BY_AXIS`）として実装しており、
+  RELATIONは既存の`type.relationStyle`を、GROWTHは既存の「残り4軸のバランス」計算結果と
+  `type.blindSpot`を、それぞれ再利用しています
+- **KAKU MATCHの価格を¥980に変更し、対象を恋人関係に限定しない表現に変更**：紹介文を「恋人、夫婦、
+  友人、仕事仲間、上司と部下——どんな関係にも使えます」という書き方に変更し、恋愛・結婚・仕事以外の
+  関係性でも使えることが伝わるようにしました
+- **KAKU TEAMに「組み合わせを断定しない」という注記を追加**：「このタイプを集めれば最強」のような
+  断定はせず、あくまで配置・役割分担・コミュニケーションを考える材料であることを明記しました
+- **料金ページにKNOW→USE→CONNECT→BUILDの流れを追加**：4つのサービスがバラバラに見えないよう、
+  「自分を知る（無料診断）→自分を活かす（PERSONAL BOOK）→人との違いを理解する（KAKU MATCH）→
+  人を組み合わせる（KAKU TEAM）」という一連の流れを可視化する`.journey-flow`を料金ページに新設し、
+  各料金カードにもKNOW/USE/CONNECT/BUILDのラベルを追加しました
+- **ABOUTページにブランドメッセージを追加**：「人には、それぞれ『核』がある。」から始まる、KAKU全体の
+  思想を伝える一文をABOUTページの冒頭に追加しました
+- **細かな表記の統一**：PERSONAL BOOKのXシェア・表紙画像シェアのテキストに残っていた
+  「〇〇のための取扱説明書」という表記を削除し、以前の表紙タイトル修正と表記を統一しました
 
-/* ---------- PERSONAL BOOK: CORE6バー（本ページ内はダーク基調） ---------- */
-.book-preview .core6-grid__bar {
-  background: rgba(255, 255, 255, 0.1);
-}
-.book-preview .core6-grid__bar-fill {
-  background: var(--color-glow);
-}
+### 日本語を主役にする全面見直しと、PERSONAL BOOKの「自分の攻略本」への再構成
 
-/* ---------- KAKU MATCH（PERSONAL BOOK 第4章）相性グラフ ---------- */
-.match-result { text-align: left; }
-.match-category {
-  margin: 24px 0;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-.match-category:first-of-type {
-  margin-top: 16px;
-  padding-top: 0;
-  border-top: none;
-}
-.match-category__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
-}
-.match-category__label {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--book-text);
-}
-.match-category__score {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--book-gold);
-}
-.match-category__score-unit {
-  font-size: 12px;
-  font-weight: 700;
-  margin-left: 1px;
-}
-.match-category__bar {
-  height: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  overflow: hidden;
-}
-.match-category__bar-fill {
-  height: 100%;
-  border-radius: 5px;
-  background: var(--color-glow);
-  transition: width 0.6s ease;
-}
-.match-category__bar-fill--romance { background: #F2789F; }
-.match-category__bar-fill--marriage { background: #8C93F5; }
-.match-category__bar-fill--work { background: #4FCE93; }
-.match-category__comment {
-  font-size: 13px;
-  color: var(--book-text-soft);
-  margin: 10px 0 0;
-}
-.book-preview .result-block p.match-category__reason {
-  font-size: 12px;
-  color: var(--color-glow);
-  background: rgba(94, 200, 242, 0.1);
-  border: 1px solid rgba(94, 200, 242, 0.3);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  margin: 10px 0 0;
-}
-.book-preview .result-block p.match-category__advice {
-  font-size: 12px;
-  color: #F2789F;
-  background: rgba(224, 86, 140, 0.1);
-  border: 1px solid rgba(224, 86, 140, 0.3);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  margin: 8px 0 0;
-}
+「合理的で綺麗な診断サービス」から「自分のことをもっと知りたくなるサービス」へ、という方針のもとで
+行った改善です。デザイン・カラー・世界観・既存の診断ロジック（QUESTION 30問／BIRTH／STATE 10問の
+判定ロジックそのもの）は変更していません。
 
-/* ---------- PERSONAL BOOK: KAKU MATCH のフォーム部品（画面上のみ・印刷時は非表示） ---------- */
-.book-preview .form-field {
-  color: var(--book-text-soft);
-}
+- **サイト全体を日本語主役にリライト**：内部ロジック用語のWEAPON／BLIND SPOT／TEAM ROLE／
+  RELATION STYLE／AWAKEN／SHUTDOWNは、すべて見出しレベルでは「あなたの武器」「あなたが陥りやすい罠」
+  「組織で輝く役割」「人との向き合い方」「あなたが覚醒する条件」「力を失いやすい環境」という日本語に
+  変更し、英語は`.label-en`という小さな補助ラベルとしてのみ添えるようにしました。QUESTION／BIRTH／
+  STATEという内部の仕組み用語はユーザーに一切見せず、【普段のあなた】【生まれ持ったあなた】
+  【今のあなた】という言葉に統一しています。また、生年月日を使うことについて「科学的に精度が上がる」
+  といった表現は一切使わず、「質問だけで決めつけず、複数の視点から自分を見つめる」という説明に
+  揃えました。CORE6の6軸も、VISION／LOGIC／DRIVE／INFLUENCE／BOND／STABILITYという軸名ではなく、
+  「未来を描く力」「構造を見抜く力」「壁を破る力」「人を動かす力」「心を通わせる力」「積み上げる力」
+  という力の名前で表示するようにし（`app.js`の`AXIS_POWER_NAMES`）、KAKU GAPのメッセージ文言
+  （`gap-engine.js`）とも呼び方を揃えています
+- **TOPページのファーストビューを刷新**：「あなたの核は、何者だ。」という新しい問いかけを中心に据え、
+  「性格診断でも、占いでもありません。」という否定形の説明はファーストビューから外しました（ABOUTページ
+  にのみ残しています）。ファーストビュー直下にキャラクターを複数まとめて見せる`.hero-cast`を新設し、
+  「この中に、自分がいるかもしれない。」という一文とともに、均一な図鑑ではなく数体を大胆に配置しています。
+  そのうえで「なぜ頑張れる時とそうでない時があるのか」といった共感を誘う問いかけ→仕組みの3ステップ
+  説明（普段のあなた×生まれ持ったあなた×今のあなた→あなたの核）→診断へのCTA、という順番に並べ替え、
+  仕組みの説明より先に「自分ごと化」してもらう構成にしています
+- **KAKU GAPは必ず「本来の自分と、今の自分のズレ」という人間の言葉が先に来るように統一**：無料診断結果
+  ページ・PERSONAL BOOK第5章のどちらも、GAPスコアやKAKU GAPというラベルより先に、本来のあなたと今の
+  あなたを1文ずつ語る`.gap-hero`の比較部分を見せる順番に統一しています。スコアの算出ロジックは
+  Round 9から変更していません（引き続きランダム生成ではなく決定的な計算です）
+- **PERSONAL BOOKを「無料診断の詳しい版」から「自分の攻略本」に再構成**：従来の5章構成をやめ、
+  ①理解→②納得→③現在地への理解→④自己攻略→⑤行動、という感情の流れに沿った9章構成に組み直しました
+  （`app.js`の`renderPersonalBookPreview()`）。
+  - 第1章 あなたは、何者なのか。（キャラクター主導であなたの全体像を語る）
+  - 第2章 なぜ、あなたはそうなるのか。（CORE6のうち特に高い3つの力を、力の名前と点数で紹介）
+  - 第3章 あなたが輝くとき。（AWAKENを「思い出してみてください」という回顧的な語りで再構成）
+  - 第4章 あなたが止まるとき。（SHUTDOWNを同様に、環境条件の物語として再構成）
+  - 第5章 なぜ、今のあなたはこうなのか。（KAKU GAPを中盤のクライマックスとして展開し、
+    「この分析について」のアコーディオンで算出根拠を補足）
+  - 第6章 あなたの取扱説明書。（私を動かすもの／止めるもの／任せてほしいこと／求めすぎないでほしい
+    こと／調子がいい時のサイン／危険信号／戻るために必要なことを1画面のスコアカードにまとめた
+    `.manual-grid`）
+  - 第7章 仕事で、どう活かすか。（職業名の列挙ではなく、力を発揮しやすい仕事／失いやすい仕事／
+    リーダーになった場合、という環境条件で説明）
+  - 第8章 人と、どう付き合うか。（関係の築き方の説明に加え、「だからどうすればいいか」という
+    具体的なアドバイスまで踏み込む）
+  - 第9章 これから、どうするか。（「01｜減らす／02｜取り戻す／03｜試す」という3つの行動提案で締め、
+    要約ではなく次の一歩を渡す）
 
-/* ---------- PERSONAL BOOK: 冒頭の手紙／結びの一言 ---------- */
-.opening-letter {
-  background: rgba(94, 200, 242, 0.08);
-  border-left: 3px solid var(--color-glow);
-  border-radius: var(--radius-sm);
-  padding: 20px 22px;
-  margin-bottom: 24px;
-  font-size: 14px;
-  line-height: 1.9;
-  color: var(--book-text-soft);
-}
-.opening-letter p { margin: 0 0 12px; }
-.opening-letter p:last-child { margin-bottom: 0; }
-.opening-letter__to {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  color: var(--book-gold);
-  font-size: 14px;
-  letter-spacing: 0.04em;
-}
-.closing-note {
-  text-align: center;
-  padding: 28px 20px;
-  margin-top: 8px;
-  font-size: 13.5px;
-  line-height: 1.9;
-  color: var(--book-text-soft);
-}
-.closing-note__sign {
-  margin-top: 12px;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  color: var(--book-gold);
-  font-size: 13px;
-}
-.book-share-row.btn--text,
-.book-share-row .btn--text {
-  color: rgba(236, 238, 247, 0.75);
-}
+  いずれの章もTYPE単体ではなく、CORE6の実際のスコア・診断の回答傾向・現在のSTATE・KAKU GAPの
+  組み合わせで文章が変わるようにしており（例：第9章の3ステップは、資質と行動の一致／不一致、
+  状態の良し悪しという4パターンで内容が変わります）、相性診断に関する内容は一切含めていません
+  （気になる相手との相性はKAKU MATCH側に一本化したままです）
+- **PERSONAL BOOKのUIを「読み物」寄りに**：PDF鑑定書のような硬い見た目にならないよう、カード・
+  数値・グラフ・キャッチコピー・余白を組み合わせたレイアウトのまま、9章分のタブ切り替え・印刷時の
+  全章展開（`.book-tabpanel[hidden]`の印刷用CSS）は従来どおり維持しています
 
-/* ---------- PDF保存（印刷）用スタイル ---------- */
-@media print {
-  /* ダーク基調のブックデザインを、そのままPDFにも反映させる
-     （背景色を印刷対象にするための指定。指定がないとブラウザによって背景が白抜きになる） */
-  html, body {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  body * { visibility: hidden; }
-  #personal-book-preview,
-  #personal-book-preview * {
-    visibility: visible;
-  }
-  #personal-book-preview {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-  }
-  .no-print { display: none !important; }
-  /* 画面では章タブで1つずつ表示しているが、PDF保存では全章をまとめて出力する */
-  .book-tabpanel[hidden] { display: block !important; }
-  .book-preview .result-block {
-    box-shadow: none;
-    border: 1px solid rgba(94, 200, 242, 0.35);
-    page-break-inside: avoid;
-  }
-  .opening-letter,
-  .closing-note,
-  .book-cover {
-    page-break-inside: avoid;
-  }
-  .match-category { page-break-inside: avoid; }
-}
+### 「PDFとして保存する」を、本当にワンクリックでPDFがダウンロードされるように修正
 
-/* ---------- PERSONAL BOOK: PDFダウンロード用のキャプチャモード ----------
-   「PDFとして保存する」クリック時、html2canvasで#personal-book-previewを撮影する直前に
-   .pdf-export-modeを付与し、@media printと同じ考え方で「章タブを全部展開」「no-printを隠す」
-   状態にしてから撮影する（撮影後にこのクラスは外し、画面表示は元の状態に戻す）。 */
-.pdf-export-mode .no-print { display: none !important; }
-.pdf-export-mode .book-tabpanel[hidden] { display: block !important; }
+これまで「PDFとして保存する」ボタンはブラウザの印刷機能（`window.print()`）を呼び出すだけで、
+実際には印刷画面が開き、そこで利用者が送信先を「PDFに保存」に切り替える必要がありました。仕様どおりの
+挙動ではあるものの、ボタン名から直接ダウンロードされると誤解しやすいというフィードバックを受けて、
+html2canvas＋jsPDF（CDN経由）を使い、クリック一つで実際にPDFファイルがダウンロードされるように
+変更しました。
 
-/* ---------- Footer ---------- */
-.site-footer {
-  text-align: center;
-  padding: 40px 24px;
-  font-size: 12px;
-  color: var(--color-text-soft);
-}
+- クリック時に、画面では1章ずつ表示している9つの章をすべて展開し、共有ボタンなどの操作用UI
+  （`.no-print`）を一時的に隠した状態（`.pdf-export-mode`）でPERSONAL BOOK全体を撮影し、
+  A4サイズにページ分割してPDF化・ダウンロードします
+- 処理が終わると、開いていたタブや章の表示状態は元通りに戻ります
+- オフラインなどでライブラリの読み込みに失敗した場合は、自動的に従来の印刷画面（「PDFに保存」を
+  選ぶ方式）にフォールバックするため、動作が壊れることはありません
 
-/* ---------- Responsive ---------- */
-@media (max-width: 600px) {
-  .hero__title { font-size: 32px; }
-  .core6-grid { grid-template-columns: 1fr; }
-}
+### 診断結果が「ARCHITECT（設計者）に偏る」不具合の修正（QUESTION診断ロジック）
+
+「色々なパターンで回答してもARCHITECTばかり出る」というご指摘を受けて調査したところ、
+QUESTION（30問の二択質問）のロジックに、CORE6判定を特定の軸に偏らせてしまう不具合が
+2つ見つかったため修正しました（`core-engine.js`）。診断ロジックの根幹である「30問の回答から
+6軸のスコアを集計する」という仕組み自体は変えていません。
+
+1. **選択肢A/Bの並び順に偏りがあった**：30問中、VISION（未来を描く力）は常に選択肢A、
+   STABILITY（積み上げる力）は常に選択肢Bに配置されており、6軸もA→Bの優先順（VISION→LOGIC→
+   DRIVE→INFLUENCE→BOND→STABILITY）に沿って並んでいました。そのため「なんとなく上（A）を
+   選ぶ」といった回答の偏りがあるだけで、VISIONが不自然に選ばれやすくなっていました。全30問を
+   見直し、各軸が選択肢A・Bにちょうど5回ずつ登場するよう並び順を組み替えました（質問文・
+   選択肢の内容そのものは変更していません）
+2. **同点だった場合に、常に同じ軸が優先されていた**：6軸の合計点が同点になった場合、判定ロジックが
+   単純に軸の定義順（VISION→LOGIC→…）で決めていたため、僅差での同点時に毎回VISIONが主軸に
+   選ばれやすくなっていました（これがARCHITECT＝VISION×LOGICの組み合わせに偏っていた一番の
+   原因です）。同点の場合はまず「その2軸を直接比較した質問でどちらを多く選んだか」で決定し、
+   それでも決着がつかない場合は「回答内容から一意に計算される値」で決定するように変更しました。
+   いずれもランダム（Math.random）ではなく、同じ回答であれば必ず同じ結果になる決定的なロジックです
+
+実際に3万パターンの回答をシミュレーションして確認したところ、修正前は主軸がVISIONになる確率が
+約23%（本来は6軸均等なら約16.7%）でしたが、修正後は各軸ほぼ均等（16.2〜17.0%）になりました。
+
+### TYPE_MATRIX（主軸×副軸→16タイプの割り当て）の組み替え：CONNECTOR・FINISHERが一度も出ない不具合の修正と、出現率の均等化
+
+前回の修正（QUESTIONの偏り是正）の後に残っていた「ARCHITECT・STRATEGIST・CREATORがやや
+出やすい」という点を調査したところ、それとは別に、もっと重大な不具合が見つかりました。
+
+- **CONNECTOR（連結者）とFINISHER（完遂者）が、実質的に一度も出現しない**：TYPE判定は
+  「主軸(topAxis)と副軸(secondAxis)は必ず異なる軸になる」という前提のロジックですが、
+  `type-engine.js`のTYPE_MATRIXは6×6＝36通り全部に値を入れており、うち対角線上の6通り
+  （vision×vision、logic×logic…）は実際には絶対に参照されない組み合わせでした。旧バージョンでは
+  CONNECTORとFINISHERの2タイプが、この「絶対に参照されない対角線」にしか登録されておらず、結果として
+  診断結果としてもPERSONAL BOOKとしても、この2タイプは誰にも表示され得ない状態になっていました
+  （タイプ一覧ページには表示されるのに、実際の診断では絶対に出ない、という状態です）
+- **ARCHITECT・STRATEGIST・CREATORへの偏り**：実際に使われる30通りの組み合わせのうち、この3タイプに
+  複数の組み合わせが重複して割り当てられている一方、COMMANDER・EXECUTOR・NAVIGATOR・BUILDERなどは
+  1通りしか割り当てられていませんでした
+
+これらをまとめて修正し、実際に使われる30通りの組み合わせに16タイプができるだけ均等に
+（14タイプは2通りずつ、出現率が元々一番低い設定だったCOMMANDER・NAVIGATORの2タイプだけ1通りずつ）
+割り当たるようTYPE_MATRIXを組み替えました。診断結果として使われる主軸・副軸の判定ロジック自体は
+変更していません。あわせて、`types-data.js`の各タイプの「出現率」表示も、この新しい割り当てに
+基づいた実際の数字（14タイプ＝6.7%、COMMANDER・NAVIGATOR＝3.3%）に更新しています。
+
+6万パターンをシミュレーションして確認したところ、修正後は14タイプが6.3〜7.0%の範囲に収まり、
+16タイプすべてが実際に出現するようになりました。
+
+### 診断結果を後から見返せる「履歴」機能を追加
+
+「一度受けた診断結果を残しておけないか」というご要望を受けて、診断結果をブラウザに自動保存し、
+後から見返せる「履歴」ページを追加しました（`app.js`）。ナビゲーションに「履歴」を追加しています。
+
+- 無料診断が完了するたびに、結果（KAKUタイプ・CORE6スコア・KAKU GAP等）を自動的にこの端末の
+  ブラウザ（`localStorage`）に保存します。利用者が何か操作する必要はありません
+- ヘッダーの「履歴」から、これまで受けた診断結果を日時・タイプ名の一覧で確認でき、「結果を見る」で
+  当時の無料診断結果ページをそのまま開き直せます。1件ずつの削除、全件削除にも対応しています
+- 後からQUESTION診断ロジック等を修正しても、すでに履歴に残っている結果の内容が変わってしまわない
+  よう、回答からの再計算はせず「診断した当時に実際に表示された結果」をそのまま保存・復元しています
+- 保存先は**この端末・このブラウザだけ**です。現状のサイトはサーバーを持たない静的サイトのため、
+  別の端末・別のブラウザ間での同期や、運営側での一覧・分析はできません。ブラウザのデータ（Cookie・
+  サイトデータ）を削除すると、保存されていた履歴も消えてしまいます。この制限は履歴ページ内にも
+  明記しています
+- 運営側（上岡さん）が全利用者の診断結果を記録・分析できるようにする機能は、サーバー・データベースの
+  追加が必要な別の仕組みになるため、今回は見送り、別途ご相談のうえで実装予定です
+
+## 確定仕様 と 仮実装 について
+
+設計書に基づき、下記のように明確に分けて実装しています。
+
+**確定仕様（変更されない前提のもの）**
+- QUESTION × BIRTH × STATE という3つの視点から診断すること
+- CORE6（VISION / LOGIC / DRIVE / INFLUENCE / BOND / STABILITY）という6軸構造
+- TYPE判定は「CORE6の主軸 × 副軸」から機械的に決まる構造であること（type-engine.js）
+- KAKU GAPは「本来の資質」と「今よく使っている力」のズレを見るものであり、能力の優劣や医療的診断ではないこと
+- KAKU CARD（画像＋タイプ名＋カラー＋キャッチコピー）を結果ページ・SNSシェアで共通利用すること
+
+**仮実装（今後ロジック・文言を差し替え可能なもの）**
+- QUESTION 30問の具体的な質問文言・スコアリング方法（core-engine.js）
+- BIRTHの算出ロジック（生年月日から簡易的に決定的マッピングしているだけで、算命学等の精緻な計算式ではない）（birth-engine.js）
+- STATE診断の質問文言・分類ルール（state-engine.js）
+- KAKU GAPのメッセージ文言（gap-engine.js）
+- 16タイプの名称・キャッチコピー・色・モチーフ・WEAPON等のテキスト内容（types-data.js）
+
+## 今回のMVPに含まれるもの / 含まれないもの
+
+設計書「12. 今回実装せず将来拡張するもの」に基づき、このバージョンでは
+**PERSONAL BOOK・KAKU MATCH の決済導線と実際のレポート生成、および KAKU TEAM の全機能は実装していません。**
+それぞれの紹介ページは用意していますが、CTAボタンは非活性の「Coming soon」表示になっています。
+（旧サイトにあったStripe決済連携のコードは、このリニューアルでは含めていません。将来これらの機能を実装する際に、
+　あらためてサーバーサイド／決済まわりの構成を設計し直すことを想定しています。）
+
+## デプロイ方法（これまでと同じ手順です）
+
+1. このフォルダの中身一式を、GitHubリポジトリ「kaku-site」にアップロード（既存ファイルを上書き）してコミットする
+2. Vercelのダッシュボードで対象プロジェクトを開き、「Deployments」→ 最新デプロイの「…」→「Redeploy」を実行する
+3. 数十秒〜1分ほどでビルドが完了し、これまでと同じURL（例: kaku-site-mu.vercel.app）で新しいサイトが公開される
+
+サーバーサイドの環境変数（STRIPE_SECRET_KEY / SITE_URL）は、このバージョンでは使用していないため、
+設定したままでも消してしまっても、動作に影響はありません。
