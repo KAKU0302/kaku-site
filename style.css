@@ -176,41 +176,138 @@ img { max-width: 100%; display: block; }
     radial-gradient(ellipse 520px 360px at 50% 100%, rgba(94, 200, 242, 0.08), transparent 70%),
     var(--color-bg);
 }
-.hero__decor { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.hero__decor { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .hero__decor::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -64px;
   background-image:
     linear-gradient(rgba(44, 47, 107, 0.06) 1px, transparent 1px),
     linear-gradient(90deg, rgba(44, 47, 107, 0.06) 1px, transparent 1px);
   background-size: 64px 64px;
   -webkit-mask-image: radial-gradient(ellipse 720px 480px at 50% 20%, #000 0%, transparent 72%);
   mask-image: radial-gradient(ellipse 720px 480px at 50% 20%, #000 0%, transparent 72%);
+  animation: kakuGridDrift 22s linear infinite;
 }
 .hero__decor-circle {
   position: absolute;
   border-radius: 50%;
   border: 1px solid rgba(44, 47, 107, 0.16);
+  animation: kakuFloat 9s ease-in-out infinite;
 }
-.hero__decor-circle--a { width: 320px; height: 320px; top: -120px; left: -80px; }
-.hero__decor-circle--b { width: 200px; height: 200px; top: 30px; right: 5%; border-color: rgba(94, 200, 242, 0.32); box-shadow: 0 0 60px rgba(94, 200, 242, 0.14); }
-.hero__decor-circle--c { width: 110px; height: 110px; bottom: -30px; left: 16%; border-color: rgba(44, 47, 107, 0.14); }
+.hero__decor-circle--a { width: 320px; height: 320px; top: -120px; left: -80px; animation-duration: 12s; }
+.hero__decor-circle--b {
+  width: 200px; height: 200px; top: 30px; right: 5%;
+  border-color: rgba(94, 200, 242, 0.32);
+  animation: kakuFloat 8s ease-in-out infinite, kakuGlowPulse 4s ease-in-out infinite;
+  animation-delay: -2s, 0s;
+}
+.hero__decor-circle--c { width: 110px; height: 110px; bottom: -30px; left: 16%; border-color: rgba(44, 47, 107, 0.14); animation-duration: 10s; animation-delay: -4s; }
 .hero__decor-line {
   position: absolute;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(94, 200, 242, 0.28), transparent);
+  animation: kakuLineDrift 7s ease-in-out infinite;
 }
 .hero__decor-line--a { width: 50%; top: 20%; right: -6%; transform: rotate(-8deg); }
-.hero__decor-line--b { width: 40%; bottom: 12%; left: -3%; transform: rotate(6deg); background: linear-gradient(90deg, transparent, rgba(44, 47, 107, 0.22), transparent); }
+.hero__decor-line--b { width: 40%; bottom: 12%; left: -3%; transform: rotate(6deg); background: linear-gradient(90deg, transparent, rgba(44, 47, 107, 0.22), transparent); animation-delay: -3.2s; }
+.hero__scanline {
+  position: absolute;
+  top: 0;
+  left: -20%;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(94, 200, 242, 0.10) 45%, rgba(94, 200, 242, 0.16) 50%, rgba(94, 200, 242, 0.10) 55%, transparent);
+  animation: kakuScan 7s ease-in-out infinite;
+}
 .hero__inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
 .hero__lead--sub { margin-top: -14px; }
 
+/* 淡い・暗いセクション向けの装飾バリエーション（オーロラの浮遊するグラデーション塊で
+   「近未来感・ワクワク感」を出す。宇宙感にならないよう、抽象的な光の塊にとどめる） */
+.hero__decor--soft { opacity: 0.7; }
+.hero__decor--dark { z-index: 0; }
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+}
+.aurora-blob--a {
+  width: 420px; height: 420px;
+  top: -160px; left: -120px;
+  background: radial-gradient(circle, rgba(94, 200, 242, 0.28), transparent 70%);
+  animation: kakuAuroraA 16s ease-in-out infinite;
+}
+.aurora-blob--b {
+  width: 380px; height: 380px;
+  top: 10%; right: -140px;
+  background: radial-gradient(circle, rgba(44, 47, 107, 0.22), transparent 70%);
+  animation: kakuAuroraB 20s ease-in-out infinite;
+}
+.aurora-blob--c {
+  width: 300px; height: 300px;
+  bottom: -140px; left: 30%;
+  background: radial-gradient(circle, rgba(94, 200, 242, 0.18), transparent 70%);
+  animation: kakuAuroraC 18s ease-in-out infinite;
+}
+.hero__decor--dark .aurora-blob--a { background: radial-gradient(circle, rgba(94, 200, 242, 0.30), transparent 70%); }
+.hero__decor--dark .aurora-blob--b { background: radial-gradient(circle, rgba(94, 200, 242, 0.18), transparent 70%); }
+
+@keyframes kakuFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -18px, 0); }
+}
+@keyframes kakuGlowPulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(94, 200, 242, 0.10); }
+  50% { box-shadow: 0 0 72px rgba(94, 200, 242, 0.26); }
+}
+@keyframes kakuLineDrift {
+  0%, 100% { opacity: 0.55; transform: translateX(0) rotate(var(--line-rot, -8deg)); }
+  50% { opacity: 1; transform: translateX(14px) rotate(var(--line-rot, -8deg)); }
+}
+@keyframes kakuGridDrift {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 64px 64px, 64px 64px; }
+}
+@keyframes kakuScan {
+  0% { left: -30%; opacity: 0; }
+  15% { opacity: 1; }
+  50% { left: 55%; opacity: 1; }
+  85% { opacity: 0; }
+  100% { left: 110%; opacity: 0; }
+}
+@keyframes kakuAuroraA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 30px) scale(1.12); }
+}
+@keyframes kakuAuroraB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-36px, 24px) scale(1.08); }
+}
+@keyframes kakuAuroraC {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(26px, -22px) scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__decor-circle,
+  .hero__decor-line,
+  .hero__decor::before,
+  .hero__scanline,
+  .aurora-blob,
+  .final-cta__grid,
+  .gap-teaser__circle {
+    animation: none !important;
+  }
+}
+
 /* ---------- あなたは、どのKAKUだろう。（TOP・12タイプ×3分類ショーケース） ---------- */
 .type-showcase {
+  position: relative;
   max-width: none;
   width: 100%;
   padding: 72px 0 76px;
+  overflow: hidden;
   text-align: center;
   background:
     linear-gradient(180deg, rgba(94, 200, 242, 0.05), transparent 30%),
@@ -219,7 +316,7 @@ img { max-width: 100%; display: block; }
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
 }
-.type-showcase__inner { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.type-showcase__inner { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 .type-showcase__eyebrow { text-align: center; }
 .type-showcase__title { margin-bottom: 12px; }
 .type-showcase__lead {
@@ -472,12 +569,36 @@ img { max-width: 100%; display: block; }
 .reveal-section__eyebrow { text-align: center; }
 .reveal-section__title { margin-bottom: 32px; }
 .reveal-mock {
+  position: relative;
   text-align: left;
   border-radius: 18px;
   overflow: hidden;
   background: linear-gradient(165deg, var(--book-bg-b), var(--book-bg-a));
   box-shadow: 0 30px 60px -20px rgba(10, 13, 28, 0.45);
   border: 1px solid var(--book-border);
+}
+.reveal-mock::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -60%;
+  width: 40%;
+  height: 180%;
+  background: linear-gradient(100deg, transparent, rgba(94, 200, 242, 0.10) 45%, rgba(94, 200, 242, 0.16) 50%, rgba(94, 200, 242, 0.10) 55%, transparent);
+  transform: rotate(8deg);
+  animation: kakuMockSweep 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes kakuMockSweep {
+  0% { left: -60%; opacity: 0; }
+  20% { opacity: 1; }
+  55% { left: 120%; opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+.reveal-mock__row--gap { animation: kakuGapRowPulse 3.4s ease-in-out infinite; }
+@keyframes kakuGapRowPulse {
+  0%, 100% { background: linear-gradient(90deg, rgba(94, 200, 242, 0.10), transparent); }
+  50% { background: linear-gradient(90deg, rgba(94, 200, 242, 0.22), transparent); }
 }
 .reveal-mock__chrome {
   display: flex;
@@ -535,16 +656,18 @@ img { max-width: 100%; display: block; }
 
 /* ---------- 本来の自分と、今の自分の「ズレ」（TOP・KAKU GAPティザー） ---------- */
 .gap-teaser {
+  position: relative;
   max-width: none;
   width: 100%;
   padding: 76px 0 84px;
+  overflow: hidden;
   text-align: center;
   background:
     radial-gradient(ellipse 640px 420px at 50% 0%, rgba(44, 47, 107, 0.07), transparent 68%),
     radial-gradient(ellipse 520px 360px at 50% 100%, rgba(94, 200, 242, 0.08), transparent 70%),
     var(--color-bg);
 }
-.gap-teaser__inner { max-width: 660px; margin: 0 auto; padding: 0 24px; }
+.gap-teaser__inner { position: relative; z-index: 1; max-width: 660px; margin: 0 auto; padding: 0 24px; }
 .gap-teaser__pre {
   font-size: clamp(17px, 1.6vw, 21px);
   font-weight: 800;
@@ -552,9 +675,19 @@ img { max-width: 100%; display: block; }
 }
 .gap-teaser__visual { position: relative; margin: 0 auto 32px; width: 280px; }
 .gap-teaser__svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 0 24px rgba(94, 200, 242, 0.14)); }
-.gap-teaser__circle { fill-opacity: 0.16; stroke-width: 1.5; }
+.gap-teaser__circle { fill-opacity: 0.16; stroke-width: 1.5; transform-box: fill-box; transform-origin: center; }
 .gap-teaser__circle--core { fill: var(--color-accent); stroke: var(--color-accent); }
 .gap-teaser__circle--now { fill: var(--color-glow); stroke: var(--color-glow); mix-blend-mode: multiply; }
+.gap-teaser__visual--breathe .gap-teaser__circle--core { animation: kakuGapBreatheCore 6s ease-in-out infinite; }
+.gap-teaser__visual--breathe .gap-teaser__circle--now { animation: kakuGapBreatheNow 6s ease-in-out infinite; }
+@keyframes kakuGapBreatheCore {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-9px); }
+}
+@keyframes kakuGapBreatheNow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(9px); }
+}
 .gap-teaser__label {
   position: absolute;
   top: 100%;
@@ -605,7 +738,7 @@ img { max-width: 100%; display: block; }
 }
 .final-cta__grid {
   position: absolute;
-  inset: 0;
+  inset: -56px;
   pointer-events: none;
   background-image:
     linear-gradient(rgba(94, 200, 242, 0.08) 1px, transparent 1px),
@@ -613,6 +746,7 @@ img { max-width: 100%; display: block; }
   background-size: 56px 56px;
   -webkit-mask-image: radial-gradient(ellipse 620px 420px at 50% 40%, #000 0%, transparent 75%);
   mask-image: radial-gradient(ellipse 620px 420px at 50% 40%, #000 0%, transparent 75%);
+  animation: kakuGridDrift 18s linear infinite;
 }
 .final-cta__inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
 .final-cta__pre {
