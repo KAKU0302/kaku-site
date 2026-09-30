@@ -133,19 +133,6 @@ img { max-width: 100%; display: block; }
   padding: 96px 24px 56px;
   text-align: center;
 }
-.hero__kicker {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text-soft);
-  margin: 0 0 16px;
-}
-.hero__formula {
-  font-size: 13px;
-  letter-spacing: 0.14em;
-  color: var(--color-accent);
-  font-weight: 700;
-  margin-bottom: 24px;
-}
 .hero__title {
   font-size: 44px;
   font-weight: 800;
@@ -169,57 +156,142 @@ img { max-width: 100%; display: block; }
   font-size: 15px;
 }
 
-/* ---------- キャラクターの見本市（TOP）｜「この中に自分がいるかもしれない」 ---------- */
-.hero-cast {
-  max-width: 900px;
+/* KAKUらしい世界観の背景（宇宙・魔法陣・過剰な紫/ゴールドは使わず、
+   ごく薄いグラデーション・幾何学的な線・円の重なりだけで「核／内面」を表現） */
+.hero--kaku {
+  position: relative;
+  max-width: none;
+  width: 100%;
+  padding: 88px 24px 48px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 640px 360px at 18% 8%, rgba(94, 200, 242, 0.10), transparent 60%),
+    radial-gradient(ellipse 560px 420px at 86% 22%, rgba(44, 47, 107, 0.08), transparent 62%),
+    var(--color-bg);
+}
+.hero__decor { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.hero__decor-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(44, 47, 107, 0.14);
+}
+.hero__decor-circle--a { width: 260px; height: 260px; top: -90px; left: -60px; }
+.hero__decor-circle--b { width: 160px; height: 160px; top: 40px; right: 6%; border-color: rgba(94, 200, 242, 0.22); }
+.hero__decor-circle--c { width: 90px; height: 90px; bottom: -20px; left: 18%; border-color: rgba(44, 47, 107, 0.10); }
+.hero__decor-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(44, 47, 107, 0.16), transparent);
+}
+.hero__decor-line--a { width: 46%; top: 22%; right: -4%; transform: rotate(-8deg); }
+.hero__decor-line--b { width: 36%; bottom: 14%; left: -2%; transform: rotate(6deg); }
+.hero__inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+.hero__lead--sub { margin-top: -14px; }
+
+/* ---------- あなたは、どのKAKUだろう。（TOP・12タイプ×3分類ショーケース） ---------- */
+.type-showcase {
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 8px 24px 56px;
+  padding: 16px 24px 60px;
   text-align: center;
 }
-.hero-cast__caption {
-  font-size: 13px;
-  font-weight: 700;
+.type-showcase__eyebrow { text-align: center; }
+.type-showcase__title { margin-bottom: 10px; }
+.type-showcase__lead {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--color-text-soft);
-  margin: 0 0 20px;
+  margin: 0 0 32px;
 }
-.hero-cast__grid {
+.type-showcase__categories {
   display: flex;
-  gap: 14px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+}
+.type-showcase__category {
+  text-align: left;
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  background: var(--cat-color-soft, var(--color-accent-soft));
+  border: 1px solid color-mix(in srgb, var(--cat-color, var(--color-accent)) 22%, transparent);
+}
+.type-showcase__category-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 16px;
+}
+.type-showcase__category-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--cat-color, var(--color-accent));
+}
+.type-showcase__category-name .label-en {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-text-soft);
+  margin-left: 4px;
+}
+.type-showcase__category-tagline {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-soft);
+}
+.type-showcase__category-cards {
+  display: flex;
+  gap: 12px;
   flex-wrap: wrap;
 }
-.hero-cast__card {
-  width: 118px;
-  border-radius: var(--radius);
+.type-showcase__card {
+  width: 130px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
 }
-.hero-cast__card:nth-child(3n+1) { transform: rotate(-2deg); }
-.hero-cast__card:nth-child(3n+2) { transform: rotate(1.5deg); }
-.hero-cast__card:nth-child(3n) { transform: rotate(-1deg); }
-.hero-cast__card:hover {
-  transform: translateY(-6px) rotate(0deg);
-  box-shadow: 0 12px 24px rgba(28, 29, 33, 0.12);
+.type-showcase__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(28, 29, 33, 0.10);
 }
-.hero-cast__card img {
+.type-showcase__card img {
   width: 100%;
-  height: 148px;
+  height: 140px;
   object-fit: cover;
   display: block;
 }
-.hero-cast__card p {
+.type-showcase__card-en {
   margin: 0;
-  padding: 7px 4px;
+  padding: 8px 8px 0;
   font-size: 10px;
   font-weight: 700;
-  color: var(--color-text-soft);
+  letter-spacing: 0.04em;
+  color: var(--cat-color, var(--color-accent));
 }
-@media (max-width: 480px) {
-  .hero-cast__card { width: 96px; }
-  .hero-cast__card img { height: 122px; }
+.type-showcase__card-jp {
+  margin: 0;
+  padding: 1px 8px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.type-showcase__note {
+  margin: 32px auto 0;
+  max-width: 460px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--color-text-soft);
+  font-family: var(--font-serif);
+}
+@media (max-width: 640px) {
+  .type-showcase__card { width: 108px; }
+  .type-showcase__card img { height: 118px; }
+  .type-showcase__category-cards { justify-content: center; }
 }
 
 /* ---------- 自分事化の問いかけ（TOP） ---------- */
@@ -233,32 +305,47 @@ img { max-width: 100%; display: block; }
   text-align: center;
   margin-bottom: 20px;
 }
-.hero-questions__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  text-align: left;
+.hero-questions__featured {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
 }
-.hero-questions__item {
+.hero-questions__item--featured {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
   border-radius: var(--radius-sm);
-  padding: 18px 20px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 20px 22px;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--color-text);
   margin: 0;
   line-height: 1.6;
+  text-align: left;
+}
+.hero-questions__secondary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.hero-questions__item--secondary {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-soft);
+  margin: 0;
+  line-height: 1.6;
+  padding: 10px 4px 0;
 }
 @media (max-width: 640px) {
-  .hero-questions__grid { grid-template-columns: 1fr; }
+  .hero-questions__secondary { grid-template-columns: 1fr; text-align: left; }
 }
 
 /* ---------- 仕組みのミニ説明（TOP・最後に軽く） ---------- */
 .hero-explainer {
   max-width: 720px;
   margin: 0 auto;
-  padding: 8px 24px 88px;
+  padding: 8px 24px 72px;
   text-align: center;
 }
 .hero-explainer__lead {
@@ -317,6 +404,148 @@ img { max-width: 100%; display: block; }
 @media (max-width: 640px) {
   .hero-explainer__grid { flex-direction: column; }
   .hero-explainer__arrow { transform: rotate(90deg); }
+}
+
+/* ---------- KAKUで分かるのは「性格」だけじゃない（TOP・結果画面プレビュー風） ---------- */
+.reveal-section {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 24px 64px;
+  text-align: center;
+}
+.reveal-section__eyebrow { text-align: center; }
+.reveal-section__title { margin-bottom: 28px; }
+.reveal-mock {
+  text-align: left;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: 0 20px 44px rgba(28, 29, 33, 0.08);
+}
+.reveal-mock__chrome {
+  display: flex;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--color-accent-soft);
+  border-bottom: 1px solid var(--color-border);
+}
+.reveal-mock__chrome span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(44, 47, 107, 0.22);
+}
+.reveal-mock__body { padding: 6px 22px 10px; }
+.reveal-mock__row {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.reveal-mock__row:last-child { border-bottom: none; }
+.reveal-mock__label {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+.reveal-mock__desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-soft);
+}
+.reveal-mock__row--type .reveal-mock__label { color: var(--color-text); font-size: 15px; }
+.reveal-mock__row--gap {
+  background: linear-gradient(90deg, rgba(94, 200, 242, 0.08), transparent);
+  margin: 0 -22px;
+  padding: 16px 22px;
+}
+
+/* ---------- 本来の自分と、今の自分の「ズレ」（TOP・KAKU GAPティザー） ---------- */
+.gap-teaser {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 8px 24px 64px;
+  text-align: center;
+}
+.gap-teaser__pre {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0 0 28px;
+}
+.gap-teaser__visual { position: relative; margin: 0 auto 28px; width: 240px; }
+.gap-teaser__svg { width: 100%; height: auto; display: block; }
+.gap-teaser__circle { fill-opacity: 0.14; stroke-width: 1.5; }
+.gap-teaser__circle--core { fill: var(--color-accent); stroke: var(--color-accent); }
+.gap-teaser__circle--now { fill: var(--color-glow); stroke: var(--color-glow); }
+.gap-teaser__label {
+  position: absolute;
+  top: 100%;
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  width: 110px;
+}
+.gap-teaser__label--core { left: -6px; text-align: right; }
+.gap-teaser__label--now { right: -6px; text-align: left; }
+.gap-teaser__body {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--color-text-soft);
+  margin: 0 0 24px;
+}
+.gap-teaser__cta-line {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.8;
+  margin: 0;
+}
+.gap-teaser__label-en {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+}
+@media (max-width: 480px) {
+  .gap-teaser__label { position: static; display: block; width: auto; text-align: center !important; margin-top: 8px; }
+  .gap-teaser__visual { margin-bottom: 12px; }
+}
+
+/* ---------- 最終CTA（TOP・体験の締め、あえて背景を暗くして余韻を作る） ---------- */
+.final-cta {
+  max-width: none;
+  margin: 0;
+  padding: 76px 24px 88px;
+  text-align: center;
+  background: linear-gradient(160deg, var(--color-accent), #1B1D45);
+  color: #fff;
+}
+.final-cta__pre {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 18px;
+  line-height: 1.8;
+}
+.final-cta__title {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin: 0 0 28px;
+  color: #fff;
+}
+.final-cta .btn--primary {
+  background: #fff;
+  border-color: #fff;
+  color: var(--color-accent);
+}
+.final-cta__meta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.66);
+  margin: 12px 0 0;
+  letter-spacing: 0.04em;
 }
 
 /* ---------- ブランドメッセージ（ABOUT） ---------- */
@@ -933,12 +1162,35 @@ img { max-width: 100%; display: block; }
   margin: 16px 0;
 }
 
-/* ---------- タイプ一覧 ---------- */
+/* ---------- タイプ一覧（3分類ごとにグループ表示） ---------- */
 .types-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 24px;
+}
+.types-grid__category {
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  background: var(--cat-color-soft, var(--color-accent-soft));
+  border: 1px solid color-mix(in srgb, var(--cat-color, var(--color-accent)) 22%, transparent);
+}
+.types-grid__category-head { margin-bottom: 16px; }
+.types-grid__category-name {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--cat-color, var(--color-accent));
+}
+.types-grid__category-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-soft);
+}
+.types-grid__category-cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
-  margin-top: 24px;
 }
 .type-card {
   border: 1px solid var(--color-border);

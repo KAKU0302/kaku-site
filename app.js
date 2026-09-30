@@ -411,20 +411,43 @@
   }
 
   // ---------------------------------------------------------------------
-  // TOPページ: キャラクターの見本市（「この中に自分がいるかもしれない」）
-  // 16タイプ全部を同じ大きさで並べる図鑑UIにはせず、あえて数体だけを大胆に見せる。
+  // TOPページ: 12 KAKU TYPE ショーケース（3つの大分類ごとに見せる）
+  //
+  // 2026-09時点の重要な注記：ここで表示するのは「新体系で残る12タイプ」だけで、
+  // 旧16タイプのうちmediator/builder/adventurer/finisherの4タイプは表示しない。
+  // ただし診断ロジック（type-engine.js）自体はまだ12タイプ向けに再設計されておらず、
+  // 実際に無料診断を受けると、今もこの4タイプのいずれかが結果として出ることがある
+  // （その場合も結果ページ・PERSONAL BOOKは従来どおり正しく表示される）。
+  // 表示と実際のロジックにズレがあるのは意図的な経過措置で、診断ロジックを
+  // 12タイプ向けに再設計するタイミングで解消する（README参照）。
+  //
+  // キャラクター画像は今後12タイプ分の新規制作に差し替える前提のため、ここでは
+  // 既存の16タイプ用画像をそのまま仮利用している（差し替えはtypes-data.jsのimage
+  // フィールドを変更するだけで済む構造）。
   // ---------------------------------------------------------------------
-  const HERO_CAST_IDS = ["architect", "pioneer", "commander", "creator", "challenger", "connector"];
-  function renderHeroCast() {
-    const grid = document.getElementById("hero-cast-grid");
-    if (!grid) return;
-    grid.innerHTML = HERO_CAST_IDS.map((id) => {
-      const t = KAKU_TYPES[id];
+  function buildTypeShowcaseCardHtml(type) {
+    return `
+      <a href="#" class="type-showcase__card" data-nav="types" data-type-id="${type.id}">
+        <img src="${type.image}" alt="${type.nameEn}｜${type.nameJp}" loading="lazy" />
+        <p class="type-showcase__card-en">${type.nameEn}</p>
+        <p class="type-showcase__card-jp">${type.nameJp}</p>
+      </a>`;
+  }
+
+  function renderTypeShowcase() {
+    const wrap = document.getElementById("type-showcase-categories");
+    if (!wrap) return;
+    wrap.innerHTML = KAKU_TYPE_CATEGORY_ORDER.map((catId) => {
+      const cat = KAKU_TYPE_CATEGORIES[catId];
+      const cardsHtml = cat.typeIds.map((id) => buildTypeShowcaseCardHtml(KAKU_TYPES[id])).join("");
       return `
-        <a href="#" class="hero-cast__card" data-nav="types">
-          <img src="${t.image}" alt="${t.nameEn}｜${t.nameJp}" loading="lazy" />
-          <p>${t.nameEn}｜${t.nameJp}</p>
-        </a>`;
+        <div class="type-showcase__category" data-category="${cat.id}" style="--cat-color:${cat.color}; --cat-color-soft:${cat.colorSoft};">
+          <div class="type-showcase__category-head">
+            <p class="type-showcase__category-name">${cat.nameJp}<span class="label-en">（${cat.nameEn}）</span></p>
+            <p class="type-showcase__category-tagline">${cat.tagline}</p>
+          </div>
+          <div class="type-showcase__category-cards">${cardsHtml}</div>
+        </div>`;
     }).join("");
   }
 
@@ -443,41 +466,58 @@
   }
 
   // ---------------------------------------------------------------------
-  // タイプ一覧ページ: 全16 KAKU TYPE
+  // タイプ一覧ページ: 12 KAKU TYPE（3つの大分類ごとにグループ表示）
+  //
+  // 2026-09時点の注記：ここでは新体系で残る12タイプのみを、3つの大分類
+  // （創造型／推進型／共創型）ごとにグループ化して表示する。mediator/builder/
+  // adventurer/finisherの旧4タイプは一覧には表示しないが、データ自体は
+  // types-data.js側でtypeShowcase/renderTypeShowcaseと同じ理由で温存されて
+  // おり、実際の診断結果・PERSONAL BOOKでは引き続き正しく表示される。
   // ---------------------------------------------------------------------
+  function buildTypeCardHtml(type) {
+    return `
+      <div class="type-card" data-type-id="${type.id}">
+        <button type="button" class="type-card__summary">
+          <img src="${type.image}" alt="${type.nameEn} ${type.nameJp}" class="type-card__image" loading="lazy" />
+          <p class="type-card__poster-tag" style="background:${type.color}">${type.catchcopy}</p>
+          <div class="type-card__body">
+            <p class="type-card__type-en">${type.nameEn}</p>
+            <p class="type-card__type-jp">${type.nameJp}</p>
+            <p class="type-card__rarity">出現率 ${type.rarity}</p>
+          </div>
+          <span class="type-card__toggle" aria-hidden="true">＋</span>
+        </button>
+        <div class="type-card__detail" hidden>
+          <p class="result-block__mini-title">あなたの武器</p>
+          <p>${type.weapon}</p>
+          <p class="result-block__mini-title">陥りやすい罠</p>
+          <p>${type.blindSpot}</p>
+          <p class="result-block__mini-title">組織で輝く役割</p>
+          <p>${type.teamRole}</p>
+          <p class="result-block__mini-title">人との向き合い方</p>
+          <p>${type.relationStyle}</p>
+          <p class="result-block__mini-title">覚醒する条件</p>
+          <p><strong>${type.awaken.keywords.join(" × ")}</strong><br />${type.awaken.sentence}</p>
+        </div>
+      </div>`;
+  }
+
   function renderTypesGallery() {
     const grid = document.getElementById("types-grid");
     if (!grid) return;
 
-    grid.innerHTML = Object.values(KAKU_TYPES)
-      .map(
-        (type) => `
-        <div class="type-card" data-type-id="${type.id}">
-          <button type="button" class="type-card__summary">
-            <img src="${type.image}" alt="${type.nameEn} ${type.nameJp}" class="type-card__image" loading="lazy" />
-            <p class="type-card__poster-tag" style="background:${type.color}">${type.catchcopy}</p>
-            <div class="type-card__body">
-              <p class="type-card__type-en">${type.nameEn}</p>
-              <p class="type-card__type-jp">${type.nameJp}</p>
-              <p class="type-card__rarity">出現率 ${type.rarity}</p>
-            </div>
-            <span class="type-card__toggle" aria-hidden="true">＋</span>
-          </button>
-          <div class="type-card__detail" hidden>
-            <p class="result-block__mini-title">あなたの武器</p>
-            <p>${type.weapon}</p>
-            <p class="result-block__mini-title">陥りやすい罠</p>
-            <p>${type.blindSpot}</p>
-            <p class="result-block__mini-title">組織で輝く役割</p>
-            <p>${type.teamRole}</p>
-            <p class="result-block__mini-title">人との向き合い方</p>
-            <p>${type.relationStyle}</p>
-            <p class="result-block__mini-title">覚醒する条件</p>
-            <p><strong>${type.awaken.keywords.join(" × ")}</strong><br />${type.awaken.sentence}</p>
+    grid.innerHTML = KAKU_TYPE_CATEGORY_ORDER.map((catId) => {
+      const cat = KAKU_TYPE_CATEGORIES[catId];
+      const cardsHtml = cat.typeIds.map((id) => buildTypeCardHtml(KAKU_TYPES[id])).join("");
+      return `
+        <div class="types-grid__category" data-category="${cat.id}" style="--cat-color:${cat.color}; --cat-color-soft:${cat.colorSoft};">
+          <div class="types-grid__category-head">
+            <p class="types-grid__category-name">${cat.nameJp}<span class="label-en">（${cat.nameEn}）</span></p>
+            <p class="types-grid__category-desc">${cat.description}</p>
           </div>
-        </div>`
-      )
-      .join("");
+          <div class="types-grid__category-cards">${cardsHtml}</div>
+        </div>`;
+    }).join("");
 
     grid.querySelectorAll(".type-card__summary").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -598,7 +638,7 @@
       "普段のあなたを読み解いています…",
       "生まれ持った資質と重ね合わせています…",
       "今の状態とのズレを確認しています…",
-      "16タイプの中から、あなたのKAKUを絞り込んでいます…",
+      "数あるKAKU TYPEの中から、あなたのKAKUを絞り込んでいます…",
       "まもなく結果が見えてきます…",
     ];
     const textEl = document.getElementById("analyzing-text");
@@ -703,7 +743,7 @@
       <h2 class="section-title">${session.name ? session.name + "さんの" : "あなたの"}KAKUは…</h2>
 
       <div class="kaku-card kaku-card--reveal" id="kaku-card-share">
-        <div class="kaku-card__rarity">出現率 ${type.rarity}｜16タイプ中</div>
+        <div class="kaku-card__rarity">出現率 ${type.rarity}</div>
         <img class="kaku-card__image" src="${type.image}" alt="${type.nameEn} ${type.nameJp}" />
         <p class="kaku-card__poster-tag" style="background:${type.color}">${type.catchcopy}</p>
         <div class="kaku-card__body">
@@ -1479,7 +1519,7 @@
             <p class="opening-letter__to">${session.name ? session.name + "さんへ" : "あなたへ"}</p>
             <p>${openingLine}</p>
             <p>
-              これは、16タイプ中<strong>${type.rarity}</strong>という少数派である「${type.nameJp}」のあなたのために
+              これは、出現率<strong>${type.rarity}</strong>という少数派である「${type.nameJp}」のあなたのために
               書かれたページです。同じ${type.nameJp}であっても、あなたと全く同じ資質・行動・状態の組み合わせを
               持つ人は、そう多くはいません。
             </p>
@@ -1999,7 +2039,7 @@
   // ---------------------------------------------------------------------
   // 初期化
   // ---------------------------------------------------------------------
-  renderHeroCast();
+  renderTypeShowcase();
   renderAboutCore6();
   renderTypesGallery();
   if (!handleIncomingUrlParams()) {

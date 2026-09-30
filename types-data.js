@@ -1,6 +1,6 @@
 /**
  * types-data.js
- * 「KAKU ～核～」16 KAKU TYPE 定義データ
+ * 「KAKU ～核～」KAKU TYPE 定義データ
  *
  * ここに書かれているタイプ名・コピー・モチーフ・色は【仮実装】です。
  * 設計書の「確定仕様」は次の2点のみです:
@@ -10,11 +10,31 @@
  *
  * タイプの名称・数・コピー文言・カラーは今後変更されても良いようにこの1ファイルへ集約している。
  * （コード側は id で参照するだけで、文言や色を直接埋め込まない）
+ *
+ * 2026-09時点の重要な注記（16タイプ→12タイプへの移行について）:
+ * KAKUのタイプ体系は、MBTIの派生に見えることを避けるため、対外的には
+ * 「12 KAKU TYPE（創造型／推進型／共創型の3分類）」に整理する方針になった。
+ * ただし、判定ロジック（type-engine.jsのTYPE_MATRIX）自体はまだ12タイプ向けに
+ * 再設計されておらず、今も内部的には以下16種類すべてが診断結果として出力され得る。
+ *
+ * そのため、このファイルでは以下の対応にとどめている（安全側に倒した対応）:
+ *   - 新体系で残る12タイプには `category` フィールド（"creative"|"momentum"|"synergy"）を追加
+ *   - 新体系で廃止予定の4タイプ（mediator / builder / adventurer / finisher）は
+ *     `category: null, legacy: true` とし、データ自体は削除しない
+ *     （削除すると、診断ロジックが今もこの4タイプを返し得るため、その4タイプを
+ *     引いた利用者の結果ページ・PERSONAL BOOKが壊れてしまう）
+ *   - TOPページやタイプ一覧ページ（app.jsのrenderTypesGallery等）は、category を
+ *     持つ12タイプだけを表示するようフィルタしている
+ *   - 判定ロジックを実際に12タイプ用に再設計するタイミングで、この4タイプの扱い
+ *     （完全削除するか、他タイプへ統合するか）を改めて決定する必要がある
+ *
+ * 12タイプの3分類とカテゴリ別の説明・配色は KAKU_TYPE_CATEGORIES にまとめている。
  */
 
 const KAKU_TYPES = {
   architect: {
     id: "architect",
+    category: "creative",
     nameEn: "ARCHITECT",
     nameJp: "設計者",
     catchcopy: "まだ存在しない答えを、構造からつくる。",
@@ -40,6 +60,7 @@ const KAKU_TYPES = {
   },
   pioneer: {
     id: "pioneer",
+    category: "creative",
     nameEn: "PIONEER",
     nameJp: "開拓者",
     catchcopy: "誰も踏み入れていない場所に、最初の一歩を。",
@@ -65,6 +86,7 @@ const KAKU_TYPES = {
   },
   commander: {
     id: "commander",
+    category: "momentum",
     nameEn: "COMMANDER",
     nameJp: "指揮官",
     catchcopy: "全体を見渡し、人を動かす。",
@@ -90,6 +112,7 @@ const KAKU_TYPES = {
   },
   creator: {
     id: "creator",
+    category: "creative",
     nameEn: "CREATOR",
     nameJp: "創造者",
     catchcopy: "何もないところから、形を生み出す。",
@@ -115,6 +138,7 @@ const KAKU_TYPES = {
   },
   strategist: {
     id: "strategist",
+    category: "creative",
     nameEn: "STRATEGIST",
     nameJp: "戦略家",
     catchcopy: "何手も先を読み、勝ち筋を描く。",
@@ -140,6 +164,7 @@ const KAKU_TYPES = {
   },
   challenger: {
     id: "challenger",
+    category: "momentum",
     nameEn: "CHALLENGER",
     nameJp: "挑戦者",
     catchcopy: "壁があるほど、燃える。",
@@ -165,6 +190,7 @@ const KAKU_TYPES = {
   },
   influencer: {
     id: "influencer",
+    category: "momentum",
     nameEn: "INFLUENCER",
     nameJp: "伝道者",
     catchcopy: "言葉と熱量で、人を巻き込む。",
@@ -190,6 +216,7 @@ const KAKU_TYPES = {
   },
   connector: {
     id: "connector",
+    category: "synergy",
     nameEn: "CONNECTOR",
     nameJp: "連結者",
     catchcopy: "人と人、点と点をつなぐ。",
@@ -215,6 +242,7 @@ const KAKU_TYPES = {
   },
   navigator: {
     id: "navigator",
+    category: "synergy",
     nameEn: "NAVIGATOR",
     nameJp: "案内者",
     catchcopy: "迷う人に、進む方向を示す。",
@@ -242,6 +270,7 @@ const KAKU_TYPES = {
   },
   guardian: {
     id: "guardian",
+    category: "synergy",
     nameEn: "GUARDIAN",
     nameJp: "守護者",
     catchcopy: "大切なものを、静かに守る。",
@@ -267,6 +296,7 @@ const KAKU_TYPES = {
   },
   executor: {
     id: "executor",
+    category: "momentum",
     nameEn: "EXECUTOR",
     nameJp: "遂行者",
     catchcopy: "決めたことを、最後までやり切る。",
@@ -292,6 +322,7 @@ const KAKU_TYPES = {
   },
   specialist: {
     id: "specialist",
+    category: "synergy",
     nameEn: "SPECIALIST",
     nameJp: "探究者",
     catchcopy: "一つのことを、とことん掘り下げる。",
@@ -317,6 +348,8 @@ const KAKU_TYPES = {
   },
   mediator: {
     id: "mediator",
+    category: null, // 新12タイプ体系では廃止予定。診断ロジックがまだ出力し得るためデータは温存（ファイル冒頭の注記を参照）
+    legacy: true,
     nameEn: "MEDIATOR",
     nameJp: "調律者",
     catchcopy: "対立の間に立ち、調和を取る。",
@@ -342,6 +375,8 @@ const KAKU_TYPES = {
   },
   builder: {
     id: "builder",
+    category: null, // 新12タイプ体系では廃止予定。診断ロジックがまだ出力し得るためデータは温存（ファイル冒頭の注記を参照）
+    legacy: true,
     nameEn: "BUILDER",
     nameJp: "構築者",
     catchcopy: "土台から、着実に積み上げる。",
@@ -367,6 +402,8 @@ const KAKU_TYPES = {
   },
   adventurer: {
     id: "adventurer",
+    category: null, // 新12タイプ体系では廃止予定。診断ロジックがまだ出力し得るためデータは温存（ファイル冒頭の注記を参照）
+    legacy: true,
     nameEn: "ADVENTURER",
     nameJp: "冒険者",
     catchcopy: "決められた道より、自由な道を選ぶ。",
@@ -392,6 +429,8 @@ const KAKU_TYPES = {
   },
   finisher: {
     id: "finisher",
+    category: null, // 新12タイプ体系では廃止予定。診断ロジックがまだ出力し得るためデータは温存（ファイル冒頭の注記を参照）
+    legacy: true,
     nameEn: "FINISHER",
     nameJp: "完遂者",
     catchcopy: "最後の一手まで、責任を持つ。",
@@ -417,6 +456,52 @@ const KAKU_TYPES = {
   },
 };
 
+/**
+ * KAKU_TYPE_CATEGORIES
+ * 12 KAKU TYPEを束ねる3つの大分類（TOPページ・タイプ一覧ページで使用）。
+ *
+ * 注意：このカテゴリ分けは「CORE6の上位2項目から機械的に決まる」というものではなく、
+ * あくまで12タイプを紹介する上でのブランド上の整理（世界観づくり）のための分類。
+ * 実際のタイプ判定ロジック（type-engine.js）とは独立している。
+ *
+ * color系の値はカテゴリごとのアクセントカラー（背景・バッジ等で使用する、控えめな色味）。
+ * KAKU_TYPESの各タイプが持つcolorとは別物で、個別のタイプカードの色は変更しない。
+ */
+const KAKU_TYPE_CATEGORY_ORDER = ["creative", "momentum", "synergy"];
+
+const KAKU_TYPE_CATEGORIES = {
+  creative: {
+    id: "creative",
+    nameJp: "創造型",
+    nameEn: "CREATIVE",
+    tagline: "まだない答えをつくる人たち。",
+    description: "考え、答えをつくる力。まだ形になっていない可能性から、新しい答えを描き出す。",
+    color: "#4A4E8C",
+    colorSoft: "rgba(74, 78, 140, 0.10)",
+    typeIds: ["architect", "strategist", "creator", "pioneer"],
+  },
+  momentum: {
+    id: "momentum",
+    nameJp: "推進型",
+    nameEn: "MOMENTUM",
+    tagline: "現実を前へ動かす人たち。",
+    description: "動き、人を動かす力。立ち止まらず、現実を前に進める。",
+    color: "#B5502F",
+    colorSoft: "rgba(181, 80, 47, 0.10)",
+    typeIds: ["commander", "challenger", "influencer", "executor"],
+  },
+  synergy: {
+    id: "synergy",
+    nameJp: "共創型",
+    nameEn: "SYNERGY",
+    tagline: "人や組織を強くする人たち。",
+    description: "つながり、支える力。人と人、人と組織の間に立ち、強くする。",
+    color: "#2E7D6B",
+    colorSoft: "rgba(46, 125, 107, 0.10)",
+    typeIds: ["connector", "navigator", "guardian", "specialist"],
+  },
+};
+
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { KAKU_TYPES };
+  module.exports = { KAKU_TYPES, KAKU_TYPE_CATEGORIES, KAKU_TYPE_CATEGORY_ORDER };
 }
