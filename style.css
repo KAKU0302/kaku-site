@@ -30,6 +30,11 @@
 
 * { box-sizing: border-box; }
 
+.only-mobile { display: none; }
+@media (max-width: 640px) {
+  .only-mobile { display: inline; }
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -85,7 +90,7 @@ img { max-width: 100%; display: block; }
 .view { min-height: 60vh; }
 
 .section-title {
-  font-size: 26px;
+  font-size: clamp(24px, 2.4vw, 32px);
   font-weight: 700;
   margin-bottom: 24px;
   letter-spacing: 0.02em;
@@ -134,86 +139,109 @@ img { max-width: 100%; display: block; }
   text-align: center;
 }
 .hero__title {
-  font-size: 44px;
+  font-size: clamp(32px, 4.6vw, 68px);
   font-weight: 800;
-  line-height: 1.3;
+  line-height: 1.28;
   letter-spacing: -0.01em;
-  margin: 0 0 20px;
+  margin: 0 0 22px;
 }
 .hero__lead {
-  font-size: 15px;
+  font-size: clamp(15px, 1.35vw, 18px);
   color: var(--color-text-soft);
   margin-bottom: 28px;
 }
 .hero__meta {
-  font-size: 12px;
+  font-size: clamp(12px, 0.9vw, 14px);
   color: var(--color-text-soft);
   margin: 4px 0 20px;
   letter-spacing: 0.04em;
 }
 .btn--lg {
-  padding: 16px 40px;
-  font-size: 15px;
+  padding: 18px 46px;
+  font-size: clamp(15px, 1vw, 16px);
 }
 
 /* KAKUらしい世界観の背景（宇宙・魔法陣・過剰な紫/ゴールドは使わず、
-   ごく薄いグラデーション・幾何学的な線・円の重なりだけで「核／内面」を表現） */
+   ごく薄いグラデーション・幾何学的な線・円の重なりだけで「核／内面」を表現）
+   PCで見たときの物足りなさを解消するため、光の存在感・グリッド線・グローを強めた版 */
 .hero--kaku {
   position: relative;
   max-width: none;
   width: 100%;
-  padding: 88px 24px 48px;
+  padding: 108px 24px 64px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 640px 360px at 18% 8%, rgba(94, 200, 242, 0.10), transparent 60%),
-    radial-gradient(ellipse 560px 420px at 86% 22%, rgba(44, 47, 107, 0.08), transparent 62%),
+    radial-gradient(ellipse 760px 440px at 16% 4%, rgba(94, 200, 242, 0.16), transparent 62%),
+    radial-gradient(ellipse 680px 520px at 88% 18%, rgba(44, 47, 107, 0.13), transparent 64%),
+    radial-gradient(ellipse 520px 360px at 50% 100%, rgba(94, 200, 242, 0.08), transparent 70%),
     var(--color-bg);
 }
 .hero__decor { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.hero__decor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(44, 47, 107, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 47, 107, 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 720px 480px at 50% 20%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 720px 480px at 50% 20%, #000 0%, transparent 72%);
+}
 .hero__decor-circle {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(44, 47, 107, 0.14);
+  border: 1px solid rgba(44, 47, 107, 0.16);
 }
-.hero__decor-circle--a { width: 260px; height: 260px; top: -90px; left: -60px; }
-.hero__decor-circle--b { width: 160px; height: 160px; top: 40px; right: 6%; border-color: rgba(94, 200, 242, 0.22); }
-.hero__decor-circle--c { width: 90px; height: 90px; bottom: -20px; left: 18%; border-color: rgba(44, 47, 107, 0.10); }
+.hero__decor-circle--a { width: 320px; height: 320px; top: -120px; left: -80px; }
+.hero__decor-circle--b { width: 200px; height: 200px; top: 30px; right: 5%; border-color: rgba(94, 200, 242, 0.32); box-shadow: 0 0 60px rgba(94, 200, 242, 0.14); }
+.hero__decor-circle--c { width: 110px; height: 110px; bottom: -30px; left: 16%; border-color: rgba(44, 47, 107, 0.14); }
 .hero__decor-line {
   position: absolute;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(44, 47, 107, 0.16), transparent);
+  background: linear-gradient(90deg, transparent, rgba(94, 200, 242, 0.28), transparent);
 }
-.hero__decor-line--a { width: 46%; top: 22%; right: -4%; transform: rotate(-8deg); }
-.hero__decor-line--b { width: 36%; bottom: 14%; left: -2%; transform: rotate(6deg); }
-.hero__inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+.hero__decor-line--a { width: 50%; top: 20%; right: -6%; transform: rotate(-8deg); }
+.hero__decor-line--b { width: 40%; bottom: 12%; left: -3%; transform: rotate(6deg); background: linear-gradient(90deg, transparent, rgba(44, 47, 107, 0.22), transparent); }
+.hero__inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
 .hero__lead--sub { margin-top: -14px; }
 
 /* ---------- あなたは、どのKAKUだろう。（TOP・12タイプ×3分類ショーケース） ---------- */
 .type-showcase {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 16px 24px 60px;
+  max-width: none;
+  width: 100%;
+  padding: 72px 0 76px;
   text-align: center;
+  background:
+    linear-gradient(180deg, rgba(94, 200, 242, 0.05), transparent 30%),
+    linear-gradient(0deg, rgba(44, 47, 107, 0.04), transparent 30%),
+    var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
+.type-showcase__inner { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 .type-showcase__eyebrow { text-align: center; }
-.type-showcase__title { margin-bottom: 10px; }
+.type-showcase__title { margin-bottom: 12px; }
 .type-showcase__lead {
-  font-size: 14px;
+  font-size: clamp(14px, 1.1vw, 16px);
   font-weight: 600;
   color: var(--color-text-soft);
-  margin: 0 0 32px;
+  margin: 0 0 36px;
 }
 .type-showcase__categories {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 .type-showcase__category {
   text-align: left;
-  border-radius: var(--radius);
-  padding: 22px 20px;
-  background: var(--cat-color-soft, var(--color-accent-soft));
-  border: 1px solid color-mix(in srgb, var(--cat-color, var(--color-accent)) 22%, transparent);
+  border-radius: 18px;
+  padding: 30px 28px;
+  background:
+    linear-gradient(135deg, var(--cat-color-soft, var(--color-accent-soft)), transparent 60%),
+    var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--cat-color, var(--color-accent)) 26%, transparent);
+  box-shadow: 0 18px 40px -24px color-mix(in srgb, var(--cat-color, var(--color-accent)) 45%, transparent);
 }
 .type-showcase__category-head {
   display: flex;
@@ -221,121 +249,140 @@ img { max-width: 100%; display: block; }
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 .type-showcase__category-name {
   margin: 0;
-  font-size: 16px;
+  font-size: clamp(18px, 1.6vw, 22px);
   font-weight: 800;
   color: var(--cat-color, var(--color-accent));
 }
 .type-showcase__category-name .label-en {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--color-text-soft);
   margin-left: 4px;
+  opacity: 1;
 }
 .type-showcase__category-tagline {
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-text-soft);
 }
 .type-showcase__category-cards {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 .type-showcase__card {
-  width: 130px;
-  border-radius: var(--radius-sm);
+  border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   text-decoration: none;
 }
 .type-showcase__card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(28, 29, 33, 0.10);
+  transform: translateY(-6px);
+  border-color: var(--cat-color, var(--color-accent));
+  box-shadow: 0 16px 32px -14px color-mix(in srgb, var(--cat-color, var(--color-accent)) 55%, transparent);
 }
 .type-showcase__card img {
   width: 100%;
-  height: 140px;
+  height: 168px;
   object-fit: cover;
   display: block;
 }
 .type-showcase__card-en {
   margin: 0;
-  padding: 8px 8px 0;
-  font-size: 10px;
+  padding: 12px 12px 0;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--cat-color, var(--color-accent));
 }
 .type-showcase__card-jp {
   margin: 0;
-  padding: 1px 8px 8px;
-  font-size: 12px;
-  font-weight: 700;
+  padding: 2px 12px 12px;
+  font-size: 14px;
+  font-weight: 800;
   color: var(--color-text);
 }
 .type-showcase__note {
-  margin: 32px auto 0;
-  max-width: 460px;
-  font-size: 13px;
+  margin: 40px auto 0;
+  max-width: 480px;
+  font-size: clamp(13px, 1vw, 15px);
   line-height: 1.9;
   color: var(--color-text-soft);
   font-family: var(--font-serif);
 }
+@media (max-width: 900px) {
+  .type-showcase__category-cards { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 640px) {
-  .type-showcase__card { width: 108px; }
-  .type-showcase__card img { height: 118px; }
-  .type-showcase__category-cards { justify-content: center; }
+  .type-showcase { padding: 52px 0 56px; }
+  .type-showcase__category { padding: 22px 18px; }
+  .type-showcase__card img { height: 130px; }
 }
 
 /* ---------- 自分事化の問いかけ（TOP） ---------- */
 .hero-questions {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px 24px 56px;
+  max-width: none;
+  width: 100%;
+  padding: 72px 0 76px;
   text-align: center;
 }
+.hero-questions__inner { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 .hero-questions__eyebrow {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  font-size: clamp(14px, 1.1vw, 16px);
 }
 .hero-questions__featured {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 .hero-questions__item--featured {
+  position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-accent);
-  border-radius: var(--radius-sm);
-  padding: 20px 22px;
-  font-size: 16px;
+  border-radius: 14px;
+  padding: 26px 28px;
+  padding-left: 32px;
+  font-size: clamp(17px, 1.6vw, 21px);
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
   line-height: 1.6;
   text-align: left;
+  box-shadow: 0 16px 32px -20px rgba(44, 47, 107, 0.28);
+}
+.hero-questions__item--featured::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--color-glow), var(--color-accent));
+  box-shadow: 0 0 14px rgba(94, 200, 242, 0.5);
 }
 .hero-questions__secondary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 .hero-questions__item--secondary {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--color-text-soft);
   margin: 0;
-  line-height: 1.6;
-  padding: 10px 4px 0;
+  line-height: 1.7;
+  padding: 12px 6px 0;
 }
 @media (max-width: 640px) {
   .hero-questions__secondary { grid-template-columns: 1fr; text-align: left; }
@@ -343,42 +390,47 @@ img { max-width: 100%; display: block; }
 
 /* ---------- 仕組みのミニ説明（TOP・最後に軽く） ---------- */
 .hero-explainer {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 8px 24px 72px;
+  max-width: none;
+  width: 100%;
+  padding: 64px 0 80px;
   text-align: center;
+  background:
+    radial-gradient(ellipse 700px 400px at 50% 0%, rgba(44, 47, 107, 0.05), transparent 68%),
+    var(--color-bg);
 }
+.hero-explainer__inner { max-width: 780px; margin: 0 auto; padding: 0 24px; }
 .hero-explainer__lead {
-  font-size: 15px;
+  font-size: clamp(16px, 1.4vw, 19px);
   font-weight: 700;
-  margin: 0 0 24px;
+  margin: 0 0 28px;
 }
 .hero-explainer__grid {
   display: flex;
   align-items: stretch;
-  gap: 10px;
+  gap: 14px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 .hero-explainer__step {
-  flex: 1 1 160px;
+  flex: 1 1 180px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-top: 2px solid var(--color-accent);
   border-radius: var(--radius-sm);
-  padding: 18px 16px;
+  padding: 22px 18px;
 }
 .hero-explainer__label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--color-accent);
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 .hero-explainer__desc {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-text-soft);
   margin: 0;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 .hero-explainer__arrow {
   display: flex;
@@ -386,18 +438,18 @@ img { max-width: 100%; display: block; }
   justify-content: center;
   color: var(--color-text-soft);
   opacity: 0.5;
-  font-size: 14px;
+  font-size: 15px;
 }
 .hero-explainer__result {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-text-soft);
-  margin: 8px 0 28px;
+  margin: 10px 0 30px;
   line-height: 1.8;
 }
 .hero-explainer__result strong {
   display: block;
-  margin-top: 6px;
-  font-size: 20px;
+  margin-top: 8px;
+  font-size: 23px;
   color: var(--color-text);
   font-family: var(--font-serif);
 }
@@ -406,103 +458,129 @@ img { max-width: 100%; display: block; }
   .hero-explainer__arrow { transform: rotate(90deg); }
 }
 
-/* ---------- KAKUで分かるのは「性格」だけじゃない（TOP・結果画面プレビュー風） ---------- */
+/* ---------- KAKUで分かるのは「性格」だけじゃない（TOP・結果画面プレビュー風／ダークUIモックアップ） ---------- */
 .reveal-section {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 8px 24px 64px;
+  max-width: none;
+  width: 100%;
+  padding: 72px 0 80px;
   text-align: center;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
+.reveal-section__inner { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 .reveal-section__eyebrow { text-align: center; }
-.reveal-section__title { margin-bottom: 28px; }
+.reveal-section__title { margin-bottom: 32px; }
 .reveal-mock {
   text-align: left;
-  border-radius: var(--radius);
+  border-radius: 18px;
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: 0 20px 44px rgba(28, 29, 33, 0.08);
+  background: linear-gradient(165deg, var(--book-bg-b), var(--book-bg-a));
+  box-shadow: 0 30px 60px -20px rgba(10, 13, 28, 0.45);
+  border: 1px solid var(--book-border);
 }
 .reveal-mock__chrome {
   display: flex;
+  align-items: center;
   gap: 6px;
-  padding: 12px 14px;
-  background: var(--color-accent-soft);
-  border-bottom: 1px solid var(--color-border);
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--book-border);
 }
 .reveal-mock__chrome span {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(44, 47, 107, 0.22);
+  background: rgba(236, 238, 247, 0.22);
 }
-.reveal-mock__body { padding: 6px 22px 10px; }
+.reveal-mock__chrome-label {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--book-text-soft);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .reveal-mock__chrome-label { display: none; }
+}
+.reveal-mock__body { padding: 8px 26px 14px; }
 .reveal-mock__row {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--color-border);
+  padding: 18px 0;
+  border-bottom: 1px solid var(--book-border);
 }
 .reveal-mock__row:last-child { border-bottom: none; }
 .reveal-mock__label {
-  margin: 0 0 4px;
-  font-size: 13px;
+  margin: 0 0 5px;
+  font-size: 14px;
   font-weight: 800;
-  color: var(--color-accent);
+  color: var(--color-glow);
 }
 .reveal-mock__desc {
   margin: 0;
-  font-size: 13px;
-  color: var(--color-text-soft);
+  font-size: 14px;
+  color: var(--book-text-soft);
 }
-.reveal-mock__row--type .reveal-mock__label { color: var(--color-text); font-size: 15px; }
+.reveal-mock__row--type .reveal-mock__label { color: var(--book-text); font-size: 17px; }
+.reveal-mock__row--type .reveal-mock__desc { color: var(--book-text-soft); }
 .reveal-mock__row--gap {
-  background: linear-gradient(90deg, rgba(94, 200, 242, 0.08), transparent);
-  margin: 0 -22px;
-  padding: 16px 22px;
+  background: linear-gradient(90deg, rgba(94, 200, 242, 0.14), transparent);
+  margin: 0 -26px;
+  padding: 18px 26px;
+}
+@media (max-width: 640px) {
+  .reveal-mock__body { padding: 4px 20px 10px; }
+  .reveal-mock__row--gap { margin: 0 -20px; padding: 18px 20px; }
 }
 
 /* ---------- 本来の自分と、今の自分の「ズレ」（TOP・KAKU GAPティザー） ---------- */
 .gap-teaser {
-  max-width: 620px;
-  margin: 0 auto;
-  padding: 8px 24px 64px;
+  max-width: none;
+  width: 100%;
+  padding: 76px 0 84px;
   text-align: center;
+  background:
+    radial-gradient(ellipse 640px 420px at 50% 0%, rgba(44, 47, 107, 0.07), transparent 68%),
+    radial-gradient(ellipse 520px 360px at 50% 100%, rgba(94, 200, 242, 0.08), transparent 70%),
+    var(--color-bg);
 }
+.gap-teaser__inner { max-width: 660px; margin: 0 auto; padding: 0 24px; }
 .gap-teaser__pre {
-  font-size: 17px;
+  font-size: clamp(17px, 1.6vw, 21px);
   font-weight: 800;
-  margin: 0 0 28px;
+  margin: 0 0 32px;
 }
-.gap-teaser__visual { position: relative; margin: 0 auto 28px; width: 240px; }
-.gap-teaser__svg { width: 100%; height: auto; display: block; }
-.gap-teaser__circle { fill-opacity: 0.14; stroke-width: 1.5; }
+.gap-teaser__visual { position: relative; margin: 0 auto 32px; width: 280px; }
+.gap-teaser__svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 0 24px rgba(94, 200, 242, 0.14)); }
+.gap-teaser__circle { fill-opacity: 0.16; stroke-width: 1.5; }
 .gap-teaser__circle--core { fill: var(--color-accent); stroke: var(--color-accent); }
-.gap-teaser__circle--now { fill: var(--color-glow); stroke: var(--color-glow); }
+.gap-teaser__circle--now { fill: var(--color-glow); stroke: var(--color-glow); mix-blend-mode: multiply; }
 .gap-teaser__label {
   position: absolute;
   top: 100%;
-  margin: 6px 0 0;
-  font-size: 11px;
+  margin: 8px 0 0;
+  font-size: 12px;
   font-weight: 700;
   color: var(--color-text-soft);
-  width: 110px;
+  width: 120px;
 }
-.gap-teaser__label--core { left: -6px; text-align: right; }
-.gap-teaser__label--now { right: -6px; text-align: left; }
+.gap-teaser__label--core { left: -8px; text-align: right; }
+.gap-teaser__label--now { right: -8px; text-align: left; }
 .gap-teaser__body {
-  font-size: 13px;
+  font-size: clamp(13px, 1.05vw, 15px);
   line-height: 1.9;
   color: var(--color-text-soft);
-  margin: 0 0 24px;
+  margin: 0 0 26px;
 }
 .gap-teaser__cta-line {
-  font-size: 15px;
+  font-size: clamp(15px, 1.3vw, 18px);
   font-weight: 800;
   line-height: 1.8;
   margin: 0;
 }
 .gap-teaser__label-en {
   display: inline-block;
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -510,41 +588,57 @@ img { max-width: 100%; display: block; }
 }
 @media (max-width: 480px) {
   .gap-teaser__label { position: static; display: block; width: auto; text-align: center !important; margin-top: 8px; }
-  .gap-teaser__visual { margin-bottom: 12px; }
+  .gap-teaser__visual { margin-bottom: 14px; }
 }
 
 /* ---------- 最終CTA（TOP・体験の締め、あえて背景を暗くして余韻を作る） ---------- */
 .final-cta {
+  position: relative;
   max-width: none;
+  width: 100%;
   margin: 0;
-  padding: 76px 24px 88px;
+  padding: 96px 24px 108px;
   text-align: center;
-  background: linear-gradient(160deg, var(--color-accent), #1B1D45);
+  background: linear-gradient(160deg, var(--color-accent), #1B1D45 60%, #0F1130);
   color: #fff;
+  overflow: hidden;
 }
+.final-cta__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(94, 200, 242, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 200, 242, 0.08) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 620px 420px at 50% 40%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 620px 420px at 50% 40%, #000 0%, transparent 75%);
+}
+.final-cta__inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
 .final-cta__pre {
-  font-size: 14px;
+  font-size: clamp(14px, 1.15vw, 16px);
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.72);
-  margin: 0 0 18px;
+  color: rgba(255, 255, 255, 0.74);
+  margin: 0 0 20px;
   line-height: 1.8;
 }
 .final-cta__title {
-  font-size: 30px;
+  font-size: clamp(28px, 3.4vw, 44px);
   font-weight: 800;
-  line-height: 1.4;
-  margin: 0 0 28px;
+  line-height: 1.38;
+  margin: 0 0 30px;
   color: #fff;
 }
 .final-cta .btn--primary {
   background: #fff;
   border-color: #fff;
   color: var(--color-accent);
+  box-shadow: 0 0 32px rgba(94, 200, 242, 0.28);
 }
 .final-cta__meta {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.66);
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   letter-spacing: 0.04em;
 }
 
