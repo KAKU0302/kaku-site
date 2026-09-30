@@ -442,11 +442,16 @@
       const cardsHtml = cat.typeIds.map((id) => buildTypeShowcaseCardHtml(KAKU_TYPES[id])).join("");
       return `
         <div class="type-showcase__category" data-category="${cat.id}" style="--cat-color:${cat.color}; --cat-color-soft:${cat.colorSoft};">
-          <div class="type-showcase__category-head">
-            <p class="type-showcase__category-name">${cat.nameJp}<span class="label-en">（${cat.nameEn}）</span></p>
-            <p class="type-showcase__category-tagline">${cat.tagline}</p>
+          <div class="type-showcase__category-inner">
+            <div class="type-showcase__category-head">
+              <p class="type-showcase__category-name">${cat.nameJp}<span class="label-en">（${cat.nameEn}）</span></p>
+              <p class="type-showcase__category-tagline">${cat.tagline}</p>
+            </div>
+            <div class="type-showcase__category-visual">
+              <p class="type-showcase__category-watermark" aria-hidden="true">${cat.nameJp}</p>
+              <div class="type-showcase__category-cards">${cardsHtml}</div>
+            </div>
           </div>
-          <div class="type-showcase__category-cards">${cardsHtml}</div>
         </div>`;
     }).join("");
   }

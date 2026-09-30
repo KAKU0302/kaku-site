@@ -295,119 +295,115 @@ img { max-width: 100%; display: block; }
   .hero__decor::before,
   .hero__scanline,
   .aurora-blob,
-  .final-cta__grid,
-  .gap-teaser__circle {
+  .final-cta__grid {
     animation: none !important;
   }
 }
 
-/* ---------- あなたは、どのKAKUだろう。（TOP・12タイプ×3分類ショーケース） ---------- */
+/* ---------- あなたは、どのKAKUだろう。（TOP・12タイプ×3分類ショーケース）
+   シンプルな配色バンド＋大きく淡いカテゴリー名の透かし文字で「分類ごとの世界観」を
+   出す構成（派手なグラデーション・グロー装飾は使わず、色と余白だけで見せる） ---------- */
 .type-showcase {
-  position: relative;
   max-width: none;
   width: 100%;
-  padding: 72px 0 76px;
-  overflow: hidden;
+  padding: 64px 0 8px;
   text-align: center;
-  background:
-    linear-gradient(180deg, rgba(94, 200, 242, 0.05), transparent 30%),
-    linear-gradient(0deg, rgba(44, 47, 107, 0.04), transparent 30%),
-    var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
 }
-.type-showcase__inner { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.type-showcase__inner { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 .type-showcase__eyebrow { text-align: center; }
 .type-showcase__title { margin-bottom: 12px; }
 .type-showcase__lead {
   font-size: clamp(14px, 1.1vw, 16px);
   font-weight: 600;
   color: var(--color-text-soft);
-  margin: 0 0 36px;
+  margin: 0 0 8px;
 }
 .type-showcase__categories {
   display: flex;
   flex-direction: column;
-  gap: 22px;
 }
 .type-showcase__category {
-  text-align: left;
-  border-radius: 18px;
-  padding: 30px 28px;
-  background:
-    linear-gradient(135deg, var(--cat-color-soft, var(--color-accent-soft)), transparent 60%),
-    var(--color-surface);
-  border: 1px solid color-mix(in srgb, var(--cat-color, var(--color-accent)) 26%, transparent);
-  box-shadow: 0 18px 40px -24px color-mix(in srgb, var(--cat-color, var(--color-accent)) 45%, transparent);
+  position: relative;
+  overflow: hidden;
+  padding: 72px 24px 56px;
+  background: color-mix(in srgb, var(--cat-color, var(--color-accent)) 13%, #FFFFFF);
 }
-.type-showcase__category-head {
+.type-showcase__category-inner { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; }
+.type-showcase__category-head { margin-bottom: 32px; }
+.type-showcase__category-visual { position: relative; }
+.type-showcase__category-watermark {
+  position: absolute;
+  inset: 0;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  margin-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(92px, 15vw, 220px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
 }
 .type-showcase__category-name {
   margin: 0;
-  font-size: clamp(18px, 1.6vw, 22px);
+  font-size: clamp(19px, 1.8vw, 25px);
   font-weight: 800;
-  color: var(--cat-color, var(--color-accent));
+  color: color-mix(in srgb, var(--cat-color, var(--color-accent)) 82%, black);
 }
 .type-showcase__category-name .label-en {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--color-text-soft);
-  margin-left: 4px;
-  opacity: 1;
+  color: color-mix(in srgb, var(--cat-color, var(--color-accent)) 60%, black);
+  margin-left: 6px;
+  opacity: 0.75;
 }
 .type-showcase__category-tagline {
-  margin: 0;
+  margin: 6px 0 0;
   font-size: 13px;
-  color: var(--color-text-soft);
+  color: color-mix(in srgb, var(--cat-color, var(--color-accent)) 65%, black);
+  opacity: 0.85;
 }
 .type-showcase__category-cards {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 20px 16px;
 }
 .type-showcase__card {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  text-align: center;
   text-decoration: none;
+  transition: transform 0.22s ease;
 }
-.type-showcase__card:hover {
-  transform: translateY(-6px);
-  border-color: var(--cat-color, var(--color-accent));
-  box-shadow: 0 16px 32px -14px color-mix(in srgb, var(--cat-color, var(--color-accent)) 55%, transparent);
-}
+.type-showcase__card:hover { transform: translateY(-5px); }
 .type-showcase__card img {
   width: 100%;
-  height: 168px;
+  height: 156px;
   object-fit: cover;
   display: block;
+  border-radius: 12px;
+  box-shadow: 0 10px 22px rgba(20, 20, 30, 0.14);
 }
 .type-showcase__card-en {
-  margin: 0;
-  padding: 12px 12px 0;
+  margin: 10px 0 0;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--cat-color, var(--color-accent));
+  color: color-mix(in srgb, var(--cat-color, var(--color-accent)) 60%, black);
+  opacity: 0.8;
 }
 .type-showcase__card-jp {
-  margin: 0;
-  padding: 2px 12px 12px;
+  margin: 2px 0 0;
   font-size: 14px;
   font-weight: 800;
-  color: var(--color-text);
+  color: color-mix(in srgb, var(--cat-color, var(--color-accent)) 88%, black);
 }
 .type-showcase__note {
-  margin: 40px auto 0;
+  margin: 44px auto 0;
   max-width: 480px;
   font-size: clamp(13px, 1vw, 15px);
   line-height: 1.9;
@@ -418,9 +414,9 @@ img { max-width: 100%; display: block; }
   .type-showcase__category-cards { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 640px) {
-  .type-showcase { padding: 52px 0 56px; }
-  .type-showcase__category { padding: 22px 18px; }
-  .type-showcase__card img { height: 130px; }
+  .type-showcase { padding: 44px 0 8px; }
+  .type-showcase__category { padding: 52px 20px 40px; }
+  .type-showcase__card img { height: 128px; }
 }
 
 /* ---------- 自分事化の問いかけ（TOP） ---------- */
@@ -553,175 +549,6 @@ img { max-width: 100%; display: block; }
 @media (max-width: 640px) {
   .hero-explainer__grid { flex-direction: column; }
   .hero-explainer__arrow { transform: rotate(90deg); }
-}
-
-/* ---------- KAKUで分かるのは「性格」だけじゃない（TOP・結果画面プレビュー風／ダークUIモックアップ） ---------- */
-.reveal-section {
-  max-width: none;
-  width: 100%;
-  padding: 72px 0 80px;
-  text-align: center;
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-.reveal-section__inner { max-width: 760px; margin: 0 auto; padding: 0 24px; }
-.reveal-section__eyebrow { text-align: center; }
-.reveal-section__title { margin-bottom: 32px; }
-.reveal-mock {
-  position: relative;
-  text-align: left;
-  border-radius: 18px;
-  overflow: hidden;
-  background: linear-gradient(165deg, var(--book-bg-b), var(--book-bg-a));
-  box-shadow: 0 30px 60px -20px rgba(10, 13, 28, 0.45);
-  border: 1px solid var(--book-border);
-}
-.reveal-mock::after {
-  content: "";
-  position: absolute;
-  top: -40%;
-  left: -60%;
-  width: 40%;
-  height: 180%;
-  background: linear-gradient(100deg, transparent, rgba(94, 200, 242, 0.10) 45%, rgba(94, 200, 242, 0.16) 50%, rgba(94, 200, 242, 0.10) 55%, transparent);
-  transform: rotate(8deg);
-  animation: kakuMockSweep 6s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes kakuMockSweep {
-  0% { left: -60%; opacity: 0; }
-  20% { opacity: 1; }
-  55% { left: 120%; opacity: 1; }
-  100% { left: 120%; opacity: 0; }
-}
-.reveal-mock__row--gap { animation: kakuGapRowPulse 3.4s ease-in-out infinite; }
-@keyframes kakuGapRowPulse {
-  0%, 100% { background: linear-gradient(90deg, rgba(94, 200, 242, 0.10), transparent); }
-  50% { background: linear-gradient(90deg, rgba(94, 200, 242, 0.22), transparent); }
-}
-.reveal-mock__chrome {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid var(--book-border);
-}
-.reveal-mock__chrome span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(236, 238, 247, 0.22);
-}
-.reveal-mock__chrome-label {
-  margin-left: auto;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  color: var(--book-text-soft);
-  font-family: var(--font-mono);
-  white-space: nowrap;
-}
-@media (max-width: 480px) {
-  .reveal-mock__chrome-label { display: none; }
-}
-.reveal-mock__body { padding: 8px 26px 14px; }
-.reveal-mock__row {
-  padding: 18px 0;
-  border-bottom: 1px solid var(--book-border);
-}
-.reveal-mock__row:last-child { border-bottom: none; }
-.reveal-mock__label {
-  margin: 0 0 5px;
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--color-glow);
-}
-.reveal-mock__desc {
-  margin: 0;
-  font-size: 14px;
-  color: var(--book-text-soft);
-}
-.reveal-mock__row--type .reveal-mock__label { color: var(--book-text); font-size: 17px; }
-.reveal-mock__row--type .reveal-mock__desc { color: var(--book-text-soft); }
-.reveal-mock__row--gap {
-  background: linear-gradient(90deg, rgba(94, 200, 242, 0.14), transparent);
-  margin: 0 -26px;
-  padding: 18px 26px;
-}
-@media (max-width: 640px) {
-  .reveal-mock__body { padding: 4px 20px 10px; }
-  .reveal-mock__row--gap { margin: 0 -20px; padding: 18px 20px; }
-}
-
-/* ---------- 本来の自分と、今の自分の「ズレ」（TOP・KAKU GAPティザー） ---------- */
-.gap-teaser {
-  position: relative;
-  max-width: none;
-  width: 100%;
-  padding: 76px 0 84px;
-  overflow: hidden;
-  text-align: center;
-  background:
-    radial-gradient(ellipse 640px 420px at 50% 0%, rgba(44, 47, 107, 0.07), transparent 68%),
-    radial-gradient(ellipse 520px 360px at 50% 100%, rgba(94, 200, 242, 0.08), transparent 70%),
-    var(--color-bg);
-}
-.gap-teaser__inner { position: relative; z-index: 1; max-width: 660px; margin: 0 auto; padding: 0 24px; }
-.gap-teaser__pre {
-  font-size: clamp(17px, 1.6vw, 21px);
-  font-weight: 800;
-  margin: 0 0 32px;
-}
-.gap-teaser__visual { position: relative; margin: 0 auto 32px; width: 280px; }
-.gap-teaser__svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 0 24px rgba(94, 200, 242, 0.14)); }
-.gap-teaser__circle { fill-opacity: 0.16; stroke-width: 1.5; transform-box: fill-box; transform-origin: center; }
-.gap-teaser__circle--core { fill: var(--color-accent); stroke: var(--color-accent); }
-.gap-teaser__circle--now { fill: var(--color-glow); stroke: var(--color-glow); mix-blend-mode: multiply; }
-.gap-teaser__visual--breathe .gap-teaser__circle--core { animation: kakuGapBreatheCore 6s ease-in-out infinite; }
-.gap-teaser__visual--breathe .gap-teaser__circle--now { animation: kakuGapBreatheNow 6s ease-in-out infinite; }
-@keyframes kakuGapBreatheCore {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-9px); }
-}
-@keyframes kakuGapBreatheNow {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(9px); }
-}
-.gap-teaser__label {
-  position: absolute;
-  top: 100%;
-  margin: 8px 0 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--color-text-soft);
-  width: 120px;
-}
-.gap-teaser__label--core { left: -8px; text-align: right; }
-.gap-teaser__label--now { right: -8px; text-align: left; }
-.gap-teaser__body {
-  font-size: clamp(13px, 1.05vw, 15px);
-  line-height: 1.9;
-  color: var(--color-text-soft);
-  margin: 0 0 26px;
-}
-.gap-teaser__cta-line {
-  font-size: clamp(15px, 1.3vw, 18px);
-  font-weight: 800;
-  line-height: 1.8;
-  margin: 0;
-}
-.gap-teaser__label-en {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--color-accent);
-}
-@media (max-width: 480px) {
-  .gap-teaser__label { position: static; display: block; width: auto; text-align: center !important; margin-top: 8px; }
-  .gap-teaser__visual { margin-bottom: 14px; }
 }
 
 /* ---------- 最終CTA（TOP・体験の締め、あえて背景を暗くして余韻を作る） ---------- */
