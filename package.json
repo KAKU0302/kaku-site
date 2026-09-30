@@ -1,0 +1,10 @@
+{
+  "name": "kaku-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "KAKU ～核～｜自己理解診断サイト。サイト本体は静的HTML/CSS/JSだが、PERSONAL BOOKの決済（Stripe）とメール送信（Resend）のためだけに、/api配下にVercelのサーバーレス関数を追加している。",
+  "dependencies": {
+    "stripe": "^18.0.0",
+    "resend": "^4.0.1"
+  }
+}

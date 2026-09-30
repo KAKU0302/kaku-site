@@ -36,6 +36,16 @@
     context: null,   // PERSONAL BOOK限定の追加入力 { role, value, relationship }
   };
 
+  // PERSONAL BOOK購入後にメールで届く復元リンク（?book=...）から開かれた場合はtrueになる。
+  // このフラグが立っている間は、PERSONAL BOOK画面で深掘り質問（CONTEXT）を再度聞かず、
+  // 購入時点の内容をそのまま表示する。
+  let openedFromBookLink = false;
+
+  // Stripe Checkout決済完了直後の戻り先（?purchased=1）から開かれた場合にtrueになる。
+  // ブラウザが全画面リロードされる（＝それまでのsession中身は消えている）ため、
+  // 診断結果を再表示するのではなく、「メールが届くのを待ってください」という案内だけを出す。
+  let justPurchased = false;
+
   // ---------------------------------------------------------------------
   // PERSONAL BOOK: 承認・肯定を軸にしたコピー生成用データ
   // ---------------------------------------------------------------------
@@ -225,14 +235,50 @@
     session.typeId = null;
     session.gap = null;
     session.context = null;
+    openedFromBookLink = false;
+  }
+
+  // ---------------------------------------------------------------------
+  // 結果スナップショット：現在のsessionから「診断結果として確定した内容」だけを切り出す。
+  // 履歴（localStorage保存）と、PERSONAL BOOK購入者にメールで送る復元リンクの、
+  // 両方で同じ形のデータを使い回すための共通処理。後からロジック（core-engine.js等）を
+  // 修正しても、すでに見せた・お金をいただいた結果の内容が変わってしまわないよう、
+  // 再計算はせず「当時実際に出た結果」をそのまま保存・復元する。
+  // ---------------------------------------------------------------------
+  function buildResultSnapshot() {
+    return {
+      id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+      savedAt: new Date().toISOString(),
+      name: session.name,
+      birthdate: session.birthdate,
+      questionAnswers: Object.assign({}, session.questionAnswers),
+      stateAnswers: Object.assign({}, session.stateAnswers),
+      context: session.context ? Object.assign({}, session.context) : null,
+      core6: session.core6,
+      birth: session.birth,
+      state: session.state,
+      typeId: session.typeId,
+      gap: session.gap,
+    };
+  }
+
+  function applySnapshotToSession(entry) {
+    session.name = entry.name;
+    session.birthdate = entry.birthdate;
+    session.questionAnswers = Object.assign({}, entry.questionAnswers);
+    session.stateAnswers = Object.assign({}, entry.stateAnswers);
+    session.context = entry.context ? Object.assign({}, entry.context) : null;
+    session.core6 = entry.core6;
+    session.birth = entry.birth;
+    session.state = entry.state;
+    session.typeId = entry.typeId;
+    session.gap = entry.gap;
   }
 
   // ---------------------------------------------------------------------
   // 履歴：診断結果をこのブラウザ（localStorage）に保存し、後から見返せるようにする。
   // このサイトはサーバーを持たない静的サイトのため、保存範囲は「この端末のこのブラウザ」に限られる。
   // ブラウザのデータを削除した場合や、別の端末・別のブラウザで開いた場合は復元できない前提。
-  // また、後からロジック（core-engine.js等）を修正しても過去の結果が変わってしまわないよう、
-  // 再計算はせず「診断した当時に実際に出た結果」をそのまま保存・復元する。
   // ---------------------------------------------------------------------
   const HISTORY_STORAGE_KEY = "kaku_result_history_v1";
   const HISTORY_MAX_ENTRIES = 30;
@@ -261,20 +307,7 @@
   // 診断結果が出た直後に呼び、現在のsessionの内容を履歴の先頭に追加する。
   function saveCurrentResultToHistory() {
     if (!session.typeId || !session.core6) return;
-    const entry = {
-      id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-      savedAt: new Date().toISOString(),
-      name: session.name,
-      birthdate: session.birthdate,
-      questionAnswers: Object.assign({}, session.questionAnswers),
-      stateAnswers: Object.assign({}, session.stateAnswers),
-      context: session.context ? Object.assign({}, session.context) : null,
-      core6: session.core6,
-      birth: session.birth,
-      state: session.state,
-      typeId: session.typeId,
-      gap: session.gap,
-    };
+    const entry = buildResultSnapshot();
     const list = loadHistory();
     list.unshift(entry);
     saveHistoryList(list.slice(0, HISTORY_MAX_ENTRIES));
@@ -297,16 +330,7 @@
   function restoreFromHistoryEntry(entryId) {
     const entry = loadHistory().find((e) => e.id === entryId);
     if (!entry) return;
-    session.name = entry.name;
-    session.birthdate = entry.birthdate;
-    session.questionAnswers = Object.assign({}, entry.questionAnswers);
-    session.stateAnswers = Object.assign({}, entry.stateAnswers);
-    session.context = entry.context ? Object.assign({}, entry.context) : null;
-    session.core6 = entry.core6;
-    session.birth = entry.birth;
-    session.state = entry.state;
-    session.typeId = entry.typeId;
-    session.gap = entry.gap;
+    applySnapshotToSession(entry);
     showView("result");
     renderResult();
   }
@@ -1187,7 +1211,45 @@
   }
 
   // ---------------------------------------------------------------------
-  // PERSONAL BOOK プレビュー（購入前サンプル・仮実装）
+  // PERSONAL BOOK 購入：Stripe Checkoutを開き、決済完了後はサーバー側（/api/stripe-webhook）
+  // からご購入者のメールアドレス宛に、このPERSONAL BOOKを開き直せるリンクを送信する。
+  // このサイト自体は静的サイトのままだが、決済とメール送信のためだけにVercelの
+  // サーバーレス関数（/api配下）を追加している（詳細はREADME参照）。
+  // ---------------------------------------------------------------------
+  async function startPersonalBookCheckout(btn, statusEl) {
+    if (!session.typeId) return;
+    btn.disabled = true;
+    if (statusEl) statusEl.textContent = "決済ページを準備しています…";
+    try {
+      const snapshot = buildResultSnapshot();
+      const res = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshot }),
+      });
+      let data = null;
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        data = null;
+      }
+      if (!res.ok || !data || !data.url) {
+        throw new Error((data && data.error) || "決済ページの作成に失敗しました。");
+      }
+      window.location.href = data.url;
+    } catch (err) {
+      if (statusEl) {
+        statusEl.textContent =
+          "決済ページを開けませんでした。時間をおいて再度お試しいただくか、しばらくしてからやり直してください。";
+      }
+      btn.disabled = false;
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // PERSONAL BOOK 本編描画
+  // ※ 購入前でも実際の完成版と同じ内容をそのまま表示する仕様（2026-09時点の方針）。
+  //   中身の確認が済み、購入者限定に切り替える方針が決まったら、このあたりの表示ロジックを見直す。
   // ---------------------------------------------------------------------
   function renderPersonalBookPreview() {
       const target = document.getElementById("personal-book-preview");
@@ -1377,10 +1439,14 @@
 
       target.innerHTML = `
         <div class="book-preview">
-          <p class="form-note">※ ここから先は購入前の内容サンプルです。実際の購入版では、全16タイプぶんの書き下ろし解説がさらに続きます。</p>
+          ${
+            openedFromBookLink
+              ? `<p class="form-note">この内容は、ご購入いただいたあなた専用のPERSONAL BOOKです。このページをブックマークしておくと、いつでも見返せます。</p>`
+              : `<p class="form-note">これが、あなたのPERSONAL BOOKです。¥980のお支払いで、この内容をメールでも受け取れるようになります（ブラウザの履歴を消しても、別の端末からでも見返せます）。</p>`
+          }
 
           <div class="book-cover" style="background: linear-gradient(160deg, ${type.color} 0%, #14161f 100%);">
-            <p class="book-cover__label">PERSONAL BOOK｜サンプル</p>
+            <p class="book-cover__label">PERSONAL BOOK</p>
             <img src="${type.image}" alt="${type.nameJp}" class="book-cover__image" />
             <p class="book-cover__title">${coverTitle}</p>
             <div class="book-cover__rule"></div>
@@ -1392,6 +1458,22 @@
             <button class="btn btn--text" id="btn-book-share-x">Xでシェア</button>
           </div>
           <p class="form-note no-print" id="book-share-status" aria-live="polite"></p>
+
+          ${
+            openedFromBookLink
+              ? ""
+              : `
+          <div class="book-purchase-cta no-print" id="book-purchase-cta">
+            <p class="book-purchase-cta__title">¥980で購入して、メールで受け取る</p>
+            <p class="book-purchase-cta__desc">
+              お支払い後、ご登録いただいたメールアドレス宛に、このPERSONAL BOOKを開けるリンクをお送りします。
+              メールが届けば、ブラウザの履歴を消してしまっても、別の端末からでも、いつでも見返すことができます。
+            </p>
+            <button class="btn btn--primary" id="btn-book-purchase">¥980で購入する</button>
+            <p class="form-note" id="book-purchase-status" aria-live="polite"></p>
+          </div>
+          `
+          }
 
           <div class="opening-letter">
             <p class="opening-letter__to">${session.name ? session.name + "さんへ" : "あなたへ"}</p>
@@ -1672,6 +1754,13 @@
         }
       });
 
+      const purchaseBtn = document.getElementById("btn-book-purchase");
+      if (purchaseBtn) {
+        purchaseBtn.addEventListener("click", () => {
+          startPersonalBookCheckout(purchaseBtn, document.getElementById("book-purchase-status"));
+        });
+      }
+
       const bookTabButtons = target.querySelectorAll(".book-tab");
       const bookTabPanels = target.querySelectorAll(".book-tabpanel");
       bookTabButtons.forEach((btn) => {
@@ -1692,13 +1781,37 @@
     if (previewTarget) previewTarget.innerHTML = "";
     if (!introEl) return;
 
+    // Stripe Checkout決済直後の戻り先。ページがリロードされ診断結果はメモリ上に残っていないため、
+    // 結果を出し直そうとはせず、「メールが届くのを待ってください」という案内だけを表示する。
+    if (justPurchased) {
+      justPurchased = false;
+      introEl.hidden = false;
+      introEl.innerHTML = `
+        <p class="context-intro__title">ご購入ありがとうございます</p>
+        <p class="body-text">
+          ご登録いただいたメールアドレス宛に、PERSONAL BOOKを開けるリンクをお送りしています。
+          数分以内に届きますので、少しお待ちください。見当たらない場合は、迷惑メールフォルダもご確認ください。
+        </p>
+        <button class="btn" data-nav="top">TOPへ戻る</button>
+      `;
+      return;
+    }
+
     if (!session.typeId) {
       introEl.hidden = false;
       introEl.innerHTML = `
         <p class="context-intro__title">深掘り診断｜3つだけ質問させてください</p>
-        <p class="body-text">プレビューを見るには、先に無料診断でKAKUタイプを診断してください。</p>
+        <p class="body-text">PERSONAL BOOKを見るには、先に無料診断でKAKUタイプを診断してください。</p>
         <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
       `;
+      return;
+    }
+
+    // メールで届いたPERSONAL BOOKのリンクから開いた場合は、購入時点の内容が
+    // すでにsessionに復元されているので、深掘り質問を再度聞かずそのまま表示する。
+    if (openedFromBookLink && session.context) {
+      introEl.hidden = true;
+      renderPersonalBookPreview();
       return;
     }
 
@@ -1707,10 +1820,10 @@
       <p class="context-intro__title">深掘り診断｜3つだけ質問させてください</p>
       <p class="body-text">
         今の仕事・役割、大事にしたい価値観、気になっている人間関係を教えてください。
-        この3つを踏まえて、あなたの状況によりフィットしたプレビューを作成します（選択式・30秒程度です）。
+        この3つを踏まえて、あなたの状況によりフィットした内容でPERSONAL BOOKを作成します（選択式・30秒程度です）。
       </p>
       <div id="context-form"></div>
-      <button class="btn" id="btn-preview-personal-book" disabled>この内容でプレビューを見る</button>
+      <button class="btn" id="btn-preview-personal-book" disabled>この内容でPERSONAL BOOKを見る</button>
     `;
 
     const formEl = document.getElementById("context-form");
@@ -1836,10 +1949,60 @@
   }
 
   // ---------------------------------------------------------------------
+  // ページ読み込み時のURLパラメータ処理：
+  // ・?book=... … PERSONAL BOOK購入後にメールで届くリンク。中身は購入時点の結果スナップショット
+  //   （buildResultSnapshotと同じ形）をJSON化したもの。サーバー側にデータを保存していないため、
+  //   復元に必要な情報はすべてこのリンクの中に入っている。
+  // ・?purchased=1 … Stripe Checkout決済完了後の戻り先。まだメールが届く前のタイミングなので、
+  //   その場でsessionに残っている内容をそのままPERSONAL BOOK画面に表示し、案内メッセージを出す。
+  // ---------------------------------------------------------------------
+  function handleIncomingUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    const bookParam = params.get("book");
+    const purchased = params.get("purchased");
+
+    if (bookParam) {
+      try {
+        const snapshot = JSON.parse(bookParam);
+        if (snapshot && snapshot.typeId) {
+          applySnapshotToSession(snapshot);
+          openedFromBookLink = true;
+          window.history.replaceState({}, "", window.location.pathname);
+          showView("personal-book");
+          return true;
+        }
+      } catch (err) {
+        // リンクが壊れている場合は、下の通常のTOP画面表示にフォールバックする
+      }
+    }
+
+    if (purchased) {
+      justPurchased = true;
+      window.history.replaceState({}, "", window.location.pathname);
+      showView("personal-book");
+      return true;
+    }
+
+    // Stripe Checkoutを「戻る」でキャンセルした場合の戻り先（?view=personal-book）。
+    // ページはリロードされ診断結果は失われているため、通常のTOP画面ではなく、せめて
+    // PERSONAL BOOKの紹介画面に戻す（そこから改めて無料診断を受け直せる）。
+    const viewParam = params.get("view");
+    if (viewParam && VIEW_IDS.includes(viewParam)) {
+      window.history.replaceState({}, "", window.location.pathname);
+      showView(viewParam);
+      return true;
+    }
+
+    return false;
+  }
+
+  // ---------------------------------------------------------------------
   // 初期化
   // ---------------------------------------------------------------------
   renderHeroCast();
   renderAboutCore6();
   renderTypesGallery();
-  showView("top");
+  if (!handleIncomingUrlParams()) {
+    showView("top");
+  }
 })();

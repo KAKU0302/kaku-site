@@ -1269,6 +1269,30 @@ img { max-width: 100%; display: block; }
 .book-share-row {
   margin-bottom: 8px;
 }
+.book-purchase-cta {
+  background: rgba(217, 179, 108, 0.08);
+  border: 1px solid var(--book-gold);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 4px 0 24px;
+  text-align: center;
+}
+.book-purchase-cta__title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--book-text);
+  margin: 0 0 8px;
+}
+.book-purchase-cta__desc {
+  font-size: 13px;
+  color: var(--book-text-soft);
+  margin: 0 0 16px;
+}
+.book-purchase-cta .btn { width: 100%; max-width: 320px; }
+.book-purchase-cta .form-note {
+  color: var(--book-text-soft);
+  margin: 12px 0 0;
+}
 .book-axis-row {
   margin: 20px 0;
 }
