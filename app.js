@@ -453,64 +453,10 @@
       </div>`;
   }
 
-  let typeShowcaseIndex = 0;
-
-  function updateTypeShowcaseCarousel() {
-    const track = document.getElementById("type-showcase-track");
-    const dotsWrap = document.getElementById("type-showcase-dots");
-    if (!track) return;
-    track.style.transform = `translateX(-${typeShowcaseIndex * 100}%)`;
-    if (dotsWrap) {
-      Array.from(dotsWrap.children).forEach((dot, i) => {
-        dot.classList.toggle("is-active", i === typeShowcaseIndex);
-      });
-    }
-  }
-
-  function goToTypeShowcaseSlide(index) {
-    const count = KAKU_TYPE_CATEGORY_ORDER.length;
-    typeShowcaseIndex = ((index % count) + count) % count;
-    updateTypeShowcaseCarousel();
-  }
-
   function renderTypeShowcase() {
     const track = document.getElementById("type-showcase-track");
-    const dotsWrap = document.getElementById("type-showcase-dots");
-    const nextBtn = document.getElementById("type-showcase-next");
     if (!track) return;
-
     track.innerHTML = KAKU_TYPE_CATEGORY_ORDER.map((catId) => buildTypeShowcaseSlideHtml(KAKU_TYPE_CATEGORIES[catId])).join("");
-
-    if (dotsWrap) {
-      dotsWrap.innerHTML = KAKU_TYPE_CATEGORY_ORDER.map((catId, i) =>
-        `<button type="button" class="type-showcase__dot" data-index="${i}" aria-label="${KAKU_TYPE_CATEGORIES[catId].nameJp}を見る"></button>`
-      ).join("");
-      dotsWrap.querySelectorAll(".type-showcase__dot").forEach((dot) => {
-        dot.addEventListener("click", () => goToTypeShowcaseSlide(Number(dot.dataset.index)));
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => goToTypeShowcaseSlide(typeShowcaseIndex + 1));
-    }
-
-    // 簡易スワイプ対応（タッチ端末でカードを左右にめくれるように）
-    const carousel = track.closest(".type-showcase__carousel");
-    if (carousel) {
-      let touchStartX = null;
-      carousel.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
-      carousel.addEventListener("touchend", (e) => {
-        if (touchStartX === null) return;
-        const deltaX = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(deltaX) > 40) {
-          goToTypeShowcaseSlide(typeShowcaseIndex + (deltaX < 0 ? 1 : -1));
-        }
-        touchStartX = null;
-      }, { passive: true });
-    }
-
-    typeShowcaseIndex = 0;
-    updateTypeShowcaseCarousel();
   }
 
   // ---------------------------------------------------------------------
