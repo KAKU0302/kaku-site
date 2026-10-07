@@ -26,7 +26,7 @@
   <!-- ===================== TOP ===================== -->
   <section class="view" id="view-top">
     <div class="hero hero--kaku">
-      <div class="hero__decor" aria-hidden="true">
+      <div class="hero__decor hero__decor--vivid" aria-hidden="true">
         <span class="aurora-blob aurora-blob--a"></span>
         <span class="aurora-blob aurora-blob--b"></span>
         <span class="aurora-blob aurora-blob--c"></span>
@@ -36,8 +36,13 @@
         <span class="hero__decor-line hero__decor-line--a"></span>
         <span class="hero__decor-line hero__decor-line--b"></span>
         <span class="hero__scanline"></span>
+        <span class="hero__sparkle hero__sparkle--a"></span>
+        <span class="hero__sparkle hero__sparkle--b"></span>
+        <span class="hero__sparkle hero__sparkle--c"></span>
+        <span class="hero__sparkle hero__sparkle--d"></span>
       </div>
       <div class="hero__inner">
+        <p class="hero__badge"><span class="hero__badge-dot" aria-hidden="true"></span>自己理解の、新しいかたち。</p>
         <h1 class="hero__title">自分でも知らない、<br />自分を知る。</h1>
         <p class="hero__lead">
           強みも、弱さも。<br />
@@ -59,7 +64,17 @@
         <h2 class="section-title type-showcase__title">あなたは、どのKAKUだろう。</h2>
         <p class="type-showcase__lead">この中に、自分がいるかもしれない。</p>
       </div>
-      <div class="type-showcase__categories" id="type-showcase-categories"></div>
+      <div class="type-showcase__carousel">
+        <div class="type-showcase__viewport">
+          <div class="type-showcase__track" id="type-showcase-track"></div>
+        </div>
+      </div>
+      <div class="type-showcase__controls">
+        <div class="type-showcase__dots" id="type-showcase-dots"></div>
+        <button class="type-showcase__next" id="type-showcase-next" type="button" aria-label="次の分類を見る">
+          <span aria-hidden="true">&raquo;</span>
+        </button>
+      </div>
       <div class="type-showcase__inner">
         <p class="type-showcase__note">
           でも、タイプだけではあなたは分からない。<br />

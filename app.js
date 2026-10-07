@@ -425,35 +425,92 @@
   // 既存の16タイプ用画像をそのまま仮利用している（差し替えはtypes-data.jsのimage
   // フィールドを変更するだけで済む構造）。
   // ---------------------------------------------------------------------
-  function buildTypeShowcaseCardHtml(type) {
+  function buildTypeShowcaseSwatchHtml(type) {
     return `
-      <a href="#" class="type-showcase__card" data-nav="types" data-type-id="${type.id}">
-        <img src="${type.image}" alt="${type.nameEn}｜${type.nameJp}" loading="lazy" />
-        <p class="type-showcase__card-en">${type.nameEn}</p>
-        <p class="type-showcase__card-jp">${type.nameJp}</p>
+      <a href="#" class="type-showcase__swatch" data-nav="types" data-type-id="${type.id}">
+        <span class="type-showcase__swatch-photo">
+          <img src="${type.image}" alt="${type.nameEn}｜${type.nameJp}" loading="lazy" />
+        </span>
+        <p class="type-showcase__swatch-code">${type.color}</p>
+        <p class="type-showcase__swatch-name">${type.nameJp}</p>
       </a>`;
   }
 
-  function renderTypeShowcase() {
-    const wrap = document.getElementById("type-showcase-categories");
-    if (!wrap) return;
-    wrap.innerHTML = KAKU_TYPE_CATEGORY_ORDER.map((catId) => {
-      const cat = KAKU_TYPE_CATEGORIES[catId];
-      const cardsHtml = cat.typeIds.map((id) => buildTypeShowcaseCardHtml(KAKU_TYPES[id])).join("");
-      return `
-        <div class="type-showcase__category" data-category="${cat.id}" style="--cat-color:${cat.color}; --cat-color-soft:${cat.colorSoft};">
-          <div class="type-showcase__category-inner">
-            <div class="type-showcase__category-head">
-              <p class="type-showcase__category-name">${cat.nameJp}<span class="label-en">（${cat.nameEn}）</span></p>
-              <p class="type-showcase__category-tagline">${cat.tagline}</p>
-            </div>
-            <div class="type-showcase__category-visual">
-              <p class="type-showcase__category-watermark" aria-hidden="true">${cat.nameJp}</p>
-              <div class="type-showcase__category-cards">${cardsHtml}</div>
-            </div>
+  function buildTypeShowcaseSlideHtml(cat) {
+    const swatchesHtml = cat.typeIds.map((id) => buildTypeShowcaseSwatchHtml(KAKU_TYPES[id])).join("");
+    return `
+      <div class="type-showcase__slide" data-category="${cat.id}">
+        <div class="type-showcase__slide-card" style="--cat-color:${cat.color};">
+          <div class="type-showcase__slide-bar">
+            <span class="type-showcase__slide-bar-label">${cat.nameEn}</span>
+            <p class="type-showcase__slide-bar-text">${cat.tagline}</p>
           </div>
-        </div>`;
-    }).join("");
+          <div class="type-showcase__slide-visual">
+            <p class="type-showcase__slide-watermark" aria-hidden="true">${cat.nameJp}</p>
+          </div>
+          <div class="type-showcase__slide-swatches">${swatchesHtml}</div>
+        </div>
+      </div>`;
+  }
+
+  let typeShowcaseIndex = 0;
+
+  function updateTypeShowcaseCarousel() {
+    const track = document.getElementById("type-showcase-track");
+    const dotsWrap = document.getElementById("type-showcase-dots");
+    if (!track) return;
+    track.style.transform = `translateX(-${typeShowcaseIndex * 100}%)`;
+    if (dotsWrap) {
+      Array.from(dotsWrap.children).forEach((dot, i) => {
+        dot.classList.toggle("is-active", i === typeShowcaseIndex);
+      });
+    }
+  }
+
+  function goToTypeShowcaseSlide(index) {
+    const count = KAKU_TYPE_CATEGORY_ORDER.length;
+    typeShowcaseIndex = ((index % count) + count) % count;
+    updateTypeShowcaseCarousel();
+  }
+
+  function renderTypeShowcase() {
+    const track = document.getElementById("type-showcase-track");
+    const dotsWrap = document.getElementById("type-showcase-dots");
+    const nextBtn = document.getElementById("type-showcase-next");
+    if (!track) return;
+
+    track.innerHTML = KAKU_TYPE_CATEGORY_ORDER.map((catId) => buildTypeShowcaseSlideHtml(KAKU_TYPE_CATEGORIES[catId])).join("");
+
+    if (dotsWrap) {
+      dotsWrap.innerHTML = KAKU_TYPE_CATEGORY_ORDER.map((catId, i) =>
+        `<button type="button" class="type-showcase__dot" data-index="${i}" aria-label="${KAKU_TYPE_CATEGORIES[catId].nameJp}を見る"></button>`
+      ).join("");
+      dotsWrap.querySelectorAll(".type-showcase__dot").forEach((dot) => {
+        dot.addEventListener("click", () => goToTypeShowcaseSlide(Number(dot.dataset.index)));
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => goToTypeShowcaseSlide(typeShowcaseIndex + 1));
+    }
+
+    // 簡易スワイプ対応（タッチ端末でカードを左右にめくれるように）
+    const carousel = track.closest(".type-showcase__carousel");
+    if (carousel) {
+      let touchStartX = null;
+      carousel.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+      carousel.addEventListener("touchend", (e) => {
+        if (touchStartX === null) return;
+        const deltaX = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(deltaX) > 40) {
+          goToTypeShowcaseSlide(typeShowcaseIndex + (deltaX < 0 ? 1 : -1));
+        }
+        touchStartX = null;
+      }, { passive: true });
+    }
+
+    typeShowcaseIndex = 0;
+    updateTypeShowcaseCarousel();
   }
 
   // ---------------------------------------------------------------------
@@ -481,10 +538,10 @@
   // ---------------------------------------------------------------------
   function buildTypeCardHtml(type) {
     return `
-      <div class="type-card" data-type-id="${type.id}">
+      <div class="type-card" data-type-id="${type.id}" style="--type-color:${type.color};">
         <button type="button" class="type-card__summary">
           <img src="${type.image}" alt="${type.nameEn} ${type.nameJp}" class="type-card__image" loading="lazy" />
-          <p class="type-card__poster-tag" style="background:${type.color}">${type.catchcopy}</p>
+          <p class="type-card__poster-tag">${type.catchcopy}</p>
           <div class="type-card__body">
             <p class="type-card__type-en">${type.nameEn}</p>
             <p class="type-card__type-jp">${type.nameJp}</p>
