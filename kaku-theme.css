@@ -1,0 +1,220 @@
+/* ==========================================================================
+   KAKU ～核～ 共通デザイン（kaku-theme.css）
+   コンセプト：「自分の本質を知る、上質な体験。」
+   ディープネイビー × シャンパンゴールド。TOP・診断・RESULT・PERSONAL BOOK・料金・履歴まで、
+   ここに集めた共通ルール（色・文字・余白・角丸・ボタン・カード・進捗バー）で統一します。
+   style.css の後、lab.css の前に読み込みます（style.css は書き換えず、ここで上書き）。
+   余白は 8px を基本単位（--s1 = 8px）。
+   ========================================================================== */
+:root {
+  /* 色 */
+  --k-bg: #0B1020;
+  --k-bg-2: #0F1630;
+  --k-card: #161C30;
+  --k-card-2: #1C2440;
+  --k-text: #F5F0E8;
+  --k-soft: #B9BDCC;
+  --k-faint: rgba(185, 189, 204, .62);
+  --k-gold: #C8A96B;
+  --k-gold-hi: #E3CC95;
+  --k-gold-lo: #9E8247;
+  --k-ink: #0B1020;                       /* ゴールド地の上の文字色 */
+  --k-line: rgba(200, 169, 107, .26);
+  --k-line-2: rgba(245, 240, 232, .10);
+  --k-blue: #8FB4E8;                      /* 補助色（A/B の A、情報の強調） */
+  --k-ok: #8FD3B4; --k-warn: #E8B98A;
+  /* 文字 */
+  --k-serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "BIZ UDPMincho", "Noto Serif CJK JP", serif;
+  --k-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Noto Sans CJK JP", system-ui, sans-serif;
+  --k-mono: "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
+  /* 余白（8px基準） */
+  --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px; --s5: 48px; --s6: 64px;
+  /* 角丸・影 */
+  --r-card: 16px; --r-sm: 12px; --r-pill: 999px;
+  --shadow-card: 0 16px 40px -24px rgba(0, 0, 0, .7);
+  --glow-gold: 0 0 28px rgba(200, 169, 107, .22);
+
+  /* style.css のトークンを、共通色に差し替える */
+  --color-bg: var(--k-bg);
+  --color-surface: var(--k-card);
+  --color-text: var(--k-text);
+  --color-text-soft: var(--k-soft);
+  --color-border: var(--k-line-2);
+  --color-accent: var(--k-gold);
+  --color-accent-soft: rgba(200, 169, 107, .10);
+  --color-glow: var(--k-gold-hi);
+  --color-vivid: var(--k-gold-lo);
+  --color-vivid-2: var(--k-gold);
+  --font-jp: var(--k-sans);
+  --font-serif: var(--k-serif);
+  --book-bg-a: var(--k-bg);
+  --book-bg-b: var(--k-bg-2);
+  --book-panel: var(--k-card);
+  --book-text: var(--k-text);
+  --book-text-soft: var(--k-soft);
+  --book-border: var(--k-line);
+  --book-gold: var(--k-gold);
+  --radius: var(--r-card);
+  --radius-sm: var(--r-sm);
+  color-scheme: dark;
+}
+
+/* ---------- 土台 ---------- */
+html, body { background: var(--k-bg); color: var(--k-text); font-family: var(--k-sans); }
+body {
+  background-image:
+    radial-gradient(ellipse 900px 520px at 50% -8%, rgba(200,169,107,.10), transparent 62%),
+    linear-gradient(180deg, var(--k-bg) 0%, var(--k-bg-2) 100%);
+  line-height: 1.85;
+  -webkit-text-size-adjust: 100%;
+}
+::selection { background: rgba(200,169,107,.35); color: var(--k-text); }
+h1, h2, h3, .section-title, .hero__title, .final-cta__title { font-family: var(--k-serif); letter-spacing: .02em; text-wrap: balance; }
+.section-title { font-weight: 700; color: var(--k-text); }
+.subsection-title { font-family: var(--k-serif); color: var(--k-text); }
+.eyebrow, .type-showcase__eyebrow, .hero-questions__eyebrow {
+  font-family: var(--k-serif); color: var(--k-gold); letter-spacing: .26em; font-weight: 700; font-size: 12px;
+}
+.body-text, .hero__lead, .hero__meta { color: var(--k-soft); }
+.form-note { color: var(--k-faint); }
+.view { min-height: 60vh; }
+
+/* ---------- ヘッダー・フッター ---------- */
+.site-header {
+  background: rgba(11, 16, 32, .88);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--k-line);
+}
+.site-header__inner { padding: var(--s2) var(--s3); gap: var(--s2); }
+.logo { font-family: var(--k-serif); font-size: 20px; font-weight: 700; letter-spacing: .12em; color: var(--k-text); white-space: nowrap; }
+.logo span { color: var(--k-gold); font-weight: 500; letter-spacing: .04em; }
+.site-nav { gap: var(--s3); font-size: 13px; letter-spacing: .06em; }
+.site-nav a { color: var(--k-soft); white-space: nowrap; padding: 4px 0; border-bottom: 1px solid transparent; transition: color .15s, border-color .15s; }
+.site-nav a:hover { color: var(--k-gold-hi); border-bottom-color: var(--k-gold); }
+.site-footer { color: var(--k-faint); border-top: 1px solid var(--k-line-2); font-family: var(--k-serif); letter-spacing: .12em; }
+@media (max-width: 480px) {
+  .site-header__inner { padding: 12px var(--s2); gap: 8px; }
+  .logo { font-size: 17px; letter-spacing: .08em; }
+  .site-nav { gap: 14px; font-size: 12px; letter-spacing: .02em; }
+}
+@media (max-width: 360px) { .site-nav { gap: 10px; } .site-nav a:nth-child(2) { display: none; } }
+
+/* ---------- ボタン（.btn / .k-btn 共通） ---------- */
+.btn, .k-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 12px 32px; border-radius: var(--r-pill);
+  border: 1px solid var(--k-line); background: rgba(245,240,232,.04); color: var(--k-text);
+  font-family: var(--k-sans); font-size: 14px; font-weight: 700; letter-spacing: .06em; line-height: 1.4;
+  cursor: pointer; text-align: center; margin: 6px;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.btn:hover, .k-btn:hover { transform: translateY(-1px); border-color: var(--k-gold); background: rgba(200,169,107,.10); }
+.btn--primary, .k-btn.primary {
+  background: linear-gradient(135deg, var(--k-gold-hi) 0%, var(--k-gold) 55%, var(--k-gold-lo) 130%);
+  border-color: transparent; color: var(--k-ink);
+  box-shadow: 0 10px 28px -12px rgba(200,169,107,.65), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.btn--primary:hover, .k-btn.primary:hover { background: linear-gradient(135deg, #F0DCA6 0%, var(--k-gold-hi) 60%, var(--k-gold) 130%); box-shadow: 0 14px 34px -12px rgba(200,169,107,.8); }
+.btn--lg { padding: 16px 40px; font-size: 15px; min-height: 56px; }
+.btn--text, .k-btn.ghost { background: none; border-color: transparent; color: var(--k-soft); box-shadow: none; }
+.btn--text:hover, .k-btn.ghost:hover { color: var(--k-gold-hi); background: none; }
+.btn:focus-visible, .k-btn:focus-visible, .site-nav a:focus-visible { outline: 2px solid var(--k-gold-hi); outline-offset: 3px; }
+.btn:disabled, .k-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+/* ---------- フォーム ---------- */
+.form-field { color: var(--k-soft); }
+.form-field input, .form-field select, .form-field textarea {
+  background: var(--k-card); color: var(--k-text); border: 1px solid var(--k-line-2); border-radius: var(--r-sm); min-height: 48px;
+}
+.form-field input:focus, .form-field select:focus { outline: none; border-color: var(--k-gold); box-shadow: 0 0 0 3px rgba(200,169,107,.2); }
+.reassurance-note { background: rgba(200,169,107,.08); color: var(--k-soft); border: 1px solid var(--k-line); }
+.progress-bar { background: var(--k-line-2); }
+.progress-bar__fill { background: linear-gradient(90deg, var(--k-gold-lo), var(--k-gold-hi)); }
+
+/* ---------- TOP：ヒーロー ---------- */
+.hero--kaku {
+  background:
+    radial-gradient(ellipse 560px 420px at 50% 6%, rgba(200,169,107,.20), transparent 62%),
+    radial-gradient(ellipse 600px 480px at 88% 30%, rgba(143,180,232,.10), transparent 64%),
+    linear-gradient(180deg, #0B1020 0%, #0B1020 100%);
+  background-size: auto;
+  animation: none;
+  padding: 88px var(--s3) 72px;
+}
+.hero--kaku::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 96px; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(11,16,32,0), var(--k-bg)); }
+.hero__decor::before {
+  background-image: linear-gradient(rgba(200,169,107,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(200,169,107,.07) 1px, transparent 1px);
+}
+.hero__decor-circle { border-color: rgba(200,169,107,.22) !important; }
+.hero__decor-circle--b { border-color: rgba(227,204,149,.45) !important; }
+.hero__decor-line, .hero__decor-line--b { background: linear-gradient(90deg, transparent, rgba(200,169,107,.45), transparent) !important; }
+.hero__scanline { background: linear-gradient(100deg, transparent, rgba(200,169,107,.08) 50%, transparent); }
+.hero__sparkle { background: var(--k-gold-hi); box-shadow: 0 0 10px 2px rgba(200,169,107,.7); }
+.hero__decor--vivid .aurora-blob--a, .hero__decor--vivid .aurora-blob--b, .hero__decor--vivid .aurora-blob--c,
+.hero__decor--dark .aurora-blob--a, .hero__decor--dark .aurora-blob--b, .aurora-blob--a, .aurora-blob--b, .aurora-blob--c {
+  background: radial-gradient(circle, rgba(200,169,107,.20), transparent 68%);
+}
+.hero__badge {
+  color: var(--k-gold-hi); background: rgba(22,28,48,.8); border: 1px solid var(--k-line);
+  background-image: none; box-shadow: none; animation: none; font-family: var(--k-serif); letter-spacing: .14em;
+}
+.hero__badge-dot { background: var(--k-gold); box-shadow: 0 0 10px rgba(200,169,107,.8); }
+.hero__title { font-weight: 700; color: var(--k-text); line-height: 1.4; text-shadow: 0 2px 30px rgba(200,169,107,.18); }
+.hero__lead { line-height: 2; }
+
+/* TOP：12TYPE ショーケース（キャラクターを主役に、ダークカードへ） */
+.type-showcase { background: transparent; }
+.type-showcase__title { color: var(--k-text); }
+.type-showcase__lead, .type-showcase__note { color: var(--k-soft); }
+.type-showcase__slide-card { background: var(--k-card); border: 1px solid var(--k-line); box-shadow: var(--shadow-card); }
+.type-showcase__slide-visual { background: color-mix(in srgb, var(--cat-color, var(--k-gold)) 14%, var(--k-card)); }
+.type-showcase__slide-watermark { color: color-mix(in srgb, var(--cat-color, var(--k-gold)) 46%, var(--k-card)); opacity: .75; font-family: var(--k-serif); }
+.type-showcase__swatch-code { color: color-mix(in srgb, var(--cat-color, var(--k-gold)) 55%, white); }
+.type-showcase__swatch-name { color: var(--k-text); }
+.type-showcase__swatch-photo { box-shadow: 0 0 0 2px rgba(245,240,232,.16), 0 8px 20px rgba(0,0,0,.5); }
+
+/* TOP：問いかけ */
+.hero-questions { background: transparent; }
+.hero-questions__item--featured { background: var(--k-card); border: 1px solid var(--k-line); color: var(--k-text); box-shadow: var(--shadow-card); font-family: var(--k-serif); }
+.hero-questions__item--featured::before { background: linear-gradient(180deg, var(--k-gold-hi), var(--k-gold-lo)); box-shadow: 0 0 14px rgba(200,169,107,.5); }
+.hero-questions__item--secondary { color: var(--k-soft); }
+
+/* TOP：仕組み */
+.hero-explainer { background: linear-gradient(180deg, rgba(200,169,107,.05), transparent); border-top: 1px solid var(--k-line-2); }
+.hero-explainer__step { background: var(--k-card); border: 1px solid var(--k-line-2); border-top: 2px solid var(--k-gold); }
+.hero-explainer__label { color: var(--k-gold-hi); font-family: var(--k-serif); }
+.hero-explainer__desc, .hero-explainer__arrow, .hero-explainer__result { color: var(--k-soft); }
+.hero-explainer__result strong { color: var(--k-text); font-family: var(--k-serif); }
+.hero-explainer__lead { color: var(--k-text); font-family: var(--k-serif); }
+
+/* TOP：最終CTA */
+.final-cta { background: radial-gradient(ellipse 520px 360px at 50% 0%, rgba(200,169,107,.18), transparent 65%), linear-gradient(180deg, #0F1630, #0B1020 70%); border-top: 1px solid var(--k-line); }
+.final-cta__grid { background-image: linear-gradient(rgba(200,169,107,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(200,169,107,.06) 1px, transparent 1px); }
+.final-cta__pre { color: var(--k-soft); }
+.final-cta__title { color: var(--k-text); }
+.final-cta .btn--primary { background: linear-gradient(135deg, var(--k-gold-hi), var(--k-gold)); border-color: transparent; color: var(--k-ink); box-shadow: 0 0 36px rgba(200,169,107,.35); }
+.final-cta__meta { color: var(--k-faint); }
+.brand-message { background: rgba(200,169,107,.08); color: var(--k-text); border: 1px solid var(--k-line); font-family: var(--k-serif); }
+
+.hero-explainer__step { min-height: 0; }
+.hero-explainer__arrow, .hero-explainer__result { color: var(--k-gold); }
+.final-cta .aurora-blob { opacity: .5; }
+
+/* ---------- 従来の画面（タイプ一覧・従来の結果・購入用PERSONAL BOOK）を、同じ配色で読めるように ---------- */
+.types-grid__category-title { color: color-mix(in srgb, var(--cat-color, var(--k-gold)) 55%, white); font-family: var(--k-serif); }
+.type-card__image { background: color-mix(in srgb, var(--type-color, var(--k-gold)) 18%, var(--k-card)); }
+.type-card__type-en { color: color-mix(in srgb, var(--type-color, var(--k-gold)) 55%, white); }
+.type-card__type-jp { color: color-mix(in srgb, var(--type-color, var(--k-gold)) 40%, white); font-family: var(--k-serif); }
+.type-card__rarity { color: color-mix(in srgb, var(--type-color, var(--k-gold)) 55%, white); }
+.gap-hero { background: linear-gradient(165deg, #232B4A 0%, #121830 100%); border: 1px solid var(--k-line); color: var(--k-text); }
+.gap-hero__eyebrow { color: var(--k-gold-hi); }
+.likert-scale button { background: var(--k-card); color: var(--k-text); border-color: var(--k-line-2); }
+.likert-scale button.is-selected, .context-option.is-selected { background: linear-gradient(135deg, var(--k-gold-hi), var(--k-gold)); border-color: transparent; color: var(--k-ink); font-weight: 700; }
+.context-option { background: var(--k-card); color: var(--k-text); border-color: var(--k-line-2); }
+.question-card { background: var(--k-card); border: 1px solid var(--k-line-2); box-shadow: var(--shadow-card); }
+.btn--cta { background: linear-gradient(135deg, var(--k-gold-hi), var(--k-gold)); border-color: transparent; color: var(--k-ink); }
+.pricing-card, .types-grid__card { background: var(--k-card); border-color: var(--k-line-2); }
+.pricing-card h3, .pricing-card__title { font-family: var(--k-serif); }
+.pricing-card__price { color: var(--k-gold-hi); font-family: var(--k-serif); }
+.types-grid__category-name { color: color-mix(in srgb, var(--cat-color, var(--k-gold)) 50%, white); font-family: var(--k-serif); }
+.types-grid__category { background: color-mix(in srgb, var(--cat-color, var(--k-gold)) 10%, var(--k-card)); }

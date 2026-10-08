@@ -111,16 +111,11 @@
     window.scrollTo(0, 0);
   }
 
-  function topBar(progress) {
-    var h = '<div class="k-top"><div class="k-top-row"><button class="k-logo k-logo-btn" data-act="toTop" aria-label="トップページへ">KAKU <span>～核～</span></button>' +
-      '<button class="k-link" data-act="data">データの扱い・検証について</button></div>';
-    if (progress) {
-      h += '<div class="k-progress"><div class="k-progress-label"><span>' + progress.label + '</span><span>' + progress.right + '</span></div>' +
-        '<div class="k-bar"><i style="width:' + progress.pct + '%"></i></div></div>';
-    }
-    return h + "</div>";
+  // 設問以外の画面の上部（サイトのヘッダーの下に出る、現在地と「データの扱い」）
+  function topBar(label) {
+    return '<div class="k-top k-top--page"><div class="k-top-row"><span class="k-crumb">' + esc(label || "KAKU 診断") + '</span>' +
+      '<button class="k-link" data-act="data">データの扱い・検証について</button></div></div>';
   }
-
   function pad2(n) { return (n < 10 ? "0" : "") + n; }
   // 設問画面の上部：ロゴ／STEP／進捗バー／何問目か
   function flowBar(step, stepName, counter, pct) {
@@ -135,35 +130,33 @@
   // ---------------------------------------------------------------- はじめに
   function viewIntro() {
     var saved = loadSaved();
-    var h = topBar(null) + '<div class="k-view">';
-    h += '<p class="k-kicker">KAKU 診断</p>';
-    h += '<h1 class="k-title">あなたについて、3つのステップで答えます</h1>';
-    h += '<p class="k-sub">答え終わると、あなたの人物像と、あなたのための小さな本（PERSONAL BOOK）が出ます。</p>';
-    h += '<div class="k-card"><div class="k-stack">' +
-      '<p><b>STEP1　核と過去の価値観</b><br><span class="k-soft">ふだんのあなたの動き方を36問で。そのあと、昔の自分が大切にしていたことを振り返ります。</span></p>' +
-      '<p><b>STEP2　現在の価値観</b><br><span class="k-soft">いま大切にしていること、そして、それがどのくらい満たされているか。</span></p>' +
-      '<p><b>STEP3　今の状態</b><br><span class="k-soft">ここ1週間のコンディションを6問で。</span></p>' +
-      '<p class="k-soft">→ 結果（人物像・12TYPE・価値観の変化・KAKU GAP・今の状態）→ PERSONAL BOOK</p></div></div>';
-    h += '<div class="k-card plain"><p><b>所要時間の目安：約10〜12分</b></p>' +
-      '<p class="k-soft">読むのがゆっくりな方は15分ほどかかります。この時間は設問の文字数からの見積もりで、実測ではありません。いつでも戻って答えを直せます。</p></div>';
-    h += '<div class="k-note"><b>これは試作版です。</b>採点のしくみも文章も、まだ実際の利用者で確かめていません。結果は「今回の回答から読み取れる範囲」の目安として、気軽に読んでください。</div>';
-    h += '<div class="k-card plain"><p><b>データの扱い</b></p><ul class="k-list k-soft">' +
-      '<li>回答は、このブラウザの中だけで処理します。外部のサーバーには送りません。</li>' +
-      '<li>名前・メールアドレス・生年月日は聞きません。</li>' +
-      '<li>「保存して始める」を選ぶと、途中で閉じても続きから再開できるよう、この端末のブラウザに保存します。いつでも削除できます。</li>' +
-      '<li>「保存しないで始める」を選ぶと、何も保存しません。ページを閉じると、回答は消えます。</li></ul></div>';
+    var h = topBar("診断") + '<div class="k-view k-intro">';
+    h += '<div class="k-introhead"><p class="k-kicker">KAKU 診断</p>' +
+      '<h1 class="k-title k-title--xl">あなたの核を、<br>解き明かす。</h1>' +
+      '<p class="k-sub">3つのステップに答えると、あなたの人物像と、あなただけの本が出ます。</p></div>';
+    h += '<ol class="k-steps">' +
+      '<li><span class="no">01</span><span class="tx"><b>核と、過去の価値観</b><i>ふだんの動き方 36問</i></span></li>' +
+      '<li><span class="no">02</span><span class="tx"><b>いまの価値観</b><i>大切なことと、満たされ具合</i></span></li>' +
+      '<li><span class="no">03</span><span class="tx"><b>今の状態</b><i>ここ1週間のコンディション 6問</i></span></li></ol>';
+    h += '<p class="k-meta">所要時間の目安　約10〜12分　／　正解はありません</p>';
     if (ui.parked) {
-      h += '<div class="k-card"><p><b>さきほどの続きがあります</b></p><p class="k-soft">このページを閉じるまで、この端末のブラウザの中に残っています。</p><div class="k-stack" style="margin-top:10px">' +
+      h += '<div class="k-card"><p><b>さきほどの続きがあります</b></p><p class="k-soft">このページを閉じるまで、この端末のブラウザの中に残っています。</p><div class="k-stack" style="margin-top:8px">' +
         '<button class="k-btn primary block" data-act="resumeMem">続きに戻る</button></div></div>';
     } else if (saved) {
-      h += '<div class="k-card"><p><b>前回の続きがあります</b></p><div class="k-stack" style="margin-top:10px">' +
+      h += '<div class="k-card"><p><b>前回の続きがあります</b></p><div class="k-stack" style="margin-top:8px">' +
         '<button class="k-btn primary block" data-act="resume">続きから再開する</button>' +
         '<button class="k-btn block" data-act="discard">保存したデータを消して、最初から</button></div></div>';
     }
     h += '<div class="k-stack k-foot">' +
-      '<button class="k-btn primary block" data-act="start" data-consent="1">保存して始める（途中で再開できます）</button>' +
+      '<button class="k-btn primary block k-btn--lg" data-act="start" data-consent="1">保存して始める</button>' +
       '<button class="k-btn block" data-act="start" data-consent="0">保存しないで始める</button></div>';
-    h += '<p style="margin-top:22px;text-align:center"><button class="k-link" data-act="toTop">← トップページへ戻る</button></p>';
+    h += '<p class="k-fine">回答は、あなたのブラウザの外には送りません。「保存して始める」は、途中で閉じても続きから再開できるよう、この端末にだけ保存します（いつでも削除できます）。</p>';
+    h += '<details class="k-det"><summary>くわしく（データの扱い・検証の状況）</summary><div class="in"><ul class="k-list k-soft">' +
+      '<li>名前・メールアドレス・生年月日は聞きません。</li>' +
+      '<li>「保存しないで始める」を選ぶと、何も保存しません。ページを閉じると、回答は消えます。</li>' +
+      '<li>採点のしくみも文章も、まだ実際の利用者で確かめていない暫定版です。結果は「今回の回答から読み取れる範囲」の目安として、気軽に読んでください。</li>' +
+      '<li>所要時間は設問の文字数からの見積もりで、実測ではありません。いつでも戻って答えを直せます。</li></ul></div></details>';
+    h += '<p style="margin-top:16px;text-align:center"><button class="k-link" data-act="toTop">← トップページへ戻る</button></p>';
     return h + "</div>";
   }
 
@@ -363,15 +356,15 @@
   var CATS = { creative: "創造型", momentum: "推進型", synergy: "共創型" };
   function viewResult() {
     var R = C.buildResult(S);
-    var h = topBar(null) + '<div class="k-view">';
-    h += '<p class="k-kicker">RESULT　あなたの人物像</p>';
+    var h = topBar("RESULT") + '<div class="k-view k-result">';
+    h += '<p class="k-kicker k-kicker--c">YOUR KAKU</p>';
 
     // 1) 人物像 + 大きなキャラクター
     var tm = R.shownType;
     h += '<div class="k-hero">';
     if (tm) {
       h += '<div class="k-hero-img" style="--tc:' + esc(tm.color) + '"><img src="/' + esc(tm.image) + '" alt="' + esc(tm.nameJp) + '" width="400" height="600" /></div>' +
-        '<div class="k-typename">' + esc(tm.nameJp) + "<small>" + esc(tm.nameEn) + '</small></div><div class="k-typecap">あなたに最も近い代表タイプ</div>';
+        '<div class="k-typename">' + esc(tm.nameJp) + "<small>" + esc(tm.nameEn) + '</small></div><div class="k-typecap">あなたに最も近い代表タイプ</div><div class="k-orn" aria-hidden="true"><i></i><b>◆</b><i></i></div>';
     } else {
       h += '<div class="k-core-mark" aria-hidden="true">核</div><div class="k-typename">タイプは保留</div>' +
         '<div class="k-typecap">今回の回答からは、一つの代表タイプには絞りきれませんでした。</div>';
@@ -486,13 +479,13 @@
     var R = C.buildResult(S);
     var pages = R.book.pages, n = pages.length;
     var i = S.bookPage;
-    var h = topBar(null) + '<div class="k-view">';
+    var h = topBar("PERSONAL BOOK") + '<div class="k-view k-bookview">';
     if (i < 0) {
       var tm = R.shownType;
-      h += '<div class="k-cover"><p class="k-kicker" style="margin:0">PERSONAL BOOK</p>';
-      h += tm ? '<div class="k-hero-img" style="--tc:' + esc(tm.color) + ';width:min(48vw,190px)"><img src="/' + esc(tm.image) + '" alt="' + esc(tm.nameJp) + '" /></div>' : '<div class="k-core-mark" style="font-size:48px">核</div>';
-      h += '<div class="ttl">あなたのための、小さな本</div><p class="for">全5章・' + n + 'ページ　／　体験版（book-0.3.0-draft）</p></div>';
-      h += '<div class="k-card plain"><p><b>この本について</b></p><p class="k-soft">あなたの36問・価値観・ここ1週間の状態の答えから、読み取れたことだけを書いています。答えていないことは、書いていません。外れているところは、外れていると思って読んでください。</p></div>';
+      h += '<div class="k-cover"><div class="k-cover-in"><p class="k-cover-kicker">PERSONAL BOOK</p><div class="k-orn" aria-hidden="true"><i></i><b>◆</b><i></i></div>';
+      h += tm ? '<div class="k-hero-img k-cover-img" style="--tc:' + esc(tm.color) + '"><img src="/' + esc(tm.image) + '" alt="' + esc(tm.nameJp) + '" /></div>' : '<div class="k-core-mark" style="font-size:48px">核</div>';
+      h += '<div class="ttl">あなたのための、<br>小さな本</div><p class="for">全5章・' + n + 'ページ</p><p class="cmark">KAKU ～核～</p></div></div>';
+      h += '<div class="k-card plain"><p><b>この本について</b></p><p class="k-soft">あなたの36問・価値観・ここ1週間の状態の答えから、読み取れたことだけを書いています。答えていないことは、書いていません。外れているところは、外れていると思って読んでください。</p><p class="k-faint" style="margin-top:8px">文章は暫定版（' + esc(L.VERSIONS.book) + '）で、実際の利用者では未検証です。</p></div>';
       h += '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="bookGo" data-i="0">1ページ目をひらく</button>' +
         '<button class="k-btn ghost block" data-act="toResult">← 結果に戻る</button></div>';
       return h + "</div>";
@@ -502,8 +495,8 @@
       var first = pages.filter(function (p) { return p.chapter === c.n; })[0];
       return first ? '<button class="k-chap' + (pg.chapter === c.n ? " on" : "") + '" data-act="bookGo" data-i="' + first.index + '">第' + c.n + "章　" + esc(c.title) + "</button>" : "";
     }).join("") + "</div>";
-    h += '<div class="k-page"><div class="chno">第' + pg.chapter + '章　' + esc(R.book.chapters[pg.chapter - 1].title) + '</div><h1 class="pt">' + esc(pg.title) + "</h1>";
-    h += '<p class="pl">' + esc(pg.lead) + '</p><div class="bd">' + pg.blocks.map(blockHtml).join("") + "</div></div>";
+    h += '<div class="k-page"><div class="chno"><span class="n">' + pad2(pg.chapter) + '</span><span class="t">第' + pg.chapter + '章　' + esc(R.book.chapters[pg.chapter - 1].title) + '</span></div><h1 class="pt">' + esc(pg.title) + "</h1>";
+    h += '<p class="pl">' + esc(pg.lead) + '</p><div class="bd">' + pg.blocks.map(blockHtml).join("") + '</div><div class="pfoot"><span>KAKU ～核～</span><span>' + (i + 1) + ' / ' + n + "</span></div></div>";
     h += '<div class="k-pager"><button class="k-btn" data-act="bookGo" data-i="' + (i - 1) + '">← 前へ</button><span class="pn">' + (i + 1) + " / " + n + "</span>" +
       (i < n - 1 ? '<button class="k-btn primary" data-act="bookGo" data-i="' + (i + 1) + '">次へ →</button>' : '<button class="k-btn primary" data-act="toResult">結果に戻る</button>') + "</div>";
     if (pg.next) h += '<p class="k-next">次のページ：' + esc(pg.next) + "</p>";
@@ -521,7 +514,7 @@
   // ---------------------------------------------------------------- データの扱い
   function viewData() {
     var saved = !!storageGet();
-    var h = topBar(null) + '<div class="k-view"><p class="k-kicker">データの扱い</p><h1 class="k-title">あなたの回答データについて</h1>';
+    var h = topBar("データの扱い") + '<div class="k-view"><p class="k-kicker">データの扱い</p><h1 class="k-title">あなたの回答データについて</h1>';
     h += '<div class="k-card"><p><b>保存</b></p><p class="k-soft">' + (S.consent === true
       ? "「保存して始める」を選んだため、回答をこの端末のブラウザ（localStorage）に保存しています。"
       : "保存していません。ページを閉じると、回答は消えます。") + "</p>" +
