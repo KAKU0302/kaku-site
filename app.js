@@ -194,7 +194,7 @@
   // ---------------------------------------------------------------------
   const VIEW_IDS = [
     "top", "about", "types", "basic", "question", "state", "analyzing",
-    "result", "personal-book", "kaku-match", "kaku-team", "pricing", "history",
+    "result", "personal-book", "kaku-match", "kaku-team", "pricing", "history", "lab",
   ];
 
   function showView(id) {
@@ -206,7 +206,10 @@
     if (id === "personal-book") initPersonalBookView();
     if (id === "kaku-match") initKakuMatchView();
     if (id === "history") renderHistoryList();
+    if (id === "lab" && window.KAKU_LAB_APP) window.KAKU_LAB_APP.open();
   }
+  // 新KAKU診断（kaku-lab）から、サイトのトップなどへ戻るための口
+  window.KAKU_SITE = { showView: showView };
 
   document.addEventListener("click", (e) => {
     const navEl = e.target.closest("[data-nav]");
@@ -218,8 +221,13 @@
     const actionEl = e.target.closest("[data-action]");
     if (actionEl && actionEl.getAttribute("data-action") === "start-diagnosis") {
       e.preventDefault();
-      resetDiagnosis();
-      showView("basic");
+      // 新しい3STEP診断へ。（従来の診断入力画面は ?view=basic で開けます）
+      if (window.KAKU_LAB_APP) {
+        showView("lab");
+      } else {
+        resetDiagnosis();
+        showView("basic");
+      }
     }
   });
 
@@ -350,7 +358,7 @@
       listEl.innerHTML = `
         <div class="history-empty">
           <p class="body-text">まだ保存された診断結果がありません。診断を受けると、ここに結果が残るようになります。</p>
-          <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
+          <button class="btn btn--primary" data-action="start-diagnosis">自分のKAKUを知る</button>
         </div>
       `;
       return;
@@ -1850,7 +1858,7 @@
       introEl.innerHTML = `
         <p class="context-intro__title">深掘り診断｜3つだけ質問させてください</p>
         <p class="body-text">PERSONAL BOOKを見るには、先に無料診断でKAKUタイプを診断してください。</p>
-        <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
+        <button class="btn btn--primary" data-action="start-diagnosis">自分のKAKUを知る</button>
       `;
       return;
     }
@@ -1928,7 +1936,7 @@
       introEl.innerHTML = `
         <p class="context-intro__title">先に無料診断を受けてください</p>
         <p class="body-text">KAKU MATCHを試すには、先に無料診断であなたのKAKUタイプを診断してください。</p>
-        <button class="btn btn--primary" data-action="start-diagnosis">3分で自分のKAKUを知る</button>
+        <button class="btn btn--primary" data-action="start-diagnosis">自分のKAKUを知る</button>
       `;
       return;
     }

@@ -1,6 +1,6 @@
 /**
  * kaku-lab/lab-app.js
- * KAKU 体験版（検証用）の画面。STEP1（核・過去の価値観）→ STEP2（現在の価値観）→ STEP3（今の状態）
+ * 新KAKU診断の画面（トップページの「診断開始」から開く）。STEP1（核・過去の価値観）→ STEP2（現在の価値観）→ STEP3（今の状態）
  * → RESULT → PERSONAL BOOK。
  *
  * データの扱い
@@ -14,7 +14,8 @@
   var L = window.KAKU_LAB_LOGIC, C = window.KAKU_LAB_CONTENT;
   var ITEMS = L.CORE.ITEMS, CHOICES = L.CORE.CHOICES, DOMAINS = L.DOMAINS, DBY = L.DOMAIN_BY_ID;
   var KEY = "kakulab.v1";
-  var root = document.getElementById("app");
+  var root = document.getElementById("kaku-lab-root");
+  if (!root) return;
 
   // ---------------------------------------------------------------- 状態
   function fresh() {
@@ -28,7 +29,7 @@
     };
   }
   var S = fresh();
-  var ui = { periodOpen: false, flash: "", t0: Date.now(), confirmReset: false, busy: false, copied: false };
+  var ui = { parked: null, periodOpen: false, flash: "", t0: Date.now(), confirmReset: false, busy: false, copied: false };
 
   function storageGet() { try { return window.localStorage.getItem(KEY); } catch (e) { return null; } }
   function storageSet(v) { try { window.localStorage.setItem(KEY, v); return true; } catch (e) { return false; } }
@@ -100,7 +101,7 @@
   }
 
   function topBar(progress) {
-    var h = '<div class="k-top"><div class="k-top-row"><div class="k-logo">KAKU <span style="font-weight:500">～核～</span><small>体験版・未検証</small></div>' +
+    var h = '<div class="k-top"><div class="k-top-row"><div class="k-logo">KAKU診断<small>新バージョン・未検証</small></div>' +
       '<button class="k-link" data-act="data">データの扱い</button></div>';
     if (progress) {
       h += '<div class="k-progress"><div class="k-progress-label"><span>' + progress.label + '</span><span>' + progress.right + '</span></div>' +
@@ -113,7 +114,7 @@
   function viewIntro() {
     var saved = loadSaved();
     var h = topBar(null) + '<div class="k-view">';
-    h += '<p class="k-kicker">KAKU 体験版（検証用）</p>';
+    h += '<p class="k-kicker">KAKU 診断</p>';
     h += '<h1 class="k-title">あなたについて、3つのステップで答えます</h1>';
     h += '<p class="k-sub">答え終わると、あなたの人物像と、あなたのための小さな本（PERSONAL BOOK）が出ます。</p>';
     h += '<div class="k-card"><div class="k-stack">' +
@@ -129,7 +130,10 @@
       '<li>名前・メールアドレス・生年月日は聞きません。</li>' +
       '<li>「保存して始める」を選ぶと、途中で閉じても続きから再開できるよう、この端末のブラウザに保存します。いつでも削除できます。</li>' +
       '<li>「保存しないで始める」を選ぶと、何も保存しません。ページを閉じると、回答は消えます。</li></ul></div>';
-    if (saved) {
+    if (ui.parked) {
+      h += '<div class="k-card"><p><b>さきほどの続きがあります</b></p><p class="k-soft">このページを閉じるまで、この端末のブラウザの中に残っています。</p><div class="k-stack" style="margin-top:10px">' +
+        '<button class="k-btn primary block" data-act="resumeMem">続きに戻る</button></div></div>';
+    } else if (saved) {
       h += '<div class="k-card"><p><b>前回の続きがあります</b></p><div class="k-stack" style="margin-top:10px">' +
         '<button class="k-btn primary block" data-act="resume">続きから再開する</button>' +
         '<button class="k-btn block" data-act="discard">保存したデータを消して、最初から</button></div></div>';
@@ -137,6 +141,7 @@
     h += '<div class="k-stack k-foot">' +
       '<button class="k-btn primary block" data-act="start" data-consent="1">保存して始める（途中で再開できます）</button>' +
       '<button class="k-btn block" data-act="start" data-consent="0">保存しないで始める</button></div>';
+    h += '<p style="margin-top:22px;text-align:center"><button class="k-link" data-act="toTop">← トップページへ戻る</button></p>';
     return h + "</div>";
   }
 
@@ -406,11 +411,21 @@
     // 5) メモ・操作
     h += '<h2 class="k-h2">体験したご感想</h2><p class="k-soft">気になったところを書いておくと、書き出したデータに含まれます。この画面から外には送られません。</p>' +
       '<textarea class="k-input" id="surveyNote" placeholder="分かりにくかった設問、しっくりこなかった文章など">' + esc(S.survey.note || "") + "</textarea>";
+    h += unconnectedNote();
     h += '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="openBook">PERSONAL BOOK を開く</button>' +
       '<button class="k-btn block" data-act="data">回答データを書き出す・削除する</button>' +
       '<button class="k-btn ghost block" data-act="reset">' + (ui.confirmReset ? "本当に消して、最初からやり直す（もう一度押す）" : "最初からやり直す") + "</button></div>";
     h += '<div class="k-note" style="margin-top:22px"><b>未検証の試作版です。</b>採点（' + esc(L.VERSIONS.core) + "）と文章（" + esc(L.VERSIONS.book) + "）は、実際の利用者で確かめていません。診断・医療・採用の判断には使わないでください。</div>";
     return h + "</div>";
+  }
+
+  // 新しい診断に、まだつながっていない既存機能の案内（つながっているように見せない）
+  function unconnectedNote() {
+    return '<div class="k-card plain"><p><b>この結果とつながっていない機能（未接続）</b></p><ul class="k-list k-soft">' +
+      '<li>「履歴」画面：この新しい結果は、まだ履歴に保存されません。</li>' +
+      '<li>有料の詳しいPERSONAL BOOK（17ページ版）、KAKU MATCH、KAKU TEAM：この新しい診断の結果からは、まだ購入・利用できません。</li>' +
+      '<li>購入済みの方：メールで届いたリンクから、これまでどおり開けます（変更していません）。</li></ul>' +
+      '<p class="k-faint" style="margin-top:8px"><button class="k-link" data-act="openOldPaid">これまでの診断で購入手続きに進む（従来版）</button></p></div>';
   }
 
   function detailCore(R) {
@@ -544,9 +559,12 @@
     var sc;
     switch (act) {
       case "start":
-        S = fresh(); S.consent = el.getAttribute("data-consent") === "1";
+        S = fresh(); ui.parked = null; S.consent = el.getAttribute("data-consent") === "1";
         if (!S.consent) storageDel();
         S.view = "flow"; S.pos = 0; persist(); render(); break;
+      case "openOldPaid": if (window.KAKU_SITE) window.KAKU_SITE.showView("basic"); break;
+      case "toTop": if (window.KAKU_SITE) window.KAKU_SITE.showView("top"); break;
+      case "resumeMem": if (ui.parked) { S.view = ui.parked; ui.parked = null; render(); } break;
       case "resume": var sv = loadSaved(); if (sv) { S = sv; persist(); } render(); break;
       case "discard": storageDel(); S = fresh(); render(); break;
       case "back": go(-1); break;
@@ -617,7 +635,20 @@
   });
 
   // 試験用の読み取り口（画面の動きを自動テストするため。外部へは何も送りません）
-  window.KAKU_LAB_APP = { getState: function () { return S; }, setState: function (s) { S = s; render(); }, render: render, screens: screens };
+  // トップページの「診断開始」から呼ばれる。途中まで進めた内容が（このページを開いている間）残っていれば、続きに戻れるようにする
+  function open() {
+    measureHeader();
+    var hasProgress = S.view !== "intro" && S.view !== "data" && (Object.keys(S.answers).length > 0 || S.view === "result" || S.view === "book");
+    if (hasProgress) { ui.parked = S.view; S.view = "intro"; }
+    else if (S.view === "data") { S.view = S.prevView || "intro"; }
+    render();
+  }
+  function measureHeader() {
+    var hd = document.querySelector(".site-header"), v = document.getElementById("view-lab");
+    if (hd && v) v.style.setProperty("--kaku-header-h", hd.offsetHeight + "px");
+  }
+  window.addEventListener("resize", measureHeader);
+  window.KAKU_LAB_APP = { open: open, getState: function () { return S; }, setState: function (s) { S = s; render(); }, render: render, screens: screens };
 
   render();
 })();

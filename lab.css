@@ -1,6 +1,6 @@
-/* KAKU 体験版（検証用）— 公開サイトのPERSONAL BOOKに合わせた、ダークの単一トーン。
-   配色・書体は公開サイトの style.css と同じ値を使っています（このファイルは style.css を読み込みません）。 */
-:root {
+/* 新KAKU診断（#view-lab の中だけに効くスタイル）。公開サイトのPERSONAL BOOKに合わせた、ダークの単一トーン。
+   サイト全体（style.css）には影響しないよう、すべて #view-lab の中に閉じています。 */
+#view-lab {
   color-scheme: dark;
   --panel: #12172E; --panel-2: #181E3C;
   --text: #ECEEF7; --soft: rgba(236, 238, 247, 0.72); --faint: rgba(236, 238, 247, 0.46);
@@ -13,27 +13,27 @@
   --mono: "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
   --r: 12px; --r-sm: 8px;
 }
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
+#view-lab, #view-lab *, #view-lab *::before, #view-lab *::after { box-sizing: border-box; }
+#view-lab {
   background-color: #0A0D1C;
   background-image:
     repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0, rgba(255,255,255,.03) 1px, transparent 1px, transparent 26px),
     repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0, rgba(255,255,255,.03) 1px, transparent 1px, transparent 26px),
     linear-gradient(180deg, #0A0D1C 0%, #10142C 100%);
-  background-attachment: fixed;
   color: var(--text); font-family: var(--jp); font-size: 15px; line-height: 1.85;
-  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  min-height: 70vh;
 }
-.k-app { max-width: 560px; margin: 0 auto; padding: 0 16px 72px; min-height: 100vh; }
+#view-lab[hidden] { display: none; }
+#view-lab .k-app { max-width: 560px; margin: 0 auto; padding: 0 16px 72px; min-height: 70vh; }
 .k-app h1, .k-app h2, .k-app h3, .k-app p, .k-app ul { margin: 0; padding: 0; }
 .k-app p + p { margin-top: 10px; }
 .k-app img { display: block; max-width: 100%; }
-button { font: inherit; color: inherit; }
+#view-lab button { font: inherit; color: inherit; }
 .k-hidden { display: none !important; }
 
 /* 上部バー */
-.k-top { position: sticky; top: 0; z-index: 20; margin: 0 -16px 12px; padding: 10px 16px 8px;
+.k-top { position: sticky; top: var(--kaku-header-h, 0px); z-index: 20; margin: 0 -16px 12px; padding: 10px 16px 8px;
   background: rgba(10, 13, 28, .94); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line-2); }
 .k-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .k-logo { font-weight: 800; letter-spacing: .08em; font-size: 16px; }
