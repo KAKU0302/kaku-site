@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>KAKU CORE36 テスト用診断（開発用）</title>
+<!-- 開発・パイロット用の画面です。公開版の index.html からは読み込まれず、旧30問・16タイプの診断とは独立しています。 -->
+<link rel="stylesheet" href="../style.css" />
+<style>
+  .c36 { max-width: 640px; margin: 0 auto; padding: 16px 16px 72px; }
+  .c36-dev { background: #FFF6E0; border: 1px solid #E8C777; color: #6B4E00; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+  .c36 h1 { font-size: 22px; margin: 8px 0 4px; letter-spacing: .02em; }
+  .c36 h2 { font-size: 17px; margin: 28px 0 10px; }
+  .c36 p { margin: 8px 0; }
+  .c36-soft { color: var(--color-text-soft); font-size: 14px; }
+  .c36-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 16px; margin: 12px 0; }
+  .c36-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .c36 input[type=text], .c36 textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: #fff; color: var(--color-text); }
+  .c36 label.c36-radio { display: inline-flex; gap: 6px; align-items: center; margin-right: 14px; font-size: 14px; }
+  .c36-progress { height: 6px; background: var(--color-accent-soft); border-radius: 3px; overflow: hidden; margin: 8px 0 4px; }
+  .c36-progress > i { display: block; height: 100%; background: var(--color-accent); width: 0; transition: width .2s; }
+  .c36-chip { display: inline-block; font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--color-accent-soft); color: var(--color-accent); }
+  .c36-note { font-size: 13px; color: var(--color-text-soft); background: var(--color-accent-soft); border-radius: var(--radius-sm); padding: 8px 12px; margin: 10px 0; }
+  .c36-stmt { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 14px 16px 14px 44px; margin: 10px 0; position: relative; font-size: 16px; line-height: 1.7; }
+  .c36-stmt b { position: absolute; left: 14px; top: 14px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: 50%; width: 22px; height: 22px; display: grid; place-items: center; font-weight: 600; }
+  .c36-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 14px 0 6px; }
+  .c36-scale button { border: 1px solid var(--color-border); background: #fff; border-radius: var(--radius-sm); padding: 12px 2px 8px; cursor: pointer; font: inherit; color: var(--color-text); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .c36-scale button i { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--color-accent); display: block; }
+  .c36-scale button span { font-size: 11px; line-height: 1.3; color: var(--color-text-soft); }
+  .c36-scale button.on { background: var(--color-accent-soft); border-color: var(--color-accent); }
+  .c36-scale button.on i { background: var(--color-accent); }
+  .c36-scale button:focus-visible { outline: 3px solid var(--color-glow); outline-offset: 1px; }
+  .c36-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 12px; }
+  .c36-nav label { font-size: 13px; color: var(--color-text-soft); display: inline-flex; gap: 6px; align-items: center; }
+  .c36-axis { margin: 14px 0 18px; }
+  .c36-axis__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .c36-axis__name { font-weight: 600; }
+  .c36-axis__en { font-size: 11px; color: var(--color-text-soft); margin-left: 6px; letter-spacing: .06em; }
+  .c36-axis__read { font-size: 14px; color: var(--color-accent); font-weight: 600; text-align: right; }
+  .c36-bar { position: relative; height: 10px; background: var(--color-accent-soft); border-radius: 5px; margin: 8px 0 4px; }
+  .c36-bar::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: #B9BBC9; }
+  .c36-bar i { position: absolute; top: -4px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--color-accent); border: 3px solid #fff; box-shadow: 0 0 0 1px var(--color-accent); }
+  .c36-bar.dim i { background: #B9BBC9; box-shadow: 0 0 0 1px #B9BBC9; }
+  .c36-poles { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-soft); }
+  .c36-axis__scene { font-size: 12px; color: var(--color-text-soft); margin-top: 4px; }
+  .c36-type { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: start; }
+  /* 既存キャラクター画像（800×1200の縦長）は切り抜かず、元の比率のまま表示する */
+  .c36-type img { width: 112px; aspect-ratio: 2 / 3; height: auto; object-fit: contain; border-radius: var(--radius-sm); }
+  .c36-type__en { font-size: 11px; letter-spacing: .12em; color: var(--color-text-soft); }
+  .c36-type__jp { font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .c36-type__cc { font-size: 13px; color: var(--color-text-soft); margin-top: 4px; }
+  .c36-type.second { grid-template-columns: 72px 1fr; }
+  .c36-type.second img { width: 72px; height: auto; }
+  .c36-type.second .c36-type__jp { font-size: 16px; }
+  .c36 details { margin: 12px 0; font-size: 13px; }
+  .c36 details pre { background: #F3F3F0; padding: 10px; border-radius: var(--radius-sm); overflow-x: auto; font-size: 12px; line-height: 1.5; }
+  .c36-q { margin: 12px 0; }
+  .c36-q .c36-row { margin-top: 6px; }
+  .c36-q .c36-row label { font-size: 13px; display: inline-flex; gap: 4px; align-items: center; margin-right: 8px; }
+  .c36 table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .c36 td, .c36 th { border-bottom: 1px solid var(--color-border); padding: 6px 4px; text-align: left; }
+  .c36 .hidden { display: none; }
+</style>
+</head>
+<body>
+<main class="c36" id="app" aria-live="polite"></main>
+<script src="../types-data.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="test.js"></script>
+</body>
+</html>
