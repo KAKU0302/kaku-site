@@ -202,6 +202,7 @@
       const el = document.getElementById("view-" + v);
       if (el) el.hidden = v !== id;
     });
+    if (id !== "lab") document.body.classList.remove("kaku-focus"); // 診断中だけ、サイトのヘッダーを隠す
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     if (id === "personal-book") initPersonalBookView();
     if (id === "kaku-match") initKakuMatchView();

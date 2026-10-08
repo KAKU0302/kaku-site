@@ -2,7 +2,9 @@
  * kaku-lab/core36-data.js
  * CORE36（36問・6軸）の設問、軸の定義、12TYPEの判定プロフィール、設定値。
  *
- * scoring_version 0.3.0-draft（暫定版。0.2.0から「設問の文」だけを平易に書き直した。軸・場面・A極の位置・しきい値・タイプ判定表は同じ）
+ * scoring_version 0.4.0-draft（暫定版。0.3.0から「設問の見せ方」だけを変更：質問1行＋A・B2つの短い文＋共通の5択。軸・場面・A極の位置・採点・しきい値・タイプ判定表は同じ）
+ *  - 画面の「A」は left（従来の「上」）、「B」は right（従来の「下」）。回答 r=1 が「Aがかなり近い」、r=5 が「Bがかなり近い」。
+ *  - 各設問の prev は 0.3.0-draft の文（変更履歴）。
  *  - 設問文はKAKUが新しく書いたものです。信頼性・妥当性の検証は済んでいません。
  *  - 軸の定義は、心理学の概念（開放性、合理的思考と経験的思考、行動志向、外向性の主張性、
  *    協調性・共感、誠実性の秩序など）を「着想の参考」にしていますが、尺度としての検証は
@@ -16,7 +18,7 @@
 (function (root) {
   "use strict";
 
-  var VERSION = "0.3.0-draft";
+  var VERSION = "0.4.0-draft";
 
   // 軸。poleA / poleB は両極の名前。優劣はなく、Aは軸名の側（名前が指す側）です。
   var AXES = [
@@ -40,51 +42,57 @@
   // 設問。aSide は「A極（軸名の側）の文が左右どちらにあるか」。画面には出さない。
   // 各軸6問：work 3問（left, right, left）、life 3問（right, left, right）→ 左右は3対3。
   var ITEMS = [
-    { id: "C01", axis: "vision", scene: "work", aSide: "left", left: "仕事を始める前に、「完成したらどうなっているか」を先に思い描く", right: "仕事を始める前に、「今わかっていること」や過去の例を先に集める" },
-    { id: "C02", axis: "logic", scene: "work", aSide: "left", left: "大事なことを決めるときは、理由や数字を並べて考える", right: "大事なことを決めるときは、経験からくる「こっちだ」という感覚を大事にする" },
-    { id: "C03", axis: "drive", scene: "work", aSide: "left", left: "新しい仕事を頼まれたら、とりあえず手をつけて、進めながら直す", right: "新しい仕事を頼まれたら、進め方を考えてから手をつける" },
-    { id: "C04", axis: "influence", scene: "work", aSide: "left", left: "意見がぶつかったとき、自分から「こうしよう」と言い出す", right: "意見がぶつかったとき、みんなの意見が出るのを待って、整理する" },
-    { id: "C05", axis: "bond", scene: "work", aSide: "left", left: "同僚が落ち込んでいたら、声をかけて、まず話を聞く", right: "同僚が落ち込んでいたら、そっとしておいて、相手が話すのを待つ" },
-    { id: "C06", axis: "steady", scene: "work", aSide: "left", left: "仕事は、決めた手順や計画どおりに進めたい", right: "仕事は、状況を見ながら、やり方をその都度変えたい" },
-    { id: "C07", axis: "vision", scene: "work", aSide: "right", left: "会議で自分が話しがちなのは、今の状況や、これまでの実例のこと", right: "会議で自分が話しがちなのは、まだ決まっていない、これからの可能性のこと" },
-    { id: "C08", axis: "logic", scene: "work", aSide: "right", left: "迷ったときは、ピンときた方を選ぶ", right: "迷ったときは、選択肢を比べて、理由を言葉にして選ぶ" },
-    { id: "C09", axis: "drive", scene: "work", aSide: "right", left: "うまくいかなそうなときは、準備をしっかりしてから進める", right: "うまくいかなそうなときも、まず小さく試して、ダメなら直す" },
-    { id: "C10", axis: "influence", scene: "work", aSide: "right", left: "会議では、聞き役やフォロー役に回ることが多い", right: "会議では、自分から発言して、議論を引っぱることが多い" },
-    { id: "C11", axis: "bond", scene: "work", aSide: "right", left: "意見が対立したら、自分の考えをはっきり言う。相手と違っていても仕方ないと思う", right: "意見が対立したら、相手の立場や気持ちも考えて、落としどころを探す" },
-    { id: "C12", axis: "steady", scene: "work", aSide: "right", left: "予定が急に変わったら、新しい状況に合わせてやり方を変える", right: "予定が急に変わったら、できるだけ元の計画に近づけて立て直す" },
-    { id: "C13", axis: "vision", scene: "work", aSide: "left", left: "課題があると、まず「そもそも何のためか」を考え直したくなる", right: "課題があると、まず「今のやり方のどこを直せばいいか」を考える" },
-    { id: "C14", axis: "logic", scene: "work", aSide: "left", left: "うまくいかなかったとき、原因を一つずつ分けて考える", right: "うまくいかなかったとき、全体の流れを見て、ここがまずかったと感じ取る" },
-    { id: "C15", axis: "drive", scene: "work", aSide: "left", left: "仕事が止まっているとき、自分から最初の一手を打つ", right: "仕事が止まっているとき、動き出すきっかけを待ってから動く" },
-    { id: "C16", axis: "influence", scene: "work", aSide: "left", left: "チームをまとめたいとき、自分の考えや思いを前に出して伝える", right: "チームをまとめたいとき、一人ひとりの話を聞いて調整する" },
-    { id: "C17", axis: "bond", scene: "work", aSide: "left", left: "仕事で何かを決めるとき、関わる人の気持ちや事情をいちばん大事にする", right: "仕事で何かを決めるとき、人の事情は考えつつも、最後は自分の考えで決める" },
-    { id: "C18", axis: "steady", scene: "work", aSide: "left", left: "長く続く仕事は、毎日のやり方を決めて、コツコツ積み重ねたい", right: "長く続く仕事は、その時々で大事なことを見直して、やり方を変えたい" },
-    { id: "C19", axis: "vision", scene: "life", aSide: "right", left: "休日の予定を考えるとき、まず「行ける場所・できること」を挙げる", right: "休日の予定を考えるとき、まず「どんな一日にしたいか」を思い描く" },
-    { id: "C20", axis: "logic", scene: "life", aSide: "right", left: "買い物では、使ったときの感じや、自分の「これだ」で選ぶことが多い", right: "買い物では、値段や性能を比べて、理由をつけて選ぶことが多い" },
-    { id: "C21", axis: "drive", scene: "life", aSide: "right", left: "気になる習い事があっても、納得できるまで始めない", right: "気になる習い事があれば、とりあえず体験に行ってみる" },
-    { id: "C22", axis: "influence", scene: "life", aSide: "right", left: "友だちの集まりでは、聞き役に回ることが多い", right: "友だちの集まりでは、話題を出す側になることが多い" },
-    { id: "C23", axis: "bond", scene: "life", aSide: "right", left: "友だちとは、会う回数も連絡の頻度も、自分のペースで付き合いたい", right: "友だちとは、こまめに連絡して、近況を分かち合いたい" },
-    { id: "C24", axis: "steady", scene: "life", aSide: "right", left: "休日は、その日の気分で動くのが心地いい", right: "休日は、だいたい決まったリズムで過ごすのが心地いい" },
-    { id: "C25", axis: "vision", scene: "life", aSide: "left", left: "将来のことは、数年先の「こうなりたい」から考える", right: "将来のことは、今月・来月の現実的な見通しから考える" },
-    { id: "C26", axis: "logic", scene: "life", aSide: "left", left: "理由をきちんと示してもらえて、初めて納得できる", right: "理由がはっきりしなくても、しっくりくれば納得できる" },
-    { id: "C27", axis: "drive", scene: "life", aSide: "left", left: "やりたいことが浮かんだら、その日のうちに最初の一歩を踏み出す", right: "やりたいことが浮かんでも、少し置いて、気持ちが変わらないか確かめる" },
-    { id: "C28", axis: "influence", scene: "life", aSide: "left", left: "好きなものは、周りの人に自分から勧めたい", right: "好きなものは、聞かれたら答えるくらいでいい" },
-    { id: "C29", axis: "bond", scene: "life", aSide: "left", left: "相手の望みが自分と違うとき、相手の気持ちを考えて、合わせられないか探す", right: "相手の望みが自分と違うとき、違いは違いとして受け止め、無理には合わせない" },
-    { id: "C30", axis: "steady", scene: "life", aSide: "left", left: "決めた日課は、欠かさず続けたい", right: "日課は、合わなくなったら変えていい" },
-    { id: "C31", axis: "vision", scene: "life", aSide: "right", left: "趣味や暮らしを工夫するとき、実際にうまくいった例から広げる", right: "趣味や暮らしを工夫するとき、「こうなったらいいな」から逆算する" },
-    { id: "C32", axis: "logic", scene: "life", aSide: "right", left: "新しい情報は、自分の経験に照らして「確かに」と思えるかで受け止める", right: "新しい情報は、出どころやデータを確かめてから受け止める" },
-    { id: "C33", axis: "drive", scene: "life", aSide: "right", left: "大きな決断は、十分に見きわめられるまで待ちたい", right: "大きな決断は、多少見切り発車でも、早く動きたい" },
-    { id: "C34", axis: "influence", scene: "life", aSide: "right", left: "仲間うちの活動では、裏方として支える役が落ち着く", right: "仲間うちの活動では、まとめ役として前に立つ役が落ち着く" },
-    { id: "C35", axis: "bond", scene: "life", aSide: "right", left: "人の悩みを聞くときは、深入りせず、本人が決めることを尊重する", right: "人の悩みを聞くときは、気持ちに寄り添って、一緒に悩む" },
-    { id: "C36", axis: "steady", scene: "life", aSide: "right", left: "物の置き場は、使いやすいように、そのつど変える", right: "物の置き場は、定位置を決めて、そこに戻す" }
+    { id: "C01", axis: "vision", scene: "work", aSide: "left", q: "仕事を始めるとき、あなたは？", left: "まず完成した姿を思い描く", right: "まず情報や過去の例を集める", prev: { left: "仕事を始める前に、「完成したらどうなっているか」を先に思い描く", right: "仕事を始める前に、「今わかっていること」や過去の例を先に集める" } },
+    { id: "C02", axis: "logic", scene: "work", aSide: "left", q: "大事なことを決めるとき、頼るのは？", left: "理由や数字を並べて考える", right: "「こっちだ」という経験からの感覚", prev: { left: "大事なことを決めるときは、理由や数字を並べて考える", right: "大事なことを決めるときは、経験からくる「こっちだ」という感覚を大事にする" } },
+    { id: "C03", axis: "drive", scene: "work", aSide: "left", q: "新しい仕事を頼まれたら？", left: "とりあえず手をつけて、進めながら直す", right: "進め方を考えてから手をつける", prev: { left: "新しい仕事を頼まれたら、とりあえず手をつけて、進めながら直す", right: "新しい仕事を頼まれたら、進め方を考えてから手をつける" } },
+    { id: "C04", axis: "influence", scene: "work", aSide: "left", q: "意見がぶつかったとき、あなたは？", left: "自分から「こうしよう」と言い出す", right: "みんなの意見を待って、整理する", prev: { left: "意見がぶつかったとき、自分から「こうしよう」と言い出す", right: "意見がぶつかったとき、みんなの意見が出るのを待って、整理する" } },
+    { id: "C05", axis: "bond", scene: "work", aSide: "left", q: "同僚が落ち込んでいたら？", left: "声をかけて、まず話を聞く", right: "そっとしておいて、話すのを待つ", prev: { left: "同僚が落ち込んでいたら、声をかけて、まず話を聞く", right: "同僚が落ち込んでいたら、そっとしておいて、相手が話すのを待つ" } },
+    { id: "C06", axis: "steady", scene: "work", aSide: "left", q: "仕事の進め方は？", left: "決めた手順や計画どおりに進めたい", right: "状況を見て、やり方をその都度変えたい", prev: { left: "仕事は、決めた手順や計画どおりに進めたい", right: "仕事は、状況を見ながら、やり方をその都度変えたい" } },
+    { id: "C07", axis: "vision", scene: "work", aSide: "right", q: "会議で、つい話しがちなのは？", left: "今の状況や、これまでの実例", right: "まだ決まっていない、これからの可能性", prev: { left: "会議で自分が話しがちなのは、今の状況や、これまでの実例のこと", right: "会議で自分が話しがちなのは、まだ決まっていない、これからの可能性のこと" } },
+    { id: "C08", axis: "logic", scene: "work", aSide: "right", q: "迷ったときは？", left: "ピンときた方を選ぶ", right: "比べて、理由を言葉にして選ぶ", prev: { left: "迷ったときは、ピンときた方を選ぶ", right: "迷ったときは、選択肢を比べて、理由を言葉にして選ぶ" } },
+    { id: "C09", axis: "drive", scene: "work", aSide: "right", q: "うまくいかなそうなときは？", left: "準備をしっかりしてから進める", right: "まず小さく試して、ダメなら直す", prev: { left: "うまくいかなそうなときは、準備をしっかりしてから進める", right: "うまくいかなそうなときも、まず小さく試して、ダメなら直す" } },
+    { id: "C10", axis: "influence", scene: "work", aSide: "right", q: "会議でのあなたは？", left: "聞き役やフォロー役が多い", right: "自分から発言して、引っぱることが多い", prev: { left: "会議では、聞き役やフォロー役に回ることが多い", right: "会議では、自分から発言して、議論を引っぱることが多い" } },
+    { id: "C11", axis: "bond", scene: "work", aSide: "right", q: "意見が対立したら？", left: "違っても、自分の考えをはっきり言う", right: "相手の気持ちも考えて、落としどころを探す", prev: { left: "意見が対立したら、自分の考えをはっきり言う。相手と違っていても仕方ないと思う", right: "意見が対立したら、相手の立場や気持ちも考えて、落としどころを探す" } },
+    { id: "C12", axis: "steady", scene: "work", aSide: "right", q: "予定が急に変わったら？", left: "新しい状況に合わせて、やり方を変える", right: "できるだけ元の計画に近づけて立て直す", prev: { left: "予定が急に変わったら、新しい状況に合わせてやり方を変える", right: "予定が急に変わったら、できるだけ元の計画に近づけて立て直す" } },
+    { id: "C13", axis: "vision", scene: "work", aSide: "left", q: "課題にぶつかったら、まず？", left: "「そもそも何のためか」を考え直す", right: "「今のやり方のどこを直すか」を考える", prev: { left: "課題があると、まず「そもそも何のためか」を考え直したくなる", right: "課題があると、まず「今のやり方のどこを直せばいいか」を考える" } },
+    { id: "C14", axis: "logic", scene: "work", aSide: "left", q: "うまくいかなかったとき、あなたは？", left: "原因を一つずつ分けて考える", right: "全体の流れから「ここだ」と感じ取る", prev: { left: "うまくいかなかったとき、原因を一つずつ分けて考える", right: "うまくいかなかったとき、全体の流れを見て、ここがまずかったと感じ取る" } },
+    { id: "C15", axis: "drive", scene: "work", aSide: "left", q: "仕事が止まっているとき、あなたは？", left: "自分から最初の一手を打つ", right: "動き出すきっかけを待つ", prev: { left: "仕事が止まっているとき、自分から最初の一手を打つ", right: "仕事が止まっているとき、動き出すきっかけを待ってから動く" } },
+    { id: "C16", axis: "influence", scene: "work", aSide: "left", q: "チームをまとめたいとき？", left: "自分の考えや思いを前に出して伝える", right: "一人ひとりの話を聞いて調整する", prev: { left: "チームをまとめたいとき、自分の考えや思いを前に出して伝える", right: "チームをまとめたいとき、一人ひとりの話を聞いて調整する" } },
+    { id: "C17", axis: "bond", scene: "work", aSide: "left", q: "仕事で何かを決めるとき？", left: "関わる人の気持ちや事情をいちばん大事にする", right: "事情は考えつつ、最後は自分の考えで決める", prev: { left: "仕事で何かを決めるとき、関わる人の気持ちや事情をいちばん大事にする", right: "仕事で何かを決めるとき、人の事情は考えつつも、最後は自分の考えで決める" } },
+    { id: "C18", axis: "steady", scene: "work", aSide: "left", q: "長く続く仕事は？", left: "やり方を決めて、コツコツ積み重ねたい", right: "その時々で、やり方を見直したい", prev: { left: "長く続く仕事は、毎日のやり方を決めて、コツコツ積み重ねたい", right: "長く続く仕事は、その時々で大事なことを見直して、やり方を変えたい" } },
+    { id: "C19", axis: "vision", scene: "life", aSide: "right", q: "休日の予定を考えるとき、まず？", left: "行ける場所・できることを挙げる", right: "どんな一日にしたいかを思い描く", prev: { left: "休日の予定を考えるとき、まず「行ける場所・できること」を挙げる", right: "休日の予定を考えるとき、まず「どんな一日にしたいか」を思い描く" } },
+    { id: "C20", axis: "logic", scene: "life", aSide: "right", q: "買い物で、決め手になるのは？", left: "使った感じや、自分の「これだ」", right: "値段や性能を比べた理由", prev: { left: "買い物では、使ったときの感じや、自分の「これだ」で選ぶことが多い", right: "買い物では、値段や性能を比べて、理由をつけて選ぶことが多い" } },
+    { id: "C21", axis: "drive", scene: "life", aSide: "right", q: "気になる習い事があったら？", left: "納得できるまで始めない", right: "とりあえず体験に行ってみる", prev: { left: "気になる習い事があっても、納得できるまで始めない", right: "気になる習い事があれば、とりあえず体験に行ってみる" } },
+    { id: "C22", axis: "influence", scene: "life", aSide: "right", q: "友だちの集まりでは？", left: "聞き役に回ることが多い", right: "話題を出す側になることが多い", prev: { left: "友だちの集まりでは、聞き役に回ることが多い", right: "友だちの集まりでは、話題を出す側になることが多い" } },
+    { id: "C23", axis: "bond", scene: "life", aSide: "right", q: "友だちとの付き合い方は？", left: "会う回数も連絡も、自分のペースで", right: "こまめに連絡して、近況を分かち合う", prev: { left: "友だちとは、会う回数も連絡の頻度も、自分のペースで付き合いたい", right: "友だちとは、こまめに連絡して、近況を分かち合いたい" } },
+    { id: "C24", axis: "steady", scene: "life", aSide: "right", q: "休日の過ごし方は？", left: "その日の気分で動くのが心地いい", right: "だいたい決まったリズムが心地いい", prev: { left: "休日は、その日の気分で動くのが心地いい", right: "休日は、だいたい決まったリズムで過ごすのが心地いい" } },
+    { id: "C25", axis: "vision", scene: "life", aSide: "left", q: "将来のことは、どこから考える？", left: "数年先の「こうなりたい」から", right: "今月・来月の現実的な見通しから", prev: { left: "将来のことは、数年先の「こうなりたい」から考える", right: "将来のことは、今月・来月の現実的な見通しから考える" } },
+    { id: "C26", axis: "logic", scene: "life", aSide: "left", q: "納得できるのは、どんなとき？", left: "理由をきちんと示してもらえたとき", right: "理由は曖昧でも、しっくりきたとき", prev: { left: "理由をきちんと示してもらえて、初めて納得できる", right: "理由がはっきりしなくても、しっくりくれば納得できる" } },
+    { id: "C27", axis: "drive", scene: "life", aSide: "left", q: "やりたいことが浮かんだら？", left: "その日のうちに最初の一歩を踏み出す", right: "少し置いて、気持ちが変わらないか確かめる", prev: { left: "やりたいことが浮かんだら、その日のうちに最初の一歩を踏み出す", right: "やりたいことが浮かんでも、少し置いて、気持ちが変わらないか確かめる" } },
+    { id: "C28", axis: "influence", scene: "life", aSide: "left", q: "好きなものができたら？", left: "周りの人に自分から勧めたい", right: "聞かれたら答えるくらいでいい", prev: { left: "好きなものは、周りの人に自分から勧めたい", right: "好きなものは、聞かれたら答えるくらいでいい" } },
+    { id: "C29", axis: "bond", scene: "life", aSide: "left", q: "相手の望みが自分と違うとき？", left: "相手の気持ちを考えて、合わせられないか探す", right: "違いは違いとして受け止め、無理には合わせない", prev: { left: "相手の望みが自分と違うとき、相手の気持ちを考えて、合わせられないか探す", right: "相手の望みが自分と違うとき、違いは違いとして受け止め、無理には合わせない" } },
+    { id: "C30", axis: "steady", scene: "life", aSide: "left", q: "決めた日課は？", left: "欠かさず続けたい", right: "合わなくなったら変えていい", prev: { left: "決めた日課は、欠かさず続けたい", right: "日課は、合わなくなったら変えていい" } },
+    { id: "C31", axis: "vision", scene: "life", aSide: "right", q: "趣味や暮らしを工夫するとき？", left: "うまくいった実例から広げる", right: "「こうなったらいいな」から逆算する", prev: { left: "趣味や暮らしを工夫するとき、実際にうまくいった例から広げる", right: "趣味や暮らしを工夫するとき、「こうなったらいいな」から逆算する" } },
+    { id: "C32", axis: "logic", scene: "life", aSide: "right", q: "新しい情報を受け止めるとき？", left: "自分の経験に照らして「確かに」と思えるか", right: "出どころやデータを確かめてから", prev: { left: "新しい情報は、自分の経験に照らして「確かに」と思えるかで受け止める", right: "新しい情報は、出どころやデータを確かめてから受け止める" } },
+    { id: "C33", axis: "drive", scene: "life", aSide: "right", q: "大きな決断をするときは？", left: "十分に見きわめられるまで待ちたい", right: "多少見切り発車でも、早く動きたい", prev: { left: "大きな決断は、十分に見きわめられるまで待ちたい", right: "大きな決断は、多少見切り発車でも、早く動きたい" } },
+    { id: "C34", axis: "influence", scene: "life", aSide: "right", q: "仲間うちの活動では？", left: "裏方として支える役が落ち着く", right: "まとめ役として前に立つ役が落ち着く", prev: { left: "仲間うちの活動では、裏方として支える役が落ち着く", right: "仲間うちの活動では、まとめ役として前に立つ役が落ち着く" } },
+    { id: "C35", axis: "bond", scene: "life", aSide: "right", q: "人の悩みを聞くときは？", left: "深入りせず、本人が決めることを尊重する", right: "気持ちに寄り添って、一緒に悩む", prev: { left: "人の悩みを聞くときは、深入りせず、本人が決めることを尊重する", right: "人の悩みを聞くときは、気持ちに寄り添って、一緒に悩む" } },
+    { id: "C36", axis: "steady", scene: "life", aSide: "right", q: "物の置き場所は？", left: "使いやすいように、そのつど変える", right: "定位置を決めて、そこに戻す", prev: { left: "物の置き場は、使いやすいように、そのつど変える", right: "物の置き場は、定位置を決めて、そこに戻す" } }
   ];
 
-  // 回答の5段階（r = 1〜5）。画面に出す文言。
+  // 回答の5段階（r = 1〜5）。画面に出す文言。A＝left の文、B＝right の文。採点は r のまま（aSide で A極に換算）。
   var CHOICES = [
-    { value: 1, label: "上がぴったり" },
-    { value: 2, label: "どちらかといえば上" },
-    { value: 3, label: "どちらともいえない" },
-    { value: 4, label: "どちらかといえば下" },
-    { value: 5, label: "下がぴったり" }
+    { value: 1, label: "Aがかなり近い",     side: "A", strength: 2 },
+    { value: 2, label: "どちらかといえばA", side: "A", strength: 1 },
+    { value: 3, label: "どちらも同じくらい", side: "-", strength: 0 },
+    { value: 4, label: "どちらかといえばB", side: "B", strength: 1 },
+    { value: 5, label: "Bがかなり近い",     side: "B", strength: 2 }
+  ];
+
+  // 設問文の変更履歴
+  var CHANGELOG = [
+    { version: "0.4.0-draft", note: "画面の見せ方を変更：質問1行＋A・B各1文（短く）＋共通5択。意味・軸・A極の位置・採点は変更なし。旧文は各設問の prev に保存" },
+    { version: "0.3.0-draft", note: "36問の文を平易に書き直し（0.2.0から）" }
   ];
 
   // 12TYPEの判定プロフィール。
@@ -129,7 +137,7 @@
 
   root.KAKU_CORE36_DATA = {
     VERSION: VERSION,
-    AXES: AXES, SCENES: SCENES, ITEMS: ITEMS, CHOICES: CHOICES,
+    AXES: AXES, SCENES: SCENES, ITEMS: ITEMS, CHOICES: CHOICES, CHANGELOG: CHANGELOG,
     PROFILES: PROFILES, TIE_BREAK_ORDER: TIE_BREAK_ORDER, CONFIG: CONFIG
   };
   if (typeof module !== "undefined" && module.exports) module.exports = root.KAKU_CORE36_DATA;

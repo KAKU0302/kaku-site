@@ -190,3 +190,82 @@ details.k-det .in { padding: 0 16px 14px; font-size: 13.5px; }
   .k-view { animation: kfade .22s ease-out; }
   @keyframes kfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 }
+
+/* ============ 設問画面（36問・追加質問）：質問1行＋A/B＋5択 ============ */
+body.kaku-focus .site-header, body.kaku-focus .site-footer { display: none; }
+.k-logo-btn { background: none; border: 0; padding: 6px 0; cursor: pointer; font-family: var(--serif); font-size: 17px; font-weight: 800; letter-spacing: .1em; color: var(--text); min-height: 40px; }
+.k-logo-btn span { font-weight: 500; color: var(--glow); }
+.k-top--flow { padding-bottom: 6px; }
+.k-top--flow .k-top-row { gap: 10px; }
+.k-top--flow .k-top-row .k-logo-btn { margin-right: auto; }
+.k-stepchip { font-size: 12px; letter-spacing: .08em; color: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+.k-stepchip b { color: var(--text); font-size: 13px; }
+.k-info { width: 28px; height: 28px; min-width: 28px; border-radius: 50%; border: 1px solid var(--line-2); background: none; color: var(--faint); font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 14px; cursor: pointer; padding: 0; }
+.k-top--flow .k-bar { margin-top: 2px; height: 5px; }
+.k-top--flow .k-bar i { transition: width .45s cubic-bezier(.2,.7,.2,1); }
+.k-qcount { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12px; color: var(--soft); margin-top: 5px; }
+.k-qcount span:last-child { font-family: var(--mono); letter-spacing: .06em; white-space: nowrap; }
+.k-qcount b { color: var(--text); font-size: 15px; }
+
+.k-q2 { font-family: var(--serif); font-size: 22px; line-height: 1.5; font-weight: 700; text-wrap: balance; margin: 14px 0 12px; letter-spacing: .01em; }
+.k-ab { display: flex; flex-direction: column; gap: 8px; }
+.k-abcard { position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 14px; min-height: 64px; border-radius: 14px;
+  background: rgba(18, 23, 46, .92); border: 1px solid var(--line-2); transition: border-color .15s, box-shadow .15s, background .15s; }
+.k-abcard p { margin: 0; font-size: 16.5px; line-height: 1.55; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.k-abtag { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-weight: 800; font-size: 16px; color: #0A0D1C; }
+.k-abcard.a { border-left: 4px solid #5EC8F2; } .k-abcard.a .k-abtag { background: #5EC8F2; }
+.k-abcard.b { border-left: 4px solid #D9B36C; } .k-abcard.b .k-abtag { background: #D9B36C; }
+.k-abcard.a.lit { background: rgba(94,200,242,.14); border-color: #5EC8F2; box-shadow: 0 0 0 1px rgba(94,200,242,.35), 0 0 18px rgba(94,200,242,.18); }
+.k-abcard.b.lit { background: rgba(217,179,108,.14); border-color: #D9B36C; box-shadow: 0 0 0 1px rgba(217,179,108,.35), 0 0 18px rgba(217,179,108,.16); }
+
+.k-scale { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.k-opt { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 46px; padding: 6px 14px; text-align: left;
+  border-radius: 12px; border: 1px solid var(--line-2); background: rgba(255,255,255,.04); cursor: pointer; font-size: 15px; font-weight: 500;
+  transition: background .12s, border-color .12s, transform .12s; -webkit-tap-highlight-color: transparent; }
+.k-opt .dot { flex: 0 0 auto; border-radius: 50%; border: 2px solid currentColor; background: transparent; }
+.k-opt.st2 .dot { width: 22px; height: 22px; } .k-opt.st1 .dot { width: 16px; height: 16px; } .k-opt.st0 .dot { width: 10px; height: 10px; }
+.k-opt .dot { margin: 0 3px; }
+.k-opt.st1 .dot { margin: 0 6px; } .k-opt.st0 .dot { margin: 0 9px; }
+.k-opt .lb { flex: 1 1 auto; min-width: 0; }
+.k-opt .ck { flex: 0 0 auto; opacity: 0; font-weight: 800; font-size: 15px; }
+.k-opt.sa { color: #9ADBF6; } .k-opt.sb { color: #E8CD97; } .k-opt.sm { color: var(--soft); }
+.k-opt .lb { color: var(--text); }
+.k-opt.st2 .lb { font-weight: 700; }
+.k-opt.sa.st2 { border-color: rgba(94,200,242,.45); } .k-opt.sb.st2 { border-color: rgba(217,179,108,.5); }
+.k-opt:active { transform: scale(.985); }
+.k-opt.on { color: #0A0D1C; font-weight: 700; border-color: transparent; }
+.k-opt.on .lb { color: #0A0D1C; font-weight: 800; }
+.k-opt.on .dot { background: #0A0D1C; border-color: #0A0D1C; }
+.k-opt.on .ck { opacity: 1; }
+.k-opt.sa.on { background: linear-gradient(90deg, #5EC8F2, #8AD8F5); }
+.k-opt.sb.on { background: linear-gradient(90deg, #E8CD97, #D9B36C); }
+.k-opt.sm.on { background: linear-gradient(90deg, #C9CCE0, #A9AECB); }
+@media (hover: hover) { .k-opt:hover:not(.on) { background: rgba(255,255,255,.09); } }
+@media (prefers-reduced-motion: no-preference) {
+  .k-opt.on { animation: kpop .18s ease-out; }
+  @keyframes kpop { 0% { transform: scale(.97); } 60% { transform: scale(1.015); } 100% { transform: scale(1); } }
+  .k-view { animation: ksl-in .2s ease-out; }
+  .k-view.back { animation: ksl-back .2s ease-out; }
+  @keyframes ksl-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+  @keyframes ksl-back { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+}
+.k-back { margin-top: 14px; }
+.k-back .k-btn { min-height: 44px; padding: 8px 18px; font-size: 14px; }
+@media (max-height: 740px) {
+  .k-q2 { font-size: 20px; margin: 8px 0 8px; }
+  .k-abcard { min-height: 54px; padding: 8px 12px; } .k-abcard p { font-size: 15.5px; }
+  .k-opt { min-height: 42px; } .k-scale { margin-top: 10px; gap: 5px; }
+}
+@media (max-width: 340px) {
+  .k-stepchip { padding: 2px 7px; font-size: 11px; }
+  .k-logo-btn { font-size: 15px; letter-spacing: .06em; }
+  .k-abcard p { font-size: 15px; } .k-opt { font-size: 14px; padding: 6px 10px; gap: 8px; }
+  .k-q2 { font-size: 19px; }
+}
+#view-lab { overflow-x: clip; }
+body.kaku-focus, html:has(body.kaku-focus) { background: #0A0D1C; }
+#view-lab .k-opt.sa .dot { color: #5EC8F2; } #view-lab .k-opt.sb .dot { color: #D9B36C; } #view-lab .k-opt.sm .dot { color: #9aa0bd; }
+#view-lab .k-opt .ck { color: #0A0D1C; }
+.k-q2 { margin-bottom: 16px; }
+@media (max-height: 740px) { .k-q2 { margin-bottom: 12px; } }

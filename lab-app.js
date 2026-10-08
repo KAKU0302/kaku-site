@@ -29,7 +29,7 @@
     };
   }
   var S = fresh();
-  var ui = { parked: null, periodOpen: false, flash: "", t0: Date.now(), confirmReset: false, busy: false, copied: false };
+  var ui = { dir: 1, prevPct: 0, parked: null, periodOpen: false, flash: "", t0: Date.now(), confirmReset: false, busy: false, copied: false };
 
   function storageGet() { try { return window.localStorage.getItem(KEY); } catch (e) { return null; } }
   function storageSet(v) { try { window.localStorage.setItem(KEY, v); return true; } catch (e) { return false; } }
@@ -97,17 +97,39 @@
     else html = viewIntro();
     root.innerHTML = html;
     ui.t0 = Date.now();
+    var focus = S.view === "flow";
+    document.body.classList.toggle("kaku-focus", focus);
+    measureHeader();
+    // 進捗バーは、前の位置からなめらかに伸ばす
+    var bar = root.querySelector(".k-bar i[data-pct]");
+    if (bar) {
+      var to = bar.getAttribute("data-pct");
+      ui.prevPct = parseFloat(to);
+      window.requestAnimationFrame(function () { window.requestAnimationFrame(function () { bar.style.width = to + "%"; }); });
+    }
+    ui.dir = 1;
     window.scrollTo(0, 0);
   }
 
   function topBar(progress) {
-    var h = '<div class="k-top"><div class="k-top-row"><div class="k-logo">KAKU診断<small>新バージョン・未検証</small></div>' +
-      '<button class="k-link" data-act="data">データの扱い</button></div>';
+    var h = '<div class="k-top"><div class="k-top-row"><button class="k-logo k-logo-btn" data-act="toTop" aria-label="トップページへ">KAKU <span>～核～</span></button>' +
+      '<button class="k-link" data-act="data">データの扱い・検証について</button></div>';
     if (progress) {
       h += '<div class="k-progress"><div class="k-progress-label"><span>' + progress.label + '</span><span>' + progress.right + '</span></div>' +
         '<div class="k-bar"><i style="width:' + progress.pct + '%"></i></div></div>';
     }
     return h + "</div>";
+  }
+
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  // 設問画面の上部：ロゴ／STEP／進捗バー／何問目か
+  function flowBar(step, stepName, counter, pct) {
+    return '<div class="k-top k-top--flow"><div class="k-top-row">' +
+      '<button class="k-logo k-logo-btn" data-act="toTop" aria-label="トップページへ">KAKU <span>～核～</span></button>' +
+      '<span class="k-stepchip">STEP <b>' + step + '</b> / 3</span>' +
+      '<button class="k-info" data-act="data" aria-label="データの扱い・検証について">i</button></div>' +
+      '<div class="k-bar"><i style="width:' + ui.prevPct + '%" data-pct="' + pct + '"></i></div>' +
+      '<div class="k-qcount"><span>' + esc(stepName) + '</span><span>' + (counter || "") + "</span></div></div>";
   }
 
   // ---------------------------------------------------------------- はじめに
@@ -156,12 +178,13 @@
     var pct = Math.round(S.pos / list.length * 100);
     var right = "";
     var qi;
-    if (sc.k === "q") { qi = ITEMS.map(function (i) { return i.id; }).indexOf(sc.id) + 1; right = qi + " / 36"; }
-    else if (sc.k === "f") { qi = S.followup.asked.indexOf(sc.id) + 1; right = "追加 " + qi + " / " + S.followup.asked.length; }
-    else if (sc.k === "fu") { qi = DOMAINS.map(function (d) { return d.id; }).indexOf(sc.id) + 1; right = "満たされ具合 " + qi + " / 14"; }
-    else if (sc.k === "st") { qi = L.STATE_ITEMS.map(function (d) { return d.id; }).indexOf(sc.id) + 1; right = qi + " / 6"; }
-    var h = topBar({ label: "<b>STEP " + step + " / 3</b>　" + stepNames[step], right: right, pct: pct });
-    h += '<div class="k-view">';
+    if (sc.k === "q") { qi = ITEMS.map(function (i) { return i.id; }).indexOf(sc.id) + 1; right = "<b>" + pad2(qi) + "</b> / 36"; }
+    else if (sc.k === "f") { qi = S.followup.asked.indexOf(sc.id) + 1; right = "追加 <b>" + pad2(qi) + "</b> / " + pad2(S.followup.asked.length); }
+    else if (sc.k === "fu") { qi = DOMAINS.map(function (d) { return d.id; }).indexOf(sc.id) + 1; right = "満たされ具合 <b>" + pad2(qi) + "</b> / 14"; }
+    else if (sc.k === "st") { qi = L.STATE_ITEMS.map(function (d) { return d.id; }).indexOf(sc.id) + 1; right = "<b>" + pad2(qi) + "</b> / 06"; }
+    var h = flowBar(step, stepNames[step], right, pct);
+    ui.nextPct = pct;
+    h += '<div class="k-view' + (ui.dir < 0 ? " back" : "") + '">';
     var body = ({
       s1intro: tplS1Intro, q: tplCore, fintro: tplFIntro, f: tplFollow, pPeriod: tplPeriod, pPick: tplPastPick, pTop: tplPastTop,
       pLess: tplPastLess, pConfirm: tplPastConfirm, s2intro: tplS2Intro, cPick: tplCurPick, cTop: tplCurTop, cLess: tplCurLess,
@@ -170,7 +193,7 @@
     return h + body + "</div>";
   }
 
-  function backBtn() { return '<div class="k-back"><button class="k-btn ghost" data-act="back">← 戻る</button></div>'; }
+  function backBtn(label) { return '<div class="k-back"><button class="k-btn ghost" data-act="back">← ' + (label || "戻る") + "</button></div>"; }
   function nextBtn(enabled, label) {
     return '<div class="k-sticky"><button class="k-btn primary block" data-act="next"' + (enabled ? "" : " disabled") + ">" + (label || "次へ") + "</button></div>";
   }
@@ -178,22 +201,28 @@
   function tplS1Intro() {
     return '<p class="k-kicker">STEP 1</p><h1 class="k-title">核と過去の価値観</h1>' +
       '<p class="k-sub">ここでは、仕事や日常で、あなたがふだんどう考え、どう動くかを聞きます。正解はありません。深く考えず、近い方を選んでください。</p>' +
-      '<div class="k-card plain"><p class="k-soft">2枚の文のうち、ふだんのあなたに近い方を、5つのボタンから選びます。1つ選ぶと次へ進みます。</p>' +
+      '<div class="k-card plain"><p class="k-soft">1つの質問に、「A」と「B」の2つの答えが出ます。ふだんのあなたに近い方を、5つのボタンから選んでください。1つ選ぶと、すぐ次へ進みます。間違えたら「戻る」で直せます。</p>' +
       '<p class="k-soft">そのあと、昔の自分が大切にしていたことを振り返ります。</p></div>' +
       '<div class="k-note info">ここでいう「核」は、あなたが答えたふだんの傾向のことです。生まれつきの性質を測るものではありません。</div>' +
       '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="next">STEP 1 をはじめる（約6〜8分）</button></div>' + backBtn();
   }
 
+  // A・B・5択のまとまり（36問も追加質問も同じ形）。A＝left、B＝right。回答値 r は従来のまま（1=A寄り … 5=B寄り）
+  function abBlock(item, choices, act, v) {
+    var h = '<h1 class="k-q2">' + esc(item.q) + "</h1>";
+    h += '<div class="k-ab">' +
+      '<div class="k-abcard a' + (v && v < 3 ? " lit" : "") + '"><span class="k-abtag">A</span><p>' + esc(item.left) + "</p></div>" +
+      '<div class="k-abcard b' + (v && v > 3 ? " lit" : "") + '"><span class="k-abtag">B</span><p>' + esc(item.right) + "</p></div></div>";
+    h += '<div class="k-scale" role="group" aria-label="あなたに近いのは？">' + choices.map(function (c) {
+      var cls = c.side === "A" ? "sa" : c.side === "B" ? "sb" : "sm";
+      return '<button class="k-choice k-opt ' + cls + " st" + c.strength + (v === c.value ? " on" : "") + '" data-act="' + act + '" data-v="' + c.value + '" aria-pressed="' + (v === c.value) + '">' +
+        '<span class="dot" aria-hidden="true"></span><span class="lb">' + esc(c.label) + '</span><span class="ck" aria-hidden="true">✓</span></button>';
+    }).join("") + "</div>";
+    return h;
+  }
   function tplCore(sc) {
     var it = ITEMS.filter(function (x) { return x.id === sc.id; })[0];
-    var v = S.answers[it.id];
-    var h = '<h1 class="k-q">ふだんのあなたに近いのは、どちらですか？</h1>';
-    h += '<div class="k-pair"><div class="k-side' + (v && v < 3 ? " lit" : "") + '" data-label="上">' + esc(it.left) + "</div>" +
-      '<div class="k-side' + (v && v > 3 ? " lit" : "") + '" data-label="下">' + esc(it.right) + "</div></div>";
-    h += '<div class="k-choices">' + CHOICES.map(function (c) {
-      return '<button class="k-choice' + (v === c.value ? " on" : "") + '" data-act="core" data-v="' + c.value + '">' + esc(c.label) + "</button>";
-    }).join("") + "</div>" + backBtn();
-    return h;
+    return abBlock(it, CHOICES, "core", S.answers[it.id]) + backBtn("前の質問に戻る");
   }
 
   function tplFIntro() {
@@ -205,14 +234,8 @@
 
   function tplFollow(sc) {
     var f = L.FOLLOWUP_BY_ID[sc.id];
-    var v = S.followup.answers[f.id];
-    var h = '<h1 class="k-q">ふだんのあなたに近いのは、どちらですか？</h1>';
-    h += '<div class="k-pair"><div class="k-side' + (v && v < 3 ? " lit" : "") + '" data-label="上">' + esc(f.left) + "</div>" +
-      '<div class="k-side' + (v && v > 3 ? " lit" : "") + '" data-label="下">' + esc(f.right) + "</div></div>";
-    h += '<div class="k-choices">' + L.FOLLOWUP_CHOICES.map(function (c) {
-      return '<button class="k-choice' + (v === c.value ? " on" : "") + '" data-act="follow" data-v="' + c.value + '">' + esc(c.label) + "</button>";
-    }).join("") + "</div>" + backBtn();
-    return h;
+    return abBlock(f, L.FOLLOWUP_CHOICES, "follow", S.followup.answers[f.id]) +
+      '<p class="k-faint" style="text-align:center;margin-top:8px">この追加質問は「どちらでもない」がなく、どちらか近い方を選びます。</p>' + backBtn("前の質問に戻る");
   }
 
   // ---- 過去の価値観
@@ -503,8 +526,11 @@
       ? "「保存して始める」を選んだため、回答をこの端末のブラウザ（localStorage）に保存しています。"
       : "保存していません。ページを閉じると、回答は消えます。") + "</p>" +
       (saved ? '<p class="k-soft">いま、この端末に保存されたデータがあります。</p>' : "") + "</div>";
-    h += '<div class="k-card"><p><b>通信</b></p><p class="k-soft">回答は外部のサーバーに送りません。このページには、データを外へ送るコードを入れていません。決済・メール・購入履歴の仕組みとも、つながっていません。</p></div>';
-    h += '<div class="k-card"><p><b>公開範囲</b></p><p class="k-soft">このページは検証用で、トップページからのリンクはありません。URLを知っている人は誰でも開けますが、あなたの回答は、他の人には見えません。</p></div>';
+    h += '<div class="k-card"><p><b>通信</b></p><p class="k-soft">回答は外部のサーバーに送りません。このページには、データを外へ送るコードを入れていません。決済・メール・購入履歴の仕組みとも、まだつながっていません。</p></div>';
+    h += '<div class="k-card"><p><b>この診断について（検証の状況）</b></p><ul class="k-list k-soft">' +
+      '<li>採点のしくみ（' + esc(L.VERSIONS.core) + '）・12TYPEの判定（' + esc(L.VERSIONS.type) + '）・文章（' + esc(L.VERSIONS.book) + '）は、まだ実際の利用者で確かめていない暫定版です。</li>' +
+      '<li>設問の文は、読みやすさのために書き直しています（変更の履歴は、書き出したデータに入ります）。分かりやすさも未検証です。</li>' +
+      '<li>結果は「今回の回答から読み取れる範囲」の目安です。診断・医療・採用の判断には使わないでください。</li></ul></div>';
     h += '<div class="k-card"><p><b>書き出し</b></p><p class="k-soft">下のボタンを押したときだけ、回答をJSONファイルとして、この端末に保存できます（名前・メール・生年月日は含みません）。</p>' +
       '<div class="k-stack" style="margin-top:10px"><button class="k-btn primary block" data-act="export">JSONファイルとして保存する</button>' +
       '<button class="k-btn block" data-act="copyJson">' + (ui.copied ? "コピーしました" : "JSONをコピーする") + "</button></div></div>";
@@ -515,14 +541,24 @@
 
   // ---------------------------------------------------------------- 操作
   function go(delta) {
+    if (ui.busy) return;
+    ui.dir = delta < 0 ? -1 : 1;
     S.pos += delta;
     if (S.pos < 0) { S.view = "intro"; S.pos = 0; }
     persist(); render();
   }
+  // 選んだ瞬間の反応：選択状態＋A/Bのカードを光らせる
+  function markPicked(el, v) {
+    var all = root.querySelectorAll(".k-opt"), i;
+    for (i = 0; i < all.length; i++) { all[i].classList.toggle("on", all[i] === el); all[i].setAttribute("aria-pressed", all[i] === el ? "true" : "false"); }
+    var a = root.querySelector(".k-abcard.a"), b = root.querySelector(".k-abcard.b");
+    if (a) a.classList.toggle("lit", v < 3);
+    if (b) b.classList.toggle("lit", v > 3);
+  }
   function advanceSoon() {
     if (ui.busy) return;
     ui.busy = true;
-    setTimeout(function () { ui.busy = false; S.pos += 1; persist(); render(); }, 170);
+    setTimeout(function () { ui.busy = false; ui.dir = 1; S.pos += 1; persist(); render(); }, 230);
   }
   function currentScreen() { return screens()[S.pos]; }
 
@@ -568,14 +604,13 @@
       case "resume": var sv = loadSaved(); if (sv) { S = sv; persist(); } render(); break;
       case "discard": storageDel(); S = fresh(); render(); break;
       case "back": go(-1); break;
-      case "next": S.pos += 1; ui.flash = ""; persist(); render(); break;
+      case "next": ui.dir = 1; S.pos += 1; ui.flash = ""; persist(); render(); break;
       case "core":
         sc = currentScreen();
         S.seconds[sc.id] = Math.min(120, Math.round((Date.now() - ui.t0) / 100) / 10);
         S.answers[sc.id] = v; syncFollowup(); persist();
-        if (!ui.busy) { var card = root.querySelectorAll(".k-choice"); for (var i = 0; i < card.length; i++) card[i].classList.toggle("on", card[i] === el); }
-        advanceSoon(); break;
-      case "follow": sc = currentScreen(); S.followup.answers[sc.id] = v; persist(); advanceSoon(); break;
+        markPicked(el, v); advanceSoon(); break;
+      case "follow": sc = currentScreen(); S.followup.answers[sc.id] = v; persist(); markPicked(el, v); advanceSoon(); break;
       case "periodToggle": ui.periodOpen = !ui.periodOpen; render(); break;
       case "periodOk": S.past.skipped = false; S.past.period.changedByUser = S.past.period.yearsAgo !== 3; ui.periodOpen = false; S.pos += 1; persist(); render(); break;
       case "period":
