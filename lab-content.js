@@ -34,7 +34,9 @@
       id: id,
       nameJp: t ? t.nameJp : f[0], nameEn: t ? t.nameEn : f[1],
       color: t ? t.color : f[2], image: t ? t.image : f[3],
-      catchcopy: t && t.catchcopy ? t.catchcopy : "", praise: t && t.praise ? t.praise : ""
+      catchcopy: t && t.catchcopy ? t.catchcopy : "", praise: t && t.praise ? t.praise : "",
+      weapon: t && t.weapon || "", blindSpot: t && t.blindSpot || "", teamRole: t && t.teamRole || "",
+      relationStyle: t && t.relationStyle || "", awaken: t && t.awaken || null, shutdown: t && t.shutdown || null
     };
   }
 
@@ -89,11 +91,11 @@
 
     // 魅力カード：寄りの強い順に最大3つ。足りなければ「どちらにも寄らない」軸の魅力で補う
     leans.slice(0, 3).forEach(function (l) {
-      out.charms.push({ axis: l.axis, axisName: AXIS_BY_ID[l.axis].nameJp, title: l.c.title, text: l.c.text, fan: l.c.fan, kind: "lean", c: l.c });
+      out.charms.push({ axis: l.axis, axisName: AXIS_BY_ID[l.axis].nameJp, title: l.c.title, you: l.c.you, text: l.c.text, fan: l.c.fan, kind: "lean", c: l.c });
     });
     for (var i = 0; i < bals.length && out.charms.length < 3; i++) {
       var b = bals[i];
-      out.charms.push({ axis: b.axis, axisName: AXIS_BY_ID[b.axis].nameJp, title: b.bc.title, text: b.bc.text, fan: b.bc.fan, kind: "balanced", c: b.bc });
+      out.charms.push({ axis: b.axis, axisName: AXIS_BY_ID[b.axis].nameJp, title: b.bc.title, you: b.bc.you, text: b.bc.text, fan: b.bc.fan, kind: "balanced", c: b.bc });
     }
 
     // 一言（見出し）と、その言い換え
@@ -116,12 +118,52 @@
     });
 
     out.fans = cs.map(function (c) { return c.fan; });
-    if (cs.length) out.closing = "ここに書いたのは、あなたの回答から見えた魅力の入口です。読み返して、「あ、これ自分だ」と思えるところを、ひとつ見つけてください。";
+    if (cs.length) out.closing = "自分の答えに、ちゃんと向き合えたあなたは、それだけで素敵です。ここに書いたのは、あなたの魅力の入口です。読み返して、「あ、これ自分だ」と思えるところを、ひとつ見つけてください。";
 
     // 互換用（本文の文）
     if (out.epithet) out.sentences.push(out.epithet);
     if (out.typePraise) out.sentences.push(out.typePraise); else if (out.wide) out.sentences.push(out.wide);
     return out;
+  }
+
+  // ------------------------------------------------------------------
+  // 武器・罠・役割・向き合い方・覚醒・力を失う環境（以前の無料診断結果と同じ6枠）
+  //  代表タイプが確かなときは、そのタイプの文。近さが弱い・保留のときは、寄りの強い軸の文から作る
+  // ------------------------------------------------------------------
+  function buildCards(ax, tm, weak) {
+    var cards = null;
+    if (tm && !weak && tm.weapon) {
+      cards = [
+        { key: "weapon", title: "あなたの武器", en: "WEAPON", text: tm.weapon },
+        { key: "blind", title: "あなたが陥りやすい罠", en: "BLIND SPOT", text: tm.blindSpot },
+        { key: "role", title: "組織で輝く役割", en: "TEAM ROLE", text: tm.teamRole },
+        { key: "rel", title: "人との向き合い方", en: "RELATION STYLE", text: tm.relationStyle },
+        { key: "awaken", title: "あなたが覚醒する条件", en: "AWAKEN", kw: tm.awaken ? tm.awaken.keywords : [], text: tm.awaken ? tm.awaken.sentence : "" },
+        { key: "shut", title: "力を失いやすい環境", en: "SHUTDOWN", kw: tm.shutdown ? tm.shutdown.keywords : [], text: tm.shutdown ? tm.shutdown.sentence : "" }
+      ];
+    } else if (ax.leans.length) {
+      var p = ax.leans[0].p;
+      cards = [
+        { key: "weapon", title: "あなたの武器", en: "WEAPON", text: p.power[0] + "。" + p.power[1] },
+        { key: "blind", title: "あなたが陥りやすい罠", en: "BLIND SPOT", text: p.backfire },
+        { key: "role", title: "組織で輝く役割", en: "TEAM ROLE", text: p.work },
+        { key: "rel", title: "人との向き合い方", en: "RELATION STYLE", text: p.others },
+        { key: "awaken", title: "あなたが覚醒する条件", en: "AWAKEN", kw: [], text: p.good },
+        { key: "shut", title: "力を失いやすい環境", en: "SHUTDOWN", kw: [], text: p.bad }
+      ];
+    }
+    return cards;
+  }
+
+  // KAKU GAP の点数（0〜100）：大切な3つの「満たされ」の低さ。0に近いほどズレが小さい
+  function gapScore(g) {
+    if (!g) return null;
+    var rows = g.rows.filter(function (r) { return r.fulfil; });
+    if (!rows.length) return null;
+    var sum = 0; rows.forEach(function (r) { sum += (5 - r.fulfil) / 4 * 100; });
+    var score = Math.round(sum / rows.length);
+    var tier = score < 25 ? { key: "s", label: "GAPは小さめ" } : score < 50 ? { key: "m", label: "少しズレがあります" } : score < 75 ? { key: "l", label: "ズレがやや大きめ" } : { key: "xl", label: "ズレが大きめ" };
+    return { score: score, tier: tier };
   }
 
   // ------------------------------------------------------------------
@@ -198,7 +240,8 @@
       versions: L.VERSIONS, type: type, core: core, ax: ax,
       shownType: type.shown ? typeMeta(type.shown) : null,
       portrait: buildPortrait(ax, type.shown && type.note !== "weak" ? typeMeta(type.shown) : null),
-      cur: cur, gapFulfil: describeFulfil(g1), gapFulfilRaw: g1,
+      cards: buildCards(ax, type.shown ? typeMeta(type.shown) : null, type.note === "weak"),
+      cur: cur, gapFulfil: describeFulfil(g1), gapFulfilRaw: g1, gapScore: gapScore(g1),
       change: describeChange(g2), changeRaw: g2,
       state: describeState(S.state && Object.keys(S.state).length ? S.state : null),
       pastSkipped: !!(S.past && S.past.skipped)
@@ -360,7 +403,7 @@
   }
 
   var API = {
-    typeMeta: typeMeta, readAxes: readAxes, buildPortrait: buildPortrait, buildResult: buildResult,
+    typeMeta: typeMeta, buildCards: buildCards, gapScore: gapScore, readAxes: readAxes, buildPortrait: buildPortrait, buildResult: buildResult,
     describeChange: describeChange, describeFulfil: describeFulfil, describeState: describeState,
     CHAPTERS: CHAPTERS
   };

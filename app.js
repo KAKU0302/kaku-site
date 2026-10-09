@@ -322,6 +322,26 @@
     saveHistoryList(list.slice(0, HISTORY_MAX_ENTRIES));
   }
 
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  // 新しい診断（3STEP）の結果を、同じ履歴に保存・更新する。同じ id なら上書き（日時は最初のまま）
+  window.KAKU_HISTORY = {
+    upsert(entry) {
+      if (!entry || !entry.id) return false;
+      const list = loadHistory();
+      const i = list.findIndex((e) => e.id === entry.id);
+      if (i >= 0) {
+        entry.savedAt = list[i].savedAt || entry.savedAt;
+        list[i] = entry;
+      } else {
+        list.unshift(entry);
+      }
+      return saveHistoryList(list.slice(0, HISTORY_MAX_ENTRIES));
+    },
+  };
+
   function formatHistoryDate(isoString) {
     try {
       const d = new Date(isoString);
@@ -339,6 +359,14 @@
   function restoreFromHistoryEntry(entryId) {
     const entry = loadHistory().find((e) => e.id === entryId);
     if (!entry) return;
+    if (entry.kind === "lab") {
+      // 新しい診断（3STEP）の結果：当時の回答をそのまま読み込んで、結果画面を開く
+      if (window.KAKU_LAB_APP) {
+        showView("lab");
+        window.KAKU_LAB_APP.showResult(entry);
+      }
+      return;
+    }
     applySnapshotToSession(entry);
     showView("result");
     renderResult();
@@ -370,13 +398,20 @@
         ${history
           .map((entry) => {
             const type = KAKU_TYPES[entry.typeId];
-            if (!type) return "";
+            if (!type && entry.kind !== "lab") return "";
+            const labTitle = entry.kind === "lab" && entry.title ? `<p class="history-item__name">${escapeHtml(entry.title)}</p>` : "";
+            const labTypeLine = type
+              ? `${type.nameEn}｜${type.nameJp}${entry.weak ? "（参考）" : ""}`
+              : "タイプは保留";
             return `
             <div class="history-item" data-entry-id="${entry.id}">
-              <img class="history-item__image" src="${type.image}" alt="${type.nameEn} ${type.nameJp}" loading="lazy" />
+              ${type
+                ? `<img class="history-item__image" src="${type.image}" alt="${type.nameEn} ${type.nameJp}" loading="lazy" />`
+                : `<div class="history-item__image" aria-hidden="true" style="display:flex;align-items:center;justify-content:center;font-size:28px;color:#C8A96B;background:#0e1226;">核</div>`}
               <div class="history-item__body">
                 <p class="history-item__date">${formatHistoryDate(entry.savedAt)}</p>
-                <p class="history-item__type">${type.nameEn}｜${type.nameJp}</p>
+                <p class="history-item__type">${labTypeLine}</p>
+                ${labTitle}
                 ${entry.name ? `<p class="history-item__name">${entry.name}さんの結果</p>` : ""}
               </div>
               <div class="history-item__actions">
