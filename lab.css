@@ -539,3 +539,55 @@ details.k-det summary::after { color: var(--k-gold); }
 .k-h2 > span { min-width: 0; flex: 1; text-wrap: pretty; word-break: auto-phrase; }
 .k-h2 > span > .k-en { display: block; margin: 3px 0 0; }
 .k-h2:has(> span > .k-en)::before { align-self: stretch; height: auto; }
+
+/* ============================================================
+   PERSONAL BOOK：本のデザイン（無料の結果画面＝紺の画面 と、はっきり差をつける）
+   ページは「紙」。濃い紺の机の上に、クリーム色のページが乗っている見た目。
+   ============================================================ */
+.k-bookview { --paper: #F4EDDA; --paper-2: #EDE3C9; --ink: #2A2216; --ink-soft: #5A4D38; --ink-faint: #8C7D62; --brown: #8A6624; --brown-hi: #A57C2E; --rule: #CDBE98; }
+.k-bkt { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 10px 4px -1px; position: relative; z-index: 2; }
+.k-bkt-b { appearance: none; border: 1px solid var(--k-line); border-bottom: 0; border-radius: 8px 8px 0 0; background: rgba(22,28,48,.85); color: var(--k-soft); font-family: var(--k-serif); font-size: 12px; min-height: 36px; padding: 6px 2px 4px; cursor: pointer; letter-spacing: .04em; }
+.k-bkt-b small { font-size: inherit; }
+.k-bkt-b.on { background: var(--paper); color: var(--brown); border-color: var(--paper); font-weight: 700; padding-top: 9px; margin-top: -3px; }
+.k-page.paper { position: relative; margin-top: 0; padding: 26px 22px 18px 30px; color: var(--ink); border: 0; border-radius: 3px 8px 8px 3px;
+  background:
+    linear-gradient(90deg, rgba(60,40,10,.22) 0, rgba(60,40,10,.07) 14px, rgba(60,40,10,0) 34px),
+    repeating-linear-gradient(0deg, rgba(120,95,40,.035) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, var(--paper), var(--paper-2));
+  box-shadow: 0 1px 0 #fff6 inset, 3px 3px 0 -1px #E5D9BC, 5px 5px 0 -1px #D3C5A3, 7px 7px 0 -1px #BFAF8A, 0 18px 40px rgba(0,0,0,.55); }
+.k-page.paper::after { display: none; }
+.k-page.paper * { color: inherit; }
+.k-ribbon { position: absolute; top: -2px; right: 22px; width: 18px; height: 54px; background: linear-gradient(180deg, #B3322B, #8E2420); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); box-shadow: 0 2px 3px rgba(0,0,0,.4); }
+.k-run { display: flex; justify-content: space-between; gap: 8px; padding-right: 30px; font-family: var(--k-serif); font-size: 10.5px; letter-spacing: .2em; color: var(--ink-faint) !important; border-bottom: 1px solid var(--rule); padding-bottom: 7px; }
+.k-run span { color: var(--ink-faint) !important; white-space: nowrap; }
+.k-chop { text-align: center; padding: 22px 0 6px; position: relative; }
+.k-chop .cw { font-family: var(--k-serif); font-size: 11px; letter-spacing: .5em; margin-right: -.5em; color: var(--brown) !important; }
+.k-chop .cn { font-family: var(--k-serif); font-size: 52px; letter-spacing: .08em; line-height: 1.15; font-weight: 700; color: var(--brown-hi) !important; opacity: .9; margin: 2px 0 0; }
+.k-page.paper .pt { font-family: var(--k-serif); font-size: 24px; line-height: 1.5; font-weight: 700; letter-spacing: .08em; margin: 2px 0 10px; color: var(--ink) !important; text-wrap: balance; }
+.k-orn2 { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 8px 0 14px; color: var(--brown) !important; }
+.k-orn2 i { height: 1px; width: 56px; background: linear-gradient(90deg, transparent, var(--brown)); }
+.k-orn2 i:last-child { background: linear-gradient(270deg, transparent, var(--brown)); }
+.k-orn2 b { font-size: 9px; color: var(--brown) !important; }
+.k-page.paper .pl { font-family: var(--k-serif); font-size: 15px; line-height: 2; color: var(--ink-soft) !important; border: 0; padding: 0 4px; margin: 0 0 8px; font-weight: 500; text-align: center; text-wrap: balance; }
+.k-page.paper .bd { margin-top: 10px; }
+.k-sec { padding-top: 22px; margin-top: 8px; border-top: 1px solid var(--rule); }
+.k-sec:first-child { border-top: 0; padding-top: 12px; }
+.k-page.paper .sh { font-family: var(--k-serif); font-size: 19px; line-height: 1.55; font-weight: 700; letter-spacing: .05em; color: var(--ink) !important; margin: 0 0 6px; display: flex; gap: 10px; align-items: baseline; }
+.k-page.paper .sh .sn { font-size: 12px; letter-spacing: .1em; color: var(--brown) !important; border: 1px solid var(--brown); border-radius: 3px; padding: 0 5px; line-height: 1.7; flex: 0 0 auto; transform: translateY(-2px); }
+.k-page.paper .sl { font-family: var(--k-serif); font-size: 14px; line-height: 1.95; color: var(--ink-faint) !important; margin: 0 0 12px; padding-left: 12px; border-left: 2px solid var(--rule); }
+.k-page.paper .bd p { font-family: var(--k-serif); font-size: 16px; line-height: 2.15; color: var(--ink) !important; letter-spacing: .03em; text-align: justify; text-wrap: pretty; }
+.k-page.paper .bd p + p { margin-top: 14px; }
+.k-page.paper .bd p.sl + p, .k-sec > p.sl + p::first-letter { }
+.k-page.paper .bd h3 { font-family: var(--k-serif); font-size: 14px; color: var(--brown) !important; margin: 20px 0 4px; letter-spacing: .12em; display: flex; align-items: center; gap: 8px; }
+.k-page.paper .bd h3::before { content: "◆"; font-size: 8px; }
+.k-page.paper .bd ul { padding-left: 1.3em; margin: 6px 0 0; }
+.k-page.paper .bd li { font-family: var(--k-serif); font-size: 16px; line-height: 2.05; color: var(--ink) !important; margin: 10px 0; }
+.k-page.paper .bd li::marker { color: var(--brown); content: "❖  "; font-size: 12px; }
+.k-page.paper .k-kv { border-bottom: 1px dotted var(--ink-faint); padding: 10px 0; }
+.k-page.paper .k-kv b { color: var(--brown) !important; font-family: var(--k-serif); font-size: 13px; letter-spacing: .06em; }
+.k-page.paper .k-kv span { font-family: var(--k-serif); font-size: 15px; color: var(--ink) !important; line-height: 1.9; }
+.k-page.paper .pfoot { margin-top: 28px; padding-top: 10px; border-top: 1px solid var(--rule); justify-content: center; font-family: var(--k-serif); font-size: 12px; letter-spacing: .3em; color: var(--ink-faint) !important; }
+.k-page.paper .pfoot span { color: var(--ink-faint) !important; }
+.k-bookview .k-pager { margin-top: 22px; }
+@media (prefers-reduced-motion: no-preference) { .k-bookview .k-page.paper { animation: kpage .38s cubic-bezier(.2,.7,.2,1); transform-origin: left center; } }
+@media (max-width: 360px) { .k-page.paper { padding: 22px 16px 16px 24px; } .k-chop .cn { font-size: 54px; } .k-page.paper .pt { font-size: 21px; } .k-page.paper .bd p, .k-page.paper .bd li { font-size: 15px; } .k-bkt-b { font-size: 11px; } }

@@ -391,13 +391,32 @@
     add(5, "最後に", "ここまで読んでくださって、ありがとうございました。", [
       p("ここに書いたのは、あなたが答えた範囲から読み取れたことだけです。答えていないことや、あなたの人生の背景までは、分かりません。"),
       p("当たっているところは、ぜひ自分の言葉に直して使ってください。外れていると感じるところは、外れていると思ってかまいません。その違和感が、あなた自身を知る手がかりになります。"),
-      p("この体験版の採点と文章は、まだ実際の利用者で検証していません。感じたことを、そのまま教えてください。")
+      p("この本は、あなたの答えから書いています。もう一度答えると、ここに書かれることも変わります。変わったところを見比べるのも、おもしろいはずです。")
     ]);
+
+    // 1章 = 1ページ にまとめる（元の節は、章ページの中の「節」になる）
+    var EPI = {
+      1: "どう動き、何のために動くのか。あなたの輪郭を、ここに書きとめます。",
+      2: "あなたの中にある、いちばん頼りになる力について。",
+      3: "同じあなたでも、調子のいい日と、そうでない日があります。その分かれ目を、書いておきます。",
+      4: "あなたと、周りの人との間にあるものについて。",
+      5: "読んで終わりにしないための、最後の一章です。"
+    };
+    var sections = pages;
+    pages = [];
+    CHAPTERS.forEach(function (ch) {
+      var secs = sections.filter(function (x) { return x.chapter === ch.n; });
+      if (!secs.length) {
+        secs = [{ chapter: ch.n, title: ch.title, lead: "この章は、今回の回答から書けることが少ないため、短くしています。", blocks: [{ t: "p", text: "答えられる範囲が増えると、ここに書けることも増えます。" }] }];
+      }
+      var flat = []; secs.forEach(function (x) { flat = flat.concat(x.blocks); });
+      pages.push({ chapter: ch.n, title: ch.title, lead: EPI[ch.n], sections: secs.map(function (x) { return { title: x.title, lead: x.lead, blocks: x.blocks }; }), blocks: flat });
+    });
 
     // ページ番号と「次は」の見出し
     pages.forEach(function (pg, i) {
       pg.index = i;
-      pg.next = pages[i + 1] ? pages[i + 1].title : null;
+      pg.next = pages[i + 1] ? "第" + pages[i + 1].chapter + "章　" + pages[i + 1].title : null;
     });
     return { chapters: CHAPTERS, pages: pages };
   }

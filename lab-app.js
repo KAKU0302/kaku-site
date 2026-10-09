@@ -649,22 +649,27 @@
       var tm = R.shownType;
       h += '<div class="k-cover"><div class="k-cover-in"><p class="k-cover-kicker">PERSONAL BOOK</p><div class="k-orn" aria-hidden="true"><i></i><b>◆</b><i></i></div>';
       h += tm ? '<div class="k-hero-img k-cover-img" style="--tc:' + esc(tm.color) + '"><img src="/' + esc(tm.image) + '" alt="' + esc(tm.nameJp) + '" /></div>' : '<div class="k-core-mark" style="font-size:48px">核</div>';
-      h += '<div class="ttl">あなたのための、<br>小さな本</div><p class="for">全5章・' + n + 'ページ</p><p class="cmark">KAKU ～核～</p></div></div>';
+      h += '<div class="ttl">あなたのための、<br>小さな本</div><p class="for">全' + n + '章</p><p class="cmark">KAKU ～核～</p></div></div>';
       h += '<div class="k-card plain"><p><b>この本について</b></p><p class="k-soft">あなたの36問・価値観・ここ1週間の状態の答えから、読み取れたことだけを書いています。答えていないことは、書いていません。外れているところは、外れていると思って読んでください。</p><p class="k-faint" style="margin-top:8px">文章は暫定版（' + esc(L.VERSIONS.book) + '）で、実際の利用者では未検証です。</p></div>';
-      h += '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="bookGo" data-i="0">1ページ目をひらく</button>' +
+      h += '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="bookGo" data-i="0">第1章をひらく</button>' +
         '<button class="k-btn ghost block" data-act="toResult">← 結果に戻る</button></div>';
       return h + "</div>";
     }
-    var pg = pages[i];
-    h += '<div class="k-chaps">' + R.book.chapters.map(function (c) {
-      var first = pages.filter(function (p) { return p.chapter === c.n; })[0];
-      return first ? '<button class="k-chap' + (pg.chapter === c.n ? " on" : "") + '" data-act="bookGo" data-i="' + first.index + '">第' + c.n + "章　" + esc(c.title) + "</button>" : "";
+    var pg = pages[i], KAN = ["", "I", "II", "III", "IV", "V"];
+    h += '<div class="k-bkt" role="tablist">' + pages.map(function (p) {
+      return '<button class="k-bkt-b' + (p.index === i ? " on" : "") + '" role="tab" aria-selected="' + (p.index === i) + '" data-act="bookGo" data-i="' + p.index + '"><small>第' + p.chapter + "章</small></button>";
     }).join("") + "</div>";
-    h += '<div class="k-page"><div class="chno"><span class="n">' + pad2(pg.chapter) + '</span><span class="t">第' + pg.chapter + '章　' + esc(R.book.chapters[pg.chapter - 1].title) + '</span></div><h1 class="pt">' + esc(pg.title) + "</h1>";
-    h += '<p class="pl">' + esc(pg.lead) + '</p><div class="bd">' + pg.blocks.map(blockHtml).join("") + '</div><div class="pfoot"><span>KAKU ～核～</span><span>' + (i + 1) + ' / ' + n + "</span></div></div>";
-    h += '<div class="k-pager"><button class="k-btn" data-act="bookGo" data-i="' + (i - 1) + '">← 前へ</button><span class="pn">' + (i + 1) + " / " + n + "</span>" +
-      (i < n - 1 ? '<button class="k-btn primary" data-act="bookGo" data-i="' + (i + 1) + '">次へ →</button>' : '<button class="k-btn primary" data-act="toResult">結果に戻る</button>') + "</div>";
-    if (pg.next) h += '<p class="k-next">次のページ：' + esc(pg.next) + "</p>";
+    h += '<article class="k-page paper"><i class="k-ribbon" aria-hidden="true"></i>' +
+      '<div class="k-run"><span>KAKU ～核～　PERSONAL BOOK</span><span>第' + pg.chapter + '章</span></div>' +
+      '<header class="k-chop"><p class="cw">CHAPTER ' + pg.chapter + '</p><div class="cn" aria-hidden="true">' + KAN[pg.chapter] + '</div><h1 class="pt">' + esc(pg.title) + '</h1>' +
+      '<div class="k-orn2" aria-hidden="true"><i></i><b>◆</b><i></i></div><p class="pl">' + esc(pg.lead) + "</p></header>" +
+      '<div class="bd">' + pg.sections.map(function (sec, si) {
+        return '<section class="k-sec"><h2 class="sh"><span class="sn">' + pad2(si + 1) + '</span>' + esc(sec.title) + '</h2><p class="sl">' + esc(sec.lead) + "</p>" + sec.blocks.map(blockHtml).join("") + "</section>";
+      }).join("") + "</div>" +
+      '<footer class="pfoot"><span>— ' + (i + 1) + " —</span></footer></article>";
+    h += '<div class="k-pager"><button class="k-btn" data-act="bookGo" data-i="' + (i - 1) + '">← 前の章</button><span class="pn">' + (i + 1) + " / " + n + "</span>" +
+      (i < n - 1 ? '<button class="k-btn primary" data-act="bookGo" data-i="' + (i + 1) + '">次の章 →</button>' : '<button class="k-btn primary" data-act="toResult">結果に戻る</button>') + "</div>";
+    if (pg.next) h += '<p class="k-next">次の章：' + esc(pg.next) + "</p>";
     else h += '<p class="k-next">おしまい。</p>';
     return h + "</div>";
   }
@@ -799,7 +804,7 @@
         else advanceSoon();
         break;
       case "openBook": S.view = "book"; S.bookPage = -1; persist(); render(); break;
-      case "bookGo": var bi = parseInt(el.getAttribute("data-i"), 10); S.bookPage = bi < 0 ? -1 : bi; persist(); render(); break;
+      case "bookGo": var bi = parseInt(el.getAttribute("data-i"), 10); S.bookPage = bi < 0 ? -1 : bi; persist(); render(); try { window.scrollTo(0, 0); } catch (e5) { /* 何もしない */ } break;
       case "toResult": S.view = "result"; persist(); render(); break;
       case "data": S.prevView = S.view === "data" ? S.prevView : S.view; S.view = "data"; render(); break;
       case "dataBack": S.view = S.prevView || "intro"; render(); break;
