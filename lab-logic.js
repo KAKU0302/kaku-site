@@ -3,7 +3,7 @@
  * KAKU 体験版（検証用）の「画面に依存しない」部分：価値観14領域、STATE6項目、12TYPEの出し方、KAKU GAP。
  * 画面（DOM）のコードは lab-app.js にあり、ここには通信するコードも保存のコードもありません。
  *
- * すべて暫定版です（value-0.1.0-draft / state-0.1.0-draft / type-0.3.0-draft / followup-0.1.0-draft）。
+ * すべて暫定版です（value-0.1.0-draft / state-0.1.0-draft / type-0.4.0-draft / followup-0.1.0-draft）。
  * 実際の利用者での検証はしていません。
  */
 (function (root) {
@@ -15,7 +15,7 @@
   var VERSIONS = {
     core: DATA.VERSION,
     followup: "followup-0.3.0-draft",
-    type: "type-0.3.0-draft",
+    type: "type-0.4.0-draft",
     value: "value-0.1.0-draft",
     state: "state-0.1.0-draft",
     gap: "gap-0.1.0-draft",
@@ -137,10 +137,11 @@
   var AXIS_ORDER = ["vision", "logic", "drive", "influence", "bond", "steady"];
 
   // ------------------------------------------------------------------
-  // 12TYPE の出し方（type-0.3.0-draft）
+  // 12TYPE の出し方（type-0.4.0-draft）
   //  ① 明確  ：根拠あり・近さ弱めでない・1位と2位の距離の差が3以上 → 1つ表示
   //  ② 僅差  ：根拠あり・近さ弱めでない・差が3未満 → 既存の同点ルールで1つ表示（2番目は出さない。内部には記録）
-  //  ③ 根拠が弱い：根拠なし / 近さ弱め → 追加質問（3〜6問）。それでも弱ければ「保留」
+  //  ③ 根拠が弱い：根拠なし / 近さ弱め → 追加質問（3〜6問）。それでも近さが弱めなら、いちばん近いタイプを「参考」として1つ表示（note=weak）。
+  //     寄りのある軸が1つもない／完全な同点が4つ以上のときだけ「保留」
   // 表示するタイプは常に1つ（または保留）。
   // ------------------------------------------------------------------
   function stageOf(type) {
@@ -226,7 +227,9 @@
     out.internal.afterFollowup = { stage: stage2, margin: et.margin === Infinity ? null : et.margin, distance: et.distance,
                                    nearTie: stage2 === 2 ? [et.primary, et.second] : [] };
     if (stage2 === 1 || stage2 === 2) { out.shown = et.primary; return out; }
-    out.held = true; // 追加質問の後でも根拠が弱い→保留
+    // 追加質問の後でも根拠が弱い（近さが弱め）：いちばん近い代表タイプを「参考」として1つ表示する（type-0.4.0）
+    if (et.primary) { out.shown = et.primary; out.note = "weak"; return out; }
+    out.held = true; // 寄りのある軸が1つもない／完全な同点が4つ以上：参考にできる根拠もないので保留
     return out;
   }
 

@@ -371,15 +371,25 @@
     var h = topBar("RESULT") + '<div class="k-view k-result">';
     h += '<p class="k-kicker k-kicker--c">YOUR KAKU</p>';
 
+    var same = sameAnswers();
+    if (same) {
+      // 36問のほとんどが同じ答え：傾向を読み取れない。「場面で使い分けている」などの人物像は出さない
+      h += '<div class="k-hero"><div class="k-core-mark" aria-hidden="true">核</div><div class="k-typename">傾向を読み取れませんでした</div>' +
+        '<div class="k-typecap">36問のうち ' + same.n + ' 問が、同じ答え（' + esc(same.label) + '）でした。</div></div>' +
+        '<div class="k-portrait"><p class="lead">同じ答えが続くと、6つの軸の傾向が打ち消し合って、どれにも寄らない結果になります。</p>' +
+        '<p style="margin-top:14px">この診断には、同じ軸について逆向きの文も入っています。たとえば「先に完成形を描く」と「まず事実を集める」の両方に「あてはまる」と答えると、傾向は中央に戻ります。</p>' +
+        '<p style="margin-top:14px">直感で、「これは自分っぽい／これは違う」を選び分けて、もう一度答えてみてください。</p></div>' +
+        '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="redoCore">36問をもう一度答える</button></div>';
+    } else {
     // 1) 人物像 + 大きなキャラクター
     var tm = R.shownType;
     h += '<div class="k-hero">';
     if (tm) {
       h += '<div class="k-hero-img" style="--tc:' + esc(tm.color) + '"><img src="/' + esc(tm.image) + '" alt="' + esc(tm.nameJp) + '" width="400" height="600" /></div>' +
-        '<div class="k-typename">' + esc(tm.nameJp) + "<small>" + esc(tm.nameEn) + '</small></div><div class="k-typecap">あなたに最も近い代表タイプ</div><div class="k-orn" aria-hidden="true"><i></i><b>◆</b><i></i></div>';
+        '<div class="k-typename">' + esc(tm.nameJp) + "<small>" + esc(tm.nameEn) + '</small></div><div class="k-typecap">' + (R.type.note === "weak" ? "いちばん近い代表タイプ（参考）" : "あなたに最も近い代表タイプ") + '</div><div class="k-orn" aria-hidden="true"><i></i><b>◆</b><i></i></div>';
     } else {
       h += '<div class="k-core-mark" aria-hidden="true">核</div><div class="k-typename">タイプは保留</div>' +
-        '<div class="k-typecap">今回の回答からは、一つの代表タイプには絞りきれませんでした。</div>';
+        '<div class="k-typecap">どの軸にも、はっきり寄る傾向が見られなかったため、参考にできるタイプも出せませんでした。</div>';
     }
     h += "</div>";
     h += '<div class="k-portrait">' + R.portrait.sentences.map(function (s) { return '<p class="lead">' + esc(s) + "</p>"; }).join("");
@@ -391,11 +401,12 @@
     h += "</div>";
     h += '<div class="k-note info">この人物像は、あなたが答えた36問のうち、はっきり寄りが出た軸だけから書いています。12TYPEは入口にすぎません。文章の正確性は、まだ検証していません。</div>';
     if (R.type.note === "weak" && tm) {
-      h += '<div class="k-note">タイプとの近さは弱めです。いちばん近い代表タイプとして、参考程度に見てください。</div>';
+      h += '<div class="k-note">タイプとの近さは弱めです。どのタイプにもはっきりとは寄らない回答だったため、いちばん近いものを参考として表示しています。人物像・CORE6を中心に見てください。</div>';
     }
 
     // 1.5) CORE6（6つの軸の回答傾向）
     h += core6Section(R);
+    }
 
     // 2) KAKU GAP（ズレと変化）
     h += gapSection(R);
@@ -413,7 +424,7 @@
     }
 
     // 4) PERSONAL BOOK（無料で分かる範囲の、いちばん下）
-    h += bookBanner(R);
+    h += same ? "" : bookBanner(R);
 
     // 5) 操作
     h += '<div class="k-stack k-foot k-endops"><button class="k-btn ghost block" data-act="data">回答データを書き出す・削除する</button>' +
@@ -441,6 +452,15 @@
         '<p class="k-axmeas">' + esc(ax.measures) + "</p></div>";
     });
     return h + '</div><p class="k-faint">各軸6問の回答からの、おおまかな目安です。診断ではなく、自分を見つめるきっかけとして使ってください。</p>';
+  }
+
+  // 36問のうち同じ答えが30問以上なら、その答えの情報を返す（そうでなければ null）
+  function sameAnswers() {
+    var cnt = {}, best = 0, bv = 0;
+    ITEMS.forEach(function (it) { var v = S.answers[it.id]; if (v) { cnt[v] = (cnt[v] || 0) + 1; if (cnt[v] > best) { best = cnt[v]; bv = v; } } });
+    if (best < 30) return null;
+    var lab = ""; CHOICES.forEach(function (c) { if (c.value === bv) lab = c.label; });
+    return { n: best, value: bv, label: lab };
   }
 
   // ---------------------------------------------------------------- KAKU GAP（ズレと変化）
@@ -713,6 +733,8 @@
         } catch (err2) { /* 何もしない */ }
         break;
       case "deleteSaved": storageDel(); S.consent = false; ui.copied = false; render(); break;
+      case "redoCore":
+        S.answers = {}; S.followup = { asked: [], answers: {} }; S.view = "flow"; S.pos = 1; ui.dir = 1; persist(); render(); break;
       case "reset":
         if (!ui.confirmReset) { ui.confirmReset = true; render(); break; }
         storageDel(); S = fresh(); ui.confirmReset = false; render(); break;
