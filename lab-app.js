@@ -25,7 +25,7 @@
       followup: { asked: [], answers: {} },
       past: { period: { yearsAgo: 3, changedByUser: false }, important: [], top: null, less: [], skipped: false },
       cur: { important: [], top: null, less: [], fulfil: {} },
-      state: {}, survey: {}, bookPage: -1, prevView: "intro"
+      state: {}, bookPage: -1, prevView: "intro"
     };
   }
   var S = fresh();
@@ -394,31 +394,11 @@
       h += '<div class="k-note">タイプとの近さは弱めです。いちばん近い代表タイプとして、参考程度に見てください。</div>';
     }
 
-    h += '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="openBook">PERSONAL BOOK を開く（5章）</button></div>';
+    // 1.5) CORE6（6つの軸の回答傾向）
+    h += core6Section(R);
 
-    // 2) KAKU GAP
-    h += '<h2 class="k-h2">KAKU GAP　価値観のズレと変化</h2>';
-    h += '<p class="k-soft">総合点は出しません。「大切なこと」と「満たされ具合」の関係、そして過去から今への変化を、言葉でそのまま示します。</p>';
-    h += '<h3 class="k-h3">① 大切にしていることと、満たされ具合</h3>';
-    if (R.gapFulfil) {
-      if (R.gapFulfil.lead) h += '<p style="margin:6px 0">' + esc(R.gapFulfil.lead) + "</p>";
-      h += '<div class="k-card"><div class="k-rows">' + R.gapFulfil.rows.map(function (r) {
-        return '<div class="k-rowitem"><div class="nm">' + (r.isTop ? '<span class="k-star">★</span>' : "") + esc(r.name) +
-          '</div><div class="tx"><span class="k-st ' + r.bucket + '">' + { low: "満たされていない", mid: "どちらとも", high: "満たされている" }[r.bucket] + "</span><br>" + esc(r.text) + "</div></div>";
-      }).join("") + '</div></div><p class="k-faint">★ ＝ いちばん大切にしていること。「ここ1か月くらい」の実感です。</p>';
-    } else {
-      h += '<p class="k-soft">まだ回答がそろっていません。</p>';
-    }
-    h += '<h3 class="k-h3">② 過去から今への、価値観の変化</h3>';
-    if (R.change) {
-      h += '<div class="k-card">' + R.change.map(function (l) { return '<div class="k-line ' + (l.kind === "big" ? "big" : "") + '">' + esc(l.text) + "</div>"; }).join("") + "</div>" +
-        '<p class="k-faint">これはあなたの記憶による振り返りです。「大切でなくなった」という意味ではなく、「3つの枠に入らなかった」ということです。</p>';
-    } else if (R.pastSkipped) {
-      h += '<p class="k-soft">過去の質問をスキップしたため、変化は表示しません。</p>';
-    } else {
-      h += '<p class="k-soft">まだ回答がそろっていません。</p>';
-    }
-    h += '<details class="k-det"><summary>まだ測れていないこと</summary><div class="in"><p>「生まれ持った傾向（CORE6）を、いま活かせているか」のズレは、まだ測れていません。この体験版では判定していません。</p></div></details>';
+    // 2) KAKU GAP（ズレと変化）
+    h += gapSection(R);
 
     // 3) 今の状態
     h += '<h2 class="k-h2">今の状態　ここ1週間</h2>';
@@ -432,58 +412,125 @@
       h += '<p class="k-soft">まだ回答がそろっていません。</p>';
     }
 
-    // 4) 詳細（折りたたみ）
-    h += '<h2 class="k-h2">詳しい中身</h2>';
-    h += detailCore(R) + detailType(R);
+    // 4) PERSONAL BOOK（無料で分かる範囲の、いちばん下）
+    h += bookBanner(R);
 
-    // 5) メモ・操作
-    h += '<h2 class="k-h2">体験したご感想</h2><p class="k-soft">気になったところを書いておくと、書き出したデータに含まれます。この画面から外には送られません。</p>' +
-      '<textarea class="k-input" id="surveyNote" placeholder="分かりにくかった設問、しっくりこなかった文章など">' + esc(S.survey.note || "") + "</textarea>";
-    h += unconnectedNote();
-    h += '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="openBook">PERSONAL BOOK を開く</button>' +
-      '<button class="k-btn block" data-act="data">回答データを書き出す・削除する</button>' +
+    // 5) 操作
+    h += '<div class="k-stack k-foot k-endops"><button class="k-btn ghost block" data-act="data">回答データを書き出す・削除する</button>' +
       '<button class="k-btn ghost block" data-act="reset">' + (ui.confirmReset ? "本当に消して、最初からやり直す（もう一度押す）" : "最初からやり直す") + "</button></div>";
-    h += '<div class="k-note" style="margin-top:22px"><b>未検証の試作版です。</b>採点（' + esc(L.VERSIONS.core) + "）と文章（" + esc(L.VERSIONS.book) + "）は、実際の利用者で確かめていません。診断・医療・採用の判断には使わないでください。</div>";
     return h + "</div>";
   }
 
-  // 新しい診断に、まだつながっていない既存機能の案内（つながっているように見せない）
-  function unconnectedNote() {
-    return '<div class="k-card plain"><p><b>この結果とつながっていない機能（未接続）</b></p><ul class="k-list k-soft">' +
-      '<li>「履歴」画面：この新しい結果は、まだ履歴に保存されません。</li>' +
-      '<li>有料の詳しいPERSONAL BOOK（17ページ版）、KAKU MATCH、KAKU TEAM：この新しい診断の結果からは、まだ購入・利用できません。</li>' +
-      '<li>購入済みの方：メールで届いたリンクから、これまでどおり開けます（変更していません）。</li></ul>' +
-      '<p class="k-faint" style="margin-top:8px"><button class="k-link" data-act="openOldPaid">これまでの診断で購入手続きに進む（従来版）</button></p></div>';
-  }
-
-  function detailCore(R) {
-    var h = '<details class="k-det"><summary>CORE6の中身（数字・理由・設問ID）</summary><div class="in">' +
-      '<p class="k-soft">6つの軸ごとに、6問の回答から位置を出しています（50が中央、左右に25ずつ）。</p>';
+  // CORE6：36問の回答から出した、6つの軸の傾向（RESULTの中心の見せ場）
+  function core6Section(R) {
+    var h = '<h2 class="k-h2">CORE6　あなたの回答の傾向</h2>' +
+      '<p class="k-soft">36問の回答から、6つの軸それぞれが、どちら寄りだったかを示します。どちらが良い・悪いはありません。「どちらにも寄らない」も、ひとつの結果です。</p>' +
+      '<div class="k-card k-core6">';
     L.CORE.AXES.forEach(function (ax) {
       var a = R.core.axes[ax.id];
       if (!a || a.status !== "ok") return;
-      var ids = ITEMS.filter(function (it) { return it.axis === ax.id; }).map(function (it) {
-        var r = S.answers[it.id];
-        return it.id + ":" + (r ? (L.ENGINE.aValue(it, r) > 0 ? "+" : "") + L.ENGINE.aValue(it, r) : "–");
-      }).join("　");
-      h += '<div class="k-ax"><div class="k-between"><b>' + esc(ax.nameJp) + "（" + esc(ax.nameEn) + ')</b><span class="k-soft">' + esc(a.reading.label.length > 22 ? "場面で違い" : a.reading.label) + "</span></div>" +
-        '<div class="k-axbar"><i style="left:' + Math.max(0, Math.min(100, a.position)).toFixed(1) + '%"></i></div>' +
-        '<div class="k-axends"><span>' + esc(ax.poleB) + "</span><span>位置 " + a.position.toFixed(1) + "</span><span>" + esc(ax.poleA) + "</span></div>" +
-        '<p class="k-mono" style="margin-top:4px">' + esc(ids) + "（+は" + esc(ax.poleA) + "側、−は" + esc(ax.poleB) + "側。逆転項目は向きを反転して数えています）</p></div>";
+      var label = a.reading.label;
+      if (a.reading.kind === "scene_diff") {
+        label = "場面で違い（仕事：" + (a.sceneMeans.work > 0 ? ax.poleA : ax.poleB) + "寄り、日常：" + (a.sceneMeans.life > 0 ? ax.poleA : ax.poleB) + "寄り）";
+      }
+      var pos = Math.max(0, Math.min(100, a.position));
+      h += '<div class="k-ax k-ax6"><div class="k-axhead"><b>' + esc(ax.nameJp) + '</b><span class="en">' + esc(ax.nameEn) + '</span></div>' +
+        '<p class="k-axread' + (a.reading.kind === "balanced" ? " mid" : "") + '">' + esc(label) + "</p>" +
+        '<div class="k-axbar" role="img" aria-label="' + esc(ax.nameJp + "：" + label) + '"><i style="left:' + pos.toFixed(1) + '%"></i></div>' +
+        '<div class="k-axends"><span>' + esc(ax.poleB) + "</span><span>" + esc(ax.poleA) + "</span></div>" +
+        '<p class="k-axmeas">' + esc(ax.measures) + "</p></div>";
     });
-    return h + "</div></details>";
+    return h + '</div><p class="k-faint">各軸6問の回答からの、おおまかな目安です。診断ではなく、自分を見つめるきっかけとして使ってください。</p>';
   }
 
-  function detailType(R) {
-    var T = R.type, st = T.finalStage;
-    var label = { 1: "① 明確：近さの差がはっきりしていました。", 2: "② 僅差で選ばれました。1位と2位の差が小さいため、あらかじめ決めた同点ルールで1つに決めています。", 3: "③ 根拠が弱い判定でした。" }[st] || "";
-    var h = '<details class="k-det"><summary>12TYPEの判定について</summary><div class="in">';
-    h += "<p>" + esc(label) + "</p>";
-    if (T.internal && T.internal.afterFollowup) h += "<p>追加質問（" + S.followup.asked.length + "問）に答えたあと、対象の軸だけ9問で再計算しています。</p>";
-    if (T.held) h += "<p>追加質問のあとでも根拠が弱かったため、タイプは保留にしています。「判定不能」ではなく、人物像はCORE6・価値観・状態から書いています。</p>";
-    if (T.note === "weak") h += "<p>近さは弱めです（追加質問の対象になる軸がありませんでした）。</p>";
-    h += '<p class="k-faint">表示するタイプは常に1つだけです。判定のしくみ：' + esc(L.VERSIONS.type) + "／追加質問：" + esc(L.VERSIONS.followup) + "。分類の基準は暫定で、実際の利用者では検証していません。</p>";
-    return h + "</div></details>";
+  // ---------------------------------------------------------------- KAKU GAP（ズレと変化）
+  var GAP_WORD = { low: "ズレが大きい", mid: "少しズレている", high: "ほぼ満たされている" };
+
+  function gapSection(R) {
+    var h = '<h2 class="k-h2">KAKU GAP　あなたの「ズレ」と「変化」</h2>' +
+      '<p class="k-soft">KAKU GAPは、「大切にしていること」と「いまの毎日」のズレに気づくための見方です。点数は出しません。「確かにそうかも」と感じるかどうかが、いちばんの手がかりです。</p>';
+
+    // ① いまのズレ
+    h += '<h3 class="k-h3">① 大切にしているのに、いまは…</h3>';
+    var g1 = R.gapFulfilRaw;
+    if (g1) {
+      var rows = g1.rows.filter(function (r) { return r.fulfil; }).sort(function (a, b) { return (a.fulfil - b.fulfil) || (b.isTop - a.isTop); });
+      var first = rows[0], D = L.DOMAIN_BY_ID;
+      if (first && first.bucket === "low") {
+        h += '<div class="k-gaphero"><p class="k-gapkick">いちばんのズレ</p>' +
+          '<p class="k-gaplead">大切な3つに選んだ「' + esc(first.name) + '」が、いまは満たされていません。</p>' +
+          '<p class="k-gapsub">' + esc(D[first.id].unmet) + '。心当たりは、ありませんか？</p>' +
+          '<p class="k-gapstep"><b>最初の一歩</b>' + esc(D[first.id].tip) + '</p></div>';
+      } else if (first && first.bucket === "mid") {
+        h += '<div class="k-gaphero"><p class="k-gapkick">気になるところ</p>' +
+          '<p class="k-gaplead">大切な3つの中で、「' + esc(first.name) + '」は「どちらともいえない」でした。</p>' +
+          '<p class="k-gapsub">大きなズレではありませんが、もう少し満たしたい気持ちが、どこかにあるのかもしれません。</p></div>';
+      } else {
+        h += '<div class="k-gaphero ok"><p class="k-gapkick">いまの状態</p>' +
+          '<p class="k-gaplead">大切にしている3つが、いま、おおむね満たされています。</p>' +
+          '<p class="k-gapsub">ズレの少ない、いい状態です。この状態を支えているものに、目を向けてみてください。</p></div>';
+      }
+      h += '<div class="k-gaprows">' + rows.map(function (r) {
+        var pct = r.fulfil * 20;
+        return '<div class="k-gaprow ' + r.bucket + '"><div class="k-gaphd"><b>' + (r.isTop ? '<span class="k-star">★</span>' : "") + esc(r.name) + '</b><span class="k-gapchip ' + r.bucket + '">' + GAP_WORD[r.bucket] + "</span></div>" +
+          '<div class="k-gb"><span class="lbl">大切さ</span><span class="bar"><i class="imp" style="width:100%"></i></span><span class="val">選んだ</span></div>' +
+          '<div class="k-gb"><span class="lbl">満たされ</span><span class="bar"><i class="ful" style="width:' + pct + '%"></i>' + (r.fulfil < 5 ? '<i class="gap" style="left:' + pct + '%;width:' + (100 - pct) + '%"></i>' : "") + '</span><span class="val">' + r.fulfil + " / 5</span></div></div>";
+      }).join("") + "</div>" +
+        '<p class="k-faint">★ ＝ いちばん大切にしていること。「満たされ」は、ここ1か月くらいの実感（5段階）です。色の濃いところが満たされている分、斜線がズレです。</p>';
+    } else {
+      h += '<p class="k-soft">まだ回答がそろっていません。</p>';
+    }
+
+    // ② 変化
+    h += '<h3 class="k-h3">② 過去から今への、大切なことの変化</h3>';
+    var ch = R.changeRaw;
+    if (ch && R.change) {
+      var D2 = L.DOMAIN_BY_ID, dsort = function (ids) { return ids.slice().sort(function (a, b) { return (b === ch.top.past) - (a === ch.top.past) || D2[a].order - D2[b].order; }); };
+      var pastIds = ch.kept.concat(ch.dropped.map(function (d) { return d.id; })), curIds = R.cur.important.slice();
+      var newMap = {}; ch.added.forEach(function (a) { newMap[a.id] = true; });
+      var goneMap = {}; ch.dropped.forEach(function (d) { goneMap[d.id] = true; });
+      var chip = function (id, kind, isTop) {
+        var tag = kind === "kept" ? "変わらず" : kind === "new" ? "NEW" : "いまは3つの外";
+        return '<div class="k-chip6 ' + kind + '"><span class="nm">' + (isTop ? '<span class="k-star">★</span>' : "") + esc(D2[id].name) + '</span><span class="tg">' + tag + "</span></div>";
+      };
+      h += '<div class="k-gaphero shift"><p class="k-gaplead">' + esc(R.change[0].text) + '</p></div>';
+      h += '<div class="k-shift"><div class="col"><p class="hd">' + ch.years + '年前の<br>大切な3つ</p>' +
+        dsort(pastIds).map(function (id) { return chip(id, goneMap[id] ? "gone" : "kept", id === ch.top.past); }).join("") + '</div>' +
+        '<div class="arr" aria-hidden="true">→</div><div class="col"><p class="hd">いまの<br>大切な3つ</p>' +
+        curIds.sort(function (a, b) { return (b === ch.top.cur) - (a === ch.top.cur) || D2[a].order - D2[b].order; }).map(function (id) { return chip(id, newMap[id] ? "new" : "kept", id === ch.top.cur); }).join("") + "</div></div>";
+      var rest = R.change.slice(1);
+      if (rest.length) {
+        h += '<details class="k-det"><summary>ひとつずつ読む</summary><div class="in">' + rest.map(function (l) { return '<div class="k-line ' + (l.kind === "big" ? "big" : "") + '">' + esc(l.text) + "</div>"; }).join("") + "</div></details>";
+      }
+      h += '<p class="k-faint">これはあなたの記憶による振り返りです。「大切でなくなった」という意味ではなく、「3つの枠に入らなかった」ということです。</p>';
+    } else if (R.pastSkipped) {
+      h += '<p class="k-soft">過去の質問をスキップしたため、変化は表示しません。</p>';
+    } else {
+      h += '<p class="k-soft">まだ回答がそろっていません。</p>';
+    }
+    return h;
+  }
+
+  // ---------------------------------------------------------------- PERSONAL BOOKへの案内（無料の範囲のいちばん下）
+  function bookBanner(R) {
+    var pages = R.book.pages.length;
+    var low = R.gapFulfilRaw && R.gapFulfilRaw.rows.filter(function (r) { return r.bucket === "low"; })[0];
+    var hooks = [
+      ["01", "あなたという人", "なぜ、あなたはそう動くのか"],
+      ["02", "あなたの武器", "強みの正体と、使いどころ"],
+      ["03", "力が出るとき・出ないとき", "調子の分かれ目と、強みが裏目に出る瞬間"],
+      ["04", "人との関わり方", "周りから見えているあなたと、伝えておくといいこと"],
+      ["05", "あなたの取扱説明書", "今日からできる、小さな一歩"]
+    ];
+    var h = '<section class="k-bookban" aria-label="PERSONAL BOOK"><p class="k-bbkick">PERSONAL BOOK</p>' +
+      '<div class="k-orn" aria-hidden="true"><i></i><b>◆</b><i></i></div>' +
+      '<h2 class="k-bbtitle">ここまでは、<br>まだ「入り口」です。</h2>' +
+      '<p class="k-bbsub">あなた専用の「自分の攻略本」</p>' +
+      '<p class="k-bbtext">「なぜ自分は、こう動くのか」「どんな日に力が出て、どんな日に止まるのか」「周りに、どう伝えれば楽になるのか」。<br>あなたの回答から書き起こした、全5章・' + pages + 'ページの1冊です。</p>' +
+      '<ol class="k-bbchaps">' + hooks.map(function (c) { return '<li><span class="no">' + c[0] + '</span><span class="tx"><b>' + c[1] + "</b><small>" + c[2] + "</small></span></li>"; }).join("") + "</ol>";
+    if (low) h += '<p class="k-bbhook">とくに、いま満たされていない「' + esc(low.name) + '」について、今日からできる一歩まで書いています。</p>';
+    h += '<button class="k-btn primary block k-bbbtn" data-act="openBook">PERSONAL BOOK を開く　→</button></section>';
+    return h;
   }
 
   // ---------------------------------------------------------------- PERSONAL BOOK
@@ -512,7 +559,7 @@
     h += '<div class="k-pager"><button class="k-btn" data-act="bookGo" data-i="' + (i - 1) + '">← 前へ</button><span class="pn">' + (i + 1) + " / " + n + "</span>" +
       (i < n - 1 ? '<button class="k-btn primary" data-act="bookGo" data-i="' + (i + 1) + '">次へ →</button>' : '<button class="k-btn primary" data-act="toResult">結果に戻る</button>') + "</div>";
     if (pg.next) h += '<p class="k-next">次のページ：' + esc(pg.next) + "</p>";
-    else h += '<p class="k-next">おしまい。感想を、結果画面のメモに書いてください。</p>';
+    else h += '<p class="k-next">おしまい。</p>';
     return h + "</div>";
   }
   function blockHtml(b) {
@@ -673,9 +720,6 @@
     }
   }
   root.addEventListener("click", onClick);
-  root.addEventListener("input", function (e) {
-    if (e.target && e.target.id === "surveyNote") { S.survey.note = e.target.value.slice(0, 2000); persist(); }
-  });
 
   // 試験用の読み取り口（画面の動きを自動テストするため。外部へは何も送りません）
   // トップページの「診断開始」から呼ばれる。途中まで進めた内容が（このページを開いている間）残っていれば、続きに戻れるようにする

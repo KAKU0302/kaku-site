@@ -291,8 +291,7 @@
         fulfillment: S.cur.fulfil || {}, fulfillmentWindow: "last_month"
       } : null,
       state: S.state ? Object.assign({ window: "last_7_days" }, S.state) : null,
-      result: null,
-      survey: S.survey || {}
+      result: null
     };
     if (R && R.type) {
       d.result = {

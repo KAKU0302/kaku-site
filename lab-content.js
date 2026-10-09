@@ -108,24 +108,25 @@
     if (!ch) return null;
     var y = ch.years + "年前";
     var lines = [];
+    // 見出しになる一文（いちばん大切なもの）を最初に
+    lines.push({ kind: "top", text: ch.top.same
+      ? y + "も今も、いちばん大切にしているのは" + q(ch.top.cur) + "。時間がたっても変わらない、あなたの芯と言えそうです。"
+      : y + "は" + q(ch.top.past) + "を何より大切にしてきたあなたが、今いちばん大切にしているのは" + q(ch.top.cur) + "。いろいろな経験を重ねてきたからこその、自然な動きかもしれません。" });
     if (ch.allSame) {
-      lines.push({ kind: "same", text: "大切な3つ（" + joinNames(ch.kept) + "）は、" + y + "と今で変わっていません。" });
+      lines.push({ kind: "same", text: "大切な3つ（" + joinNames(ch.kept) + "）は、" + y + "と今で同じ。ぶれずに、自分の軸を持ち続けています。" });
     } else {
-      if (ch.kept.length) lines.push({ kind: "kept", text: y + "も今も、" + joinNames(ch.kept) + "を大切にしています。" });
+      if (ch.kept.length) lines.push({ kind: "kept", text: y + "も今も、" + joinNames(ch.kept) + "を大切にしています。変わらない土台です。" });
       ch.added.forEach(function (a) {
         lines.push({ kind: a.big ? "big" : "added",
-          text: a.big ? y + "は「あまり大切ではない」と選んでいた" + q(a.id) + "が、今は大切な3つに入っています。（大きな変化）"
-                      : y + "は大切な3つに入っていなかった" + q(a.id) + "が、今は大切な3つに入っています。" });
+          text: a.big ? y + "は「あまり大切ではない」と選んでいた" + q(a.id) + "が、今は大切な3つに。大きな変化で、気持ちが大きく動いたことがうかがえます。"
+                      : q(a.id) + "が、新しく大切な3つに加わりました。いまのあなたが、大事にしたいと感じはじめたものです。" });
       });
       ch.dropped.forEach(function (d) {
         lines.push({ kind: d.big ? "big" : "dropped",
-          text: d.big ? y + "に大切にしていた" + q(d.id) + "は、今は「あまり大切ではない」側に選ばれています。（大きな変化）"
-                      : y + "に大切にしていた" + q(d.id) + "は、今回は3つに選ばれませんでした。" });
+          text: d.big ? y + "に大切にしていた" + q(d.id) + "は、今は「あまり大切ではない」側に。大きな変化で、気持ちの置きどころが大きく変わったようです。"
+                      : y + "に大切にしていた" + q(d.id) + "は、今回は3つの外に。十分に向き合ってきたからこそ、次のことに目が向いたのかもしれません。" });
       });
     }
-    lines.push({ kind: "top", text: ch.top.same
-      ? "いちばん大切なものは、" + y + "も今も" + q(ch.top.cur) + "です。"
-      : "いちばん大切なものは、" + y + "の" + q(ch.top.past) + "から、今は" + q(ch.top.cur) + "へ。" });
     return lines;
   }
 

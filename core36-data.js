@@ -2,7 +2,7 @@
  * kaku-lab/core36-data.js
  * CORE36（36問・6軸）の設問、軸の定義、12TYPEの判定プロフィール、設定値。
  *
- * scoring_version 0.5.0-draft（暫定版。0.4.0のA/B比較方式から「1つの文＋あてはまり度5段階」方式へ変更。36問の文は新しく書き直し）
+ * scoring_version 0.5.1-draft（暫定版。0.4.0のA/B比較方式から「1つの文＋あてはまり度5段階」方式へ変更。36問の文は新しく書き直し）
  *  - 回答 r=1「全くあてはまらない」〜5「かなりあてはまる」。各設問の keyed が "A" なら A極＝r−3、"B"（逆転項目）なら A極＝3−r。
  *  - 各軸に A極の文3問・B極の文3問を置き、両極を測る。旧A/B比較の文は LEGACY_AB_ITEMS に履歴として保存（採点には使わない）。
  *  - 新方式の得点は旧A/B方式の得点と同じ意味とは限りません。同じ人が答えても結果が一致する保証はありません。
@@ -19,7 +19,7 @@
 (function (root) {
   "use strict";
 
-  var VERSION = "0.5.0-draft";
+  var VERSION = "0.5.1-draft";
 
   // 軸。poleA / poleB は両極の名前。優劣はなく、Aは軸名の側（名前が指す側）です。
   var AXES = [
@@ -64,19 +64,19 @@
     { id: "C16", axis: "influence", scene: "work", keyed: "B", text: "チームでは、前に立つより周りを支える役のほうが落ち着く" },
     { id: "C17", axis: "bond", scene: "work", keyed: "A", text: "仕事で何かを決めるときも、関わる人の気持ちを大切にしたい" },
     { id: "C18", axis: "steady", scene: "work", keyed: "B", text: "長く続く仕事でも、やり方はときどき組み替えたい" },
-    { id: "C19", axis: "vision", scene: "life", keyed: "B", text: "休日の予定は、行ける場所やできることから決める" },
+    { id: "C19", axis: "vision", scene: "life", keyed: "B", text: "休日の予定は、行ける場所を調べるところから立てる" },
     { id: "C20", axis: "logic", scene: "life", keyed: "A", text: "買い物では、値段や性能を比べてから決める" },
-    { id: "C21", axis: "drive", scene: "life", keyed: "B", text: "気になる習い事も、納得できるまで始めない" },
+    { id: "C21", axis: "drive", scene: "life", keyed: "B", text: "気になる習い事があっても、じっくり調べて納得してから始める" },
     { id: "C22", axis: "influence", scene: "life", keyed: "A", text: "友だちの集まりでは、話題を出す側になることが多い" },
     { id: "C23", axis: "bond", scene: "life", keyed: "B", text: "友だちとの連絡は、自分のペースでゆるやかなくらいがいい" },
     { id: "C24", axis: "steady", scene: "life", keyed: "A", text: "休日は、だいたい決まったリズムで過ごすと落ち着く" },
     { id: "C25", axis: "vision", scene: "life", keyed: "A", text: "将来のことは、「こうなりたい」という姿から考える" },
-    { id: "C26", axis: "logic", scene: "life", keyed: "B", text: "理由がはっきりしなくても、しっくりくれば納得できる" },
+    { id: "C26", axis: "logic", scene: "life", keyed: "B", text: "理由をうまく説明できなくても、しっくりくれば決められる" },
     { id: "C27", axis: "drive", scene: "life", keyed: "A", text: "やりたいことが浮かんだら、その日のうちに動き出す" },
     { id: "C28", axis: "influence", scene: "life", keyed: "B", text: "好きなものができても、聞かれるまで自分からは勧めない" },
     { id: "C29", axis: "bond", scene: "life", keyed: "A", text: "相手の望みが自分と違うときは、合わせる方法を探す" },
-    { id: "C30", axis: "steady", scene: "life", keyed: "B", text: "決めた日課でも、合わなくなったら変えていい" },
-    { id: "C31", axis: "vision", scene: "life", keyed: "B", text: "暮らしの工夫は、うまくいった実例を試すのが好きだ" },
+    { id: "C30", axis: "steady", scene: "life", keyed: "B", text: "始めた習慣でも、合わなくなったら気軽に変える" },
+    { id: "C31", axis: "vision", scene: "life", keyed: "B", text: "暮らしの工夫は、うまくいっている人のやり方を真似して試す" },
     { id: "C32", axis: "logic", scene: "life", keyed: "A", text: "新しい情報は、出どころや根拠を確かめてから受け入れる" },
     { id: "C33", axis: "drive", scene: "life", keyed: "B", text: "大きな決断は、十分に見きわめられるまで待ちたい" },
     { id: "C34", axis: "influence", scene: "life", keyed: "A", text: "仲間うちの活動では、まとめ役を引き受けることが多い" },
@@ -136,6 +136,7 @@
 
   // 設問文の変更履歴
   var CHANGELOG = [
+    { version: "0.5.1-draft", note: "分かりにくいという指摘を受け、5問（C19・C21・C26・C30・C31）の文だけを言い換え。軸・場面・向き（keyed）・採点・判定表は変更なし。" },
     { version: "0.5.0-draft", note: "回答方式を「A/B比較＋5択」から「1つの文に、あてはまり度を5段階で答える方式」へ変更。36問の文を新しく書き直し（各軸：A極の文3問・B極の文3問の逆転項目つき）。軸・場面・A極の位置・しきい値・タイプ判定表は変更なし。旧A/B比較の文は LEGACY_AB_ITEMS に履歴として保存。0.4.0以前の回答とは意味が違うため、同じ結果になるとは限りません。" },
     { version: "0.4.0-draft", note: "画面の見せ方を変更：質問1行＋A・B各1文（短く）＋共通5択。意味・軸・A極の位置・採点は変更なし。旧文は各設問の prev に保存" },
     { version: "0.3.0-draft", note: "36問の文を平易に書き直し（0.2.0から）" }
