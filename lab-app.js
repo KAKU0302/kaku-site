@@ -20,7 +20,7 @@
   // ---------------------------------------------------------------- 状態
   function fresh() {
     return {
-      v: 1, consent: null, view: "intro", pos: 0,
+      v: 1, scale: "agree5", consent: null, view: "intro", pos: 0,
       answers: {}, seconds: {}, discomfort: {},
       followup: { asked: [], answers: {} },
       past: { period: { yearsAgo: 3, changedByUser: false }, important: [], top: null, less: [], skipped: false },
@@ -38,7 +38,7 @@
   function loadSaved() {
     var raw = storageGet();
     if (!raw) return null;
-    try { var o = JSON.parse(raw); return o && o.v === 1 && o.consent === true ? o : null; } catch (e) { return null; }
+    try { var o = JSON.parse(raw); return o && o.v === 1 && o.scale === "agree5" && o.consent === true ? o : null; } catch (e) { return null; }
   }
 
   function esc(s) {
@@ -193,29 +193,41 @@
 
   function tplS1Intro() {
     return '<p class="k-kicker">STEP 1</p><h1 class="k-title">核と過去の価値観</h1>' +
-      '<p class="k-sub">ここでは、仕事や日常で、あなたがふだんどう考え、どう動くかを聞きます。正解はありません。深く考えず、近い方を選んでください。</p>' +
-      '<div class="k-card plain"><p class="k-soft">1つの質問に、「A」と「B」の2つの答えが出ます。ふだんのあなたに近い方を、5つのボタンから選んでください。1つ選ぶと、すぐ次へ進みます。間違えたら「戻る」で直せます。</p>' +
+      '<p class="k-sub">ここでは、仕事や日常で、あなたがふだんどう考え、どう動くかを聞きます。正解はありません。深く考えず、直感で選んでください。</p>' +
+      '<div class="k-card plain"><p class="k-soft">1つの文が出ます。ふだんのあなたに、どのくらいあてはまるかを、横に並んだ5つのボタン（1〜5）から選んでください。1つ選ぶと、すぐ次へ進みます。間違えたら「戻る」で直せます。</p>' +
       '<p class="k-soft">そのあと、昔の自分が大切にしていたことを振り返ります。</p></div>' +
       '<div class="k-note info">ここでいう「核」は、あなたが答えたふだんの傾向のことです。生まれつきの性質を測るものではありません。</div>' +
       '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="next">STEP 1 をはじめる（約6〜8分）</button></div>' + backBtn();
   }
 
-  // A・B・5択のまとまり（36問も追加質問も同じ形）。A＝left、B＝right。回答値 r は従来のまま（1=A寄り … 5=B寄り）
-  function abBlock(item, choices, act, v) {
-    var h = '<h1 class="k-q2">' + esc(item.q) + "</h1>";
-    h += '<div class="k-ab">' +
-      '<div class="k-abcard a' + (v && v < 3 ? " lit" : "") + '"><span class="k-abtag">A</span><p>' + esc(item.left) + "</p></div>" +
-      '<div class="k-abcard b' + (v && v > 3 ? " lit" : "") + '"><span class="k-abtag">B</span><p>' + esc(item.right) + "</p></div></div>";
-    h += '<div class="k-scale" role="group" aria-label="あなたに近いのは？">' + choices.map(function (c) {
-      var cls = c.side === "A" ? "sa" : c.side === "B" ? "sb" : "sm";
-      return '<button class="k-choice k-opt ' + cls + " st" + c.strength + (v === c.value ? " on" : "") + '" data-act="' + act + '" data-v="' + c.value + '" aria-pressed="' + (v === c.value) + '">' +
-        '<span class="dot" aria-hidden="true"></span><span class="lb">' + esc(c.label) + '</span><span class="ck" aria-hidden="true">✓</span></button>';
+  // 1つの文 ＋ 横並びの5段階（36問も追加質問も同じ形）。回答値 r は 1=全くあてはまらない … 5=かなりあてはまる
+  //  下の注釈は「全く／あまり／どちらとも／少し／かなり」を各ボタンの下に、「あてはまらない／いえない／あてはまる」を同じ語の列にまたがって出す。
+  function likertBlock(item, choices, act, v) {
+    var sel = null;
+    choices.forEach(function (c) { if (c.value === v) sel = c; });
+    var h = '<p class="k-qlead">どのくらい、あてはまりますか？</p>';
+    h += '<h1 class="k-q2" id="kstmt">' + esc(item.text) + "</h1>";
+    h += '<p class="k-lkread' + (sel ? " set" : "") + '" aria-live="polite">' + (sel ? esc(sel.label) : "いちばん近いものを、1つタップ") + "</p>";
+    h += '<div class="k-lk" role="group" aria-labelledby="kstmt" style="--n:' + choices.length + '">' + choices.map(function (c) {
+      return '<button type="button" class="k-lkb st' + c.strength + (v === c.value ? " on" : "") + '" data-act="' + act + '" data-v="' + c.value +
+        '" aria-pressed="' + (v === c.value) + '" aria-label="' + esc(c.label) + '">' + c.value + "</button>";
     }).join("") + "</div>";
-    return h;
+    // 注釈：1行目＝副詞（各列）、2行目＝同じ語が続く列をまとめて1つ
+    h += '<div class="k-lkcap" aria-hidden="true" style="--n:' + choices.length + '">' + choices.map(function (c) {
+      return '<span class="adv' + (v === c.value ? " hit" : "") + '" data-v="' + c.value + '">' + esc(c.adv) + "</span>";
+    }).join("");
+    var i = 0;
+    while (i < choices.length) {
+      var j = i, vals = [];
+      while (j < choices.length && choices[j].tail === choices[i].tail) { vals.push(choices[j].value); j++; }
+      h += '<span class="tl' + (vals.indexOf(v) >= 0 ? " hit" : "") + '" data-vs="' + vals.join(",") + '" style="grid-column:span ' + (j - i) + '">' + esc(choices[i].tail) + "</span>";
+      i = j;
+    }
+    return h + "</div>";
   }
   function tplCore(sc) {
     var it = ITEMS.filter(function (x) { return x.id === sc.id; })[0];
-    return abBlock(it, CHOICES, "core", S.answers[it.id]) + backBtn("前の質問に戻る");
+    return likertBlock(it, CHOICES, "core", S.answers[it.id]) + backBtn("前の質問に戻る");
   }
 
   function tplFIntro() {
@@ -227,8 +239,8 @@
 
   function tplFollow(sc) {
     var f = L.FOLLOWUP_BY_ID[sc.id];
-    return abBlock(f, L.FOLLOWUP_CHOICES, "follow", S.followup.answers[f.id]) +
-      '<p class="k-faint" style="text-align:center;margin-top:8px">この追加質問は「どちらでもない」がなく、どちらか近い方を選びます。</p>' + backBtn("前の質問に戻る");
+    return likertBlock(f, L.FOLLOWUP_CHOICES, "follow", S.followup.answers[f.id]) +
+      '<p class="k-faint" style="text-align:center;margin-top:8px">この追加質問は「どちらともいえない」がなく、4つから近いものを選びます。</p>' + backBtn("前の質問に戻る");
   }
 
   // ---- 過去の価値観
@@ -457,7 +469,7 @@
       h += '<div class="k-ax"><div class="k-between"><b>' + esc(ax.nameJp) + "（" + esc(ax.nameEn) + ')</b><span class="k-soft">' + esc(a.reading.label.length > 22 ? "場面で違い" : a.reading.label) + "</span></div>" +
         '<div class="k-axbar"><i style="left:' + Math.max(0, Math.min(100, a.position)).toFixed(1) + '%"></i></div>' +
         '<div class="k-axends"><span>' + esc(ax.poleB) + "</span><span>位置 " + a.position.toFixed(1) + "</span><span>" + esc(ax.poleA) + "</span></div>" +
-        '<p class="k-mono" style="margin-top:4px">' + esc(ids) + "（+は" + esc(ax.poleA) + "側、−は" + esc(ax.poleB) + "側）</p></div>";
+        '<p class="k-mono" style="margin-top:4px">' + esc(ids) + "（+は" + esc(ax.poleA) + "側、−は" + esc(ax.poleB) + "側。逆転項目は向きを反転して数えています）</p></div>";
     });
     return h + "</div></details>";
   }
@@ -540,18 +552,21 @@
     if (S.pos < 0) { S.view = "intro"; S.pos = 0; }
     persist(); render();
   }
-  // 選んだ瞬間の反応：選択状態＋A/Bのカードを光らせる
+  // 選んだ瞬間の反応：選んだボタンと注釈、「選んだ答え」の表示を変える
   function markPicked(el, v) {
-    var all = root.querySelectorAll(".k-opt"), i;
+    var all = root.querySelectorAll(".k-lkb"), i, label = el.getAttribute("aria-label") || "";
     for (i = 0; i < all.length; i++) { all[i].classList.toggle("on", all[i] === el); all[i].setAttribute("aria-pressed", all[i] === el ? "true" : "false"); }
-    var a = root.querySelector(".k-abcard.a"), b = root.querySelector(".k-abcard.b");
-    if (a) a.classList.toggle("lit", v < 3);
-    if (b) b.classList.toggle("lit", v > 3);
+    var advs = root.querySelectorAll(".k-lkcap .adv");
+    for (i = 0; i < advs.length; i++) advs[i].classList.toggle("hit", parseInt(advs[i].getAttribute("data-v"), 10) === v);
+    var tls = root.querySelectorAll(".k-lkcap .tl");
+    for (i = 0; i < tls.length; i++) tls[i].classList.toggle("hit", ("," + tls[i].getAttribute("data-vs") + ",").indexOf("," + v + ",") >= 0);
+    var rd = root.querySelector(".k-lkread");
+    if (rd) { rd.textContent = label; rd.classList.add("set"); }
   }
   function advanceSoon() {
     if (ui.busy) return;
     ui.busy = true;
-    setTimeout(function () { ui.busy = false; ui.dir = 1; S.pos += 1; persist(); render(); }, 230);
+    setTimeout(function () { ui.busy = false; ui.dir = 1; S.pos += 1; persist(); render(); }, 260);
   }
   function currentScreen() { return screens()[S.pos]; }
 

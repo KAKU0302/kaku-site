@@ -1,8 +1,8 @@
 /**
  * kaku-lab/core36-engine.js
- * CORE36の採点と12TYPEの判定（scoring_version 0.2.0-draft）。
+ * CORE36の採点と12TYPEの判定（scoring_version は core36-data.js の VERSION。0.5.0〜は「あてはまり度5段階」方式）。
  *
- * 入力: 36問への回答 { C01: 1〜5, ... }（または [{id, value}] の配列）
+ * 入力: 36問への回答 { C01: 1〜5, ... }（または [{id, value}] の配列）。1=全くあてはまらない 〜 5=かなりあてはまる
  * 出力: 6軸の位置と読み、12TYPEの判定（代表タイプ・補足タイプ・状態）、判定理由、品質フラグ
  *
  * 方針:
@@ -62,8 +62,17 @@
     return { valid: valid, invalid: invalid, missing: missing, ignored: ignored };
   }
 
-  // 回答 r（1=左に近い〜5=右に近い）→ a（+2=A極に近い〜-2=B極に近い）
-  function aValue(item, r) { return item.aSide === "left" ? 3 - r : r - 3; }
+  // 回答 r（1=全くあてはまらない〜5=かなりあてはまる）→ a（+2=A極に近い〜−2=B極に近い）
+  //  keyed "A"：A極の行動・考え方を述べた文 → あてはまるほどA極（r−3）
+  //  keyed "B"：B極を述べた文（逆転項目）  → あてはまるほどB極（3−r）
+  //  旧A/B比較方式（0.4.0以前）の項目 { aSide:"left"|"right" } も、履歴・互換のため従来どおり換算できる。
+  function aValue(item, r) {
+    if (item.keyed === "A") return r - 3;
+    if (item.keyed === "B") return 3 - r;
+    if (item.aSide === "left") return 3 - r;
+    if (item.aSide === "right") return r - 3;
+    throw new Error("item " + item.id + ": keyed (A/B) is missing");
+  }
 
   function mean(arr) { return arr.length ? arr.reduce(function (s, x) { return s + x; }, 0) / arr.length : null; }
 
