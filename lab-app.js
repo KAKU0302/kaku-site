@@ -650,7 +650,7 @@
       h += '<div class="k-cover"><div class="k-cover-in"><p class="k-cover-kicker">PERSONAL BOOK</p><div class="k-orn" aria-hidden="true"><i></i><b>◆</b><i></i></div>';
       h += tm ? '<div class="k-hero-img k-cover-img" style="--tc:' + esc(tm.color) + '"><img src="/' + esc(tm.image) + '" alt="' + esc(tm.nameJp) + '" /></div>' : '<div class="k-core-mark" style="font-size:48px">核</div>';
       h += '<div class="ttl">あなたのための、<br>小さな本</div><p class="for">全' + n + '章</p><p class="cmark">KAKU ～核～</p></div></div>';
-      h += '<div class="k-card plain"><p><b>この本について</b></p><p class="k-soft">あなたの36問・価値観・ここ1週間の状態の答えから、読み取れたことだけを書いています。答えていないことは、書いていません。外れているところは、外れていると思って読んでください。</p><p class="k-faint" style="margin-top:8px">文章は暫定版（' + esc(L.VERSIONS.book) + '）で、実際の利用者では未検証です。</p></div>';
+      h += '<div class="k-card plain"><p><b>この本について</b></p><p class="k-soft">この本は、あなたの36問・価値観・ここ1週間の状態の答えから書いた、あなただけの一冊です。うれしくなったところは、何度でも読み返してください。</p><p class="k-soft" style="margin-top:8px">答えていないことは、書いていません。しっくりこないところは、そのまま「違うな」と思って読んでかまいません。</p></div>';
       h += '<div class="k-stack k-foot"><button class="k-btn primary block" data-act="bookGo" data-i="0">第1章をひらく</button>' +
         '<button class="k-btn ghost block" data-act="toResult">← 結果に戻る</button></div>';
       return h + "</div>";

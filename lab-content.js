@@ -64,6 +64,7 @@
         rec.strong = rec.abs >= 1.2;
         rec.p = P.POLES[id][rec.pole];
         rec.c = P.CHARM[id][rec.pole];
+        rec.bk = P.BOOK[id][rec.pole];
         leans.push(rec);
       } else if (k === "scene_diff") {
         rec.work = a.sceneMeans.work; rec.life = a.sceneMeans.life;
@@ -256,7 +257,7 @@
   var CHAPTERS = [
     { n: 1, title: "あなたという人" },
     { n: 2, title: "あなたの武器" },
-    { n: 3, title: "力が出るとき・出ないとき" },
+    { n: 3, title: "輝く日と、休む日" },
     { n: 4, title: "人との関わり方" },
     { n: 5, title: "あなたの取扱説明書" }
   ];
@@ -264,156 +265,177 @@
   function buildBook(R) {
     var leans = R.ax.leans, bal = R.ax.balanced;
     var top = leans.slice(0, 3);
-    var pages = [];
-    function add(ch, title, lead, blocks) {
-      pages.push({ chapter: ch, title: title, lead: lead, blocks: compact(blocks) });
-    }
+    var secs = [];
+    function add(ch, title, lead, blocks) { secs.push({ chapter: ch, title: title, lead: lead, blocks: compact(blocks) }); }
     function p(text) { return text ? { t: "p", text: text } : null; }
     function h(text) { return text ? { t: "h", text: text } : null; }
     function kv(k, v) { return v ? { t: "kv", k: k, v: v } : null; }
+    function li(items) { return items && items.length ? { t: "li", items: items } : null; }
 
     var curTop = R.cur ? R.cur.top : null;
     var topDom = curTop ? dom(curTop) : null;
+    var st = R.state;
+    var c = top.map(function (l) { return l.c; });
 
     // ---- 第1章 あなたという人 ----
     if (top.length) {
-      add(1, "あなたは、こういう人", top[0].p.hook, [
-        p(top[0].p.how),
-        top[1] ? p(top[1].p.how) : null,
-        top[2] ? p("もう一つ、" + AXIS_BY_ID[top[2].axis].nameJp + "の面では、" + top[2].p.end + "という傾向も出ています。") : null
+      add(1, "あなたは、こんな素敵な人", top[0].p.hook, [
+        p(c[0].you), p(c[0].text),
+        h("ふだんの、あなた"), p(top[0].p.how), top[1] ? p(top[1].p.how) : null,
+        top[2] ? h("もうひとつの顔") : null,
+        top[2] ? p(AXIS_BY_ID[top[2].axis].nameJp + "の面では、" + top[2].p.end + "という一面も出ています。ひとつの方向だけでなく、いくつもの良さを持っているのが、あなたの魅力です。") : null
       ]);
-      add(1, "それは、実際の場面ではこう出る", "では、それは毎日のどんな場面に出ているのでしょうか。", [
-        h("仕事の中で"), p(top[0].p.work),
-        h("休日や暮らしの中で"), p((top[1] || top[0]).p.life)
+      add(1, "毎日の中で、輝いている場面", "では、あなたの良さは、毎日のどんな場面に出ているのでしょうか。", [
+        h("仕事の中で"), p(top[0].p.work), p(top[0].bk.pw),
+        h("休日や暮らしの中で"), p((top[1] || top[0]).p.life), p((top[1] || top[0]).bk.pl)
       ]);
     } else {
-      add(1, "あなたは、こういう人", "あなたの答えは、どれか一つの方向に強く寄るものではありませんでした。", [
-        p("寄りが出なかったということは、特徴がない、という意味ではありません。場面に合わせて、動き方を変えている可能性があります。"),
-        bal[0] ? p(bal[0].bal.line) : null,
-        bal[1] ? p(bal[1].bal.line) : null,
-        p("設問に迷う場面が多かった場合も、この形になります。ここに書けるのは、答えから読み取れる範囲までです。")
+      add(1, "あなたは、こんな素敵な人", "あなたは、ひとつの型に収まらない、幅の広い人です。", [
+        p("どれか一つの方向に強く寄らなかったのは、特徴がないからではありません。場面に合わせて、動き方を選べる人だということです。"),
+        bal[0] ? p(bal[0].bc.you) : null, bal[0] ? p(bal[0].bc.text) : null,
+        bal[1] ? p(bal[1].bc.you) : null,
+        p("設問に迷う場面が多かった場合も、この形になります。答えを変えてみると、また違う顔が見えてくるかもしれません。")
       ]);
     }
-    // 価値観のページ
     if (topDom) {
       var fl = R.gapFulfilRaw ? R.gapFulfilRaw.rows.filter(function (r) { return r.id === curTop; })[0] : null;
-      var blocks = [
-        p("いまのあなたが、いちばん大切にしているのは" + q(curTop) + "。「" + topDom.desc + "」という価値観です。"),
-        fl && fl.bucket === "low" ? p("ただ、回答では、ここが「いまは満たされていない」側でした。" + topDom.unmet + "。ここが、いまのあなたのいちばんの引っかかりかもしれません。")
-          : fl && fl.bucket === "high" ? p("そして、回答ではここが「いま満たされている」側でした。大切にしていることに、手が届いている状態です。") : null
+      var vb = [
+        p("いまのあなたが、いちばん大切にしているのは" + q(curTop) + "。「" + topDom.desc + "」という価値観です。自分が大切にしたいものを、ちゃんと言葉にできるのは、自分の心の声を聞けている人だからです。"),
+        fl && fl.bucket === "low" ? p("ただ、回答では、ここが「いまは満たされていない」側でした。" + topDom.unmet + "。それは、あなたの力不足ではなく、それだけ大切にしている証拠です。小さな一歩を、第5章に用意しました。")
+          : fl && fl.bucket === "high" ? p("そして、回答ではここが「いま満たされている」側でした。大切にしていることに、ちゃんと手が届いている、すてきな状態です。") : null
       ];
       if (R.changeRaw) {
         var ch = R.changeRaw, y = ch.years + "年前";
-        blocks.push(ch.top.same ? p(y + "のあなたも、いちばん大切にしていたのは" + q(ch.top.cur) + "でした。ここは、変わらないあなたの核かもしれません。")
-          : p(y + "は" + q(ch.top.past) + "がいちばんでしたが、いまは" + q(ch.top.cur) + "に変わっています。この変化は、あなたの記憶による振り返りです。"));
+        vb.push(ch.top.same ? p(y + "のあなたも、いちばん大切にしていたのは" + q(ch.top.cur) + "でした。時間が経っても変わらない。それが、あなたの核かもしれません。")
+          : p(y + "は" + q(ch.top.past) + "がいちばんでしたが、いまは" + q(ch.top.cur) + "に変わっています。経験を重ねて、大切なものが育ってきた証かもしれません。（あなたの記憶による振り返りです）"));
       }
-      add(1, "何のために動くのか", "ここまでは「どう動くか」の話でした。次は、「何のために動くか」です。", blocks);
+      add(1, "あなたを動かしている、大切なもの", "ここまでは「どう動くか」。ここからは、あなたの心が「何を大切にしているか」です。", vb);
     }
 
     // ---- 第2章 あなたの武器 ----
     if (top.length) {
       top.forEach(function (l, i) {
-        add(2, "武器" + (i + 1) + "：" + l.p.power[0], l.p.power[1], [
-          p(l.strong ? "この傾向は、回答にはっきり出ていました。" : "この傾向は、回答に表れていました。（強さは中くらいです）"),
-          p("あなたが「" + l.poleName + "」寄りなのは、" + AXIS_BY_ID[l.axis].nameJp + "の6問の回答から読み取れたことです。")
+        add(2, "武器" + (i + 1) + "：" + l.c.title, l.c.you, [
+          p(l.c.text),
+          h("きっと、こんな場面で"), p(l.bk.moments),
+          h("もっと活かすなら"), p(l.bk.use.replace(/^もっと活かすなら、/, ""))
         ]);
       });
+      if (top.length >= 2) {
+        add(2, "二つの武器が重なるとき", "あなたの強みは、ひとつずつより、組み合わせでいちばん光ります。", [
+          p("「" + c[0].title + "」と「" + c[1].title + "」。この二つを一緒に持っていることは、それだけで、あなたらしさです。"),
+          p("片方だけの人には出せない動き方が、あなたにはできます。自分では当たり前だと思っているその動きこそ、周りから見ると「あの人ならではの力」なのです。")
+        ]);
+      }
     } else {
       bal.slice(0, 2).forEach(function (b, i) {
-        add(2, "武器" + (i + 1) + "：" + b.bal.power[0], b.bal.power[1], [p(b.bal.line)]);
+        add(2, "武器" + (i + 1) + "：" + b.bc.title, b.bc.you, [p(b.bc.text)]);
       });
     }
 
-    // ---- 第3章 力が出るとき・出ないとき ----
+    // ---- 第3章 輝く日と、休む日 ----
     if (top.length) {
-      add(3, "力が出る日と、出ない日", "同じあなたでも、力が出る日と出ない日があります。分かれ目は、ここです。", [
-        h("力が出るとき"), p(top[0].p.good), top[1] ? p(top[1].p.good) : null,
-        h("力が出にくいとき"), p(top[0].p.bad), top[1] ? p(top[1].p.bad) : null
+      add(3, "あなたが輝く日、休んでいい日", "同じあなたでも、輝く日と、休みたい日があります。それは、とても自然なことです。", [
+        h("あなたが本領を発揮するとき"),
+        p("あなたの力がいちばん出るのは、" + top[0].p.good), top[1] ? p("そして、" + top[1].p.good) : null,
+        h("力が出にくいとき"),
+        p("力が出にくいのは、" + top[0].p.bad), top[1] ? p("また、" + top[1].p.bad) : null,
+        p("これは、あなたの弱さではありません。あなたが大切にしている条件が、満たされていないだけです。")
       ]);
-      add(3, "強みが裏目に出るとき", "強みは、使い方を間違えると、そのまま弱みになります。", [
+      add(3, "強みの裏側にある、愛すべきクセ", "強みには、かならず裏側があります。それは欠点ではなく、強さの影のようなものです。", [
         p(top[0].p.backfire), top[1] ? p(top[1].p.backfire) : null,
-        p("ここに書いたことは、「そうなりやすい傾向」です。当てはまらないと感じたら、それも大切な情報です。")
+        p("気づいているだけで、もう半分は解決しています。当てはまらないと感じたら、それも大切な情報です。")
       ]);
     }
-    // 状態のページ
-    var st = R.state;
+    if (!top.length) {
+      add(3, "あなたが輝く日、休んでいい日", "同じあなたでも、輝く日と、休みたい日があります。それは、とても自然なことです。", [
+        p("どれか一つの方向に寄らなかったあなたは、場面ごとに動き方を変えられる人です。だから、調子の良し悪しも、環境や相手によって、大きく変わるかもしれません。"),
+        p("「今日は動きやすい」「今日は重い」と感じたとき、その日の環境や相手を、メモしてみてください。あなたが輝く条件が、少しずつ見えてきます。"),
+        p("休みたい日があるのは、自然なことです。休むことも、あなたの大事な仕事です。")
+      ]);
+    }
     if (st) {
-      var stateBlocks = [];
+      var sb = [];
       if (st.lows.length) {
-        stateBlocks.push(p(st.summary + "この時期は、ここまで書いた「力が出るとき」の状態に、なりにくいかもしれません。"));
-        stateBlocks.push(p("強みを無理に発揮しようとするより、まず回復を優先して大丈夫です。"));
+        sb.push(p(st.summary + "少しお疲れ気味かもしれません。"));
+        sb.push(p("強みを無理に発揮しようとせず、まず休むことを、自分に許してあげてください。休むことも、あなたの大事な仕事です。"));
       } else if (st.highs) {
-        stateBlocks.push(p(st.summary + "新しいことに力を使うには、よい時期かもしれません。"));
+        sb.push(p(st.summary + "いい状態です。新しいことに力を使うには、よい時期かもしれません。"));
       } else {
-        stateBlocks.push(p(st.summary));
+        sb.push(p(st.summary));
       }
       if (R.gapFulfilRaw && R.gapFulfilRaw.anyLow) {
         var lowRows = R.gapFulfilRaw.rows.filter(function (r) { return r.bucket === "low"; });
-        stateBlocks.push(p("また、大切にしている" + joinNames(lowRows.map(function (r) { return r.id; })) + "が満たされていないという回答でした。調子の波には、こうした背景も関わっているかもしれません。"));
+        sb.push(p("また、大切にしている" + joinNames(lowRows.map(function (r) { return r.id; })) + "が満たされていないという回答でした。調子の波には、こうした背景も関わっているかもしれません。"));
       }
-      stateBlocks.push(p("この状態は、日によって変わります。今回の1週間の様子であって、あなたの性格ではありません。"));
-      add(3, "いまのコンディション", "そして、いまのあなたのコンディションの話です。", stateBlocks);
+      sb.push(p("この状態は、日によって変わります。今回の1週間の様子であって、あなたの性格ではありません。"));
+      add(3, "いまのあなたへ", "そして、ここ1週間のあなたの様子です。", sb);
     }
 
     // ---- 第4章 人との関わり方 ----
     if (top.length) {
-      add(4, "周りから見えているあなた", "自分で思っている自分と、周りから見えているあなたは、少し違うかもしれません。", [
-        p(top[0].p.others), top[1] ? p(top[1].p.others) : null, top[2] ? p(top[2].p.others) : null
+      add(4, "周りの人は、あなたをこう見ています", "自分では気づきにくいけれど、周りは、あなたのいいところを、ちゃんと見ています。", [
+        h("周りが、あなたに感じているかもしれないこと"),
+        li(top.map(function (l) { return "「" + l.c.fan + "」"; })),
+        p(top[0].p.others), top[1] ? p(top[1].p.others) : null, top[2] ? p(top[2].p.others) : null,
+        p("あなたの存在は、思っている以上に、周りの支えになっています。")
       ]);
-      add(4, "周りに伝えておくといいこと", "あなたと気持ちよく付き合ってもらうために、周りに伝えておくといいことがあります。", [
-        { t: "li", items: compact([top[0].p.tellMe, top[1] && top[1].p.tellMe, top[2] && top[2].p.tellMe]) }
+      add(4, "あなたと、もっと心地よく付き合ってもらうために", "あなたの良さが、もっと伝わるように。周りの人に、こんなふうに伝えてみてください。", [
+        li(compact([top[0].p.tellMe, top[1] && top[1].p.tellMe, top[2] && top[2].p.tellMe])),
+        p("言葉にして伝えるのは、わがままではありません。あなたの良さを、周りが使いやすくするための、やさしい工夫です。")
       ]);
     } else {
-      add(4, "人との関わり方", "寄りが出なかったぶん、あなたの関わり方は、相手や場面によって変わりそうです。", [
-        p("この章は、回答から言えることが少ないため、短くしています。ふだんの関わり方で「いつも同じ」と感じるところと「相手によって変わる」と感じるところを、自分で書き出してみてください。")
+      add(4, "あなたと、周りの人", "寄りが出なかったぶん、あなたの関わり方は、相手や場面によって変わりそうです。", [
+        p("相手に合わせて関わり方を変えられるのは、人をよく見ている人にできることです。"),
+        p("ふだんの関わり方で「いつも同じ」と感じるところと「相手によって変わる」と感じるところを、自分で書き出してみてください。それが、あなただけの人づきあいの地図になります。")
       ]);
     }
 
     // ---- 第5章 あなたの取扱説明書 ----
     var manual = compact([
-      top[0] && kv("得意なこと", top[0].p.power[0] + (top[1] ? "／" + top[1].p.power[0] : "")),
+      top[0] && kv("得意なこと", top[0].c.title + (top[1] ? "／" + top[1].c.title : "")),
       top[0] && kv("力が出る条件", top[0].p.good),
-      top[0] && kv("苦手な状況", top[0].p.bad),
+      top[0] && kv("力が出にくい状況", top[0].p.bad),
       topDom && kv("響きやすいテーマ", q(curTop) + "（" + topDom.desc + "）"),
       st && kv("いまの注意点", st.lows.length ? "いまは余裕が低め。予定を詰めすぎない。" : "特になし（今回の1週間の様子）。")
     ]);
-    if (manual.length) {
-      add(5, "あなた専用の取扱説明書", "ここからは、あなた専用の取扱説明書です。", manual);
-    }
+    if (manual.length) add(5, "あなた専用の取扱説明書", "ここからは、あなた専用の取扱説明書。自分をていねいに扱うための、メモです。", manual);
     var steps = compact([
       top[0] && top[0].p.step,
       R.gapFulfilRaw && R.gapFulfilRaw.anyLow ? dom(R.gapFulfilRaw.rows.filter(function (r) { return r.bucket === "low"; })[0].id).tip : null,
       st && st.lows.length ? "今週は、予定を1つだけ減らして、何もしない時間をつくる。" : null
     ]);
-    if (steps.length) {
-      add(5, "今日からの小さな一歩", "読んで終わりにしないために、小さな一歩を用意しました。", [{ t: "li", items: steps }]);
+    if (steps.length) add(5, "今日からの小さな一歩", "読んで終わりにしないために、小さな一歩を用意しました。どれか一つだけで、大丈夫です。", [li(steps)]);
+    var charms = R.portrait.charms || [];
+    if (charms.length) {
+      add(5, "調子が出ない日の、お守りの言葉", "自信がなくなった日、うまくいかなかった日に、ここだけ読み返してください。", [
+        li(charms.slice(0, 3).map(function (x) { return x.you; })),
+        p("うまくいかない日があっても、これらが消えることはありません。あなたの中に、ちゃんとあります。")
+      ]);
     }
-    add(5, "最後に", "ここまで読んでくださって、ありがとうございました。", [
-      p("ここに書いたのは、あなたが答えた範囲から読み取れたことだけです。答えていないことや、あなたの人生の背景までは、分かりません。"),
-      p("当たっているところは、ぜひ自分の言葉に直して使ってください。外れていると感じるところは、外れていると思ってかまいません。その違和感が、あなた自身を知る手がかりになります。"),
-      p("この本は、あなたの答えから書いています。もう一度答えると、ここに書かれることも変わります。変わったところを見比べるのも、おもしろいはずです。")
+    add(5, "あなたへ", "ここまで読んでくださって、ありがとうございました。", [
+      p("あなたは、自分の答えと、ちゃんと向き合える人です。それは、いちばん大きな強みかもしれません。"),
+      p("ここに書いたのは、あなたが答えた範囲から読み取れたことです。当たっているところは、ぜひ自分の言葉に直して、使ってください。外れていると感じるところは、そのまま外れていると思ってかまいません。その違和感も、あなたを知る手がかりです。"),
+      p("この本は、あなたの答えから書いています。答えが変わると、ここに書かれることも変わります。数か月後の自分と、読み比べてみてください。")
     ]);
 
-    // 1章 = 1ページ にまとめる（元の節は、章ページの中の「節」になる）
+    // 1章 = 1ページ にまとめる（節は、章ページの中に並ぶ）
     var EPI = {
       1: "どう動き、何のために動くのか。あなたの輪郭を、ここに書きとめます。",
       2: "あなたの中にある、いちばん頼りになる力について。",
-      3: "同じあなたでも、調子のいい日と、そうでない日があります。その分かれ目を、書いておきます。",
+      3: "同じあなたでも、調子のいい日と、そうでない日があります。そのどちらも、あなたです。",
       4: "あなたと、周りの人との間にあるものについて。",
       5: "読んで終わりにしないための、最後の一章です。"
     };
-    var sections = pages;
-    pages = [];
-    CHAPTERS.forEach(function (ch) {
-      var secs = sections.filter(function (x) { return x.chapter === ch.n; });
-      if (!secs.length) {
-        secs = [{ chapter: ch.n, title: ch.title, lead: "この章は、今回の回答から書けることが少ないため、短くしています。", blocks: [{ t: "p", text: "答えられる範囲が増えると、ここに書けることも増えます。" }] }];
+    var pages = [];
+    CHAPTERS.forEach(function (chp) {
+      var ss = secs.filter(function (x) { return x.chapter === chp.n; });
+      if (!ss.length) {
+        ss = [{ chapter: chp.n, title: chp.title, lead: "この章は、今回の回答から書けることが少ないため、短くしています。", blocks: [{ t: "p", text: "答えられる範囲が増えると、ここに書けることも増えます。" }] }];
       }
-      var flat = []; secs.forEach(function (x) { flat = flat.concat(x.blocks); });
-      pages.push({ chapter: ch.n, title: ch.title, lead: EPI[ch.n], sections: secs.map(function (x) { return { title: x.title, lead: x.lead, blocks: x.blocks }; }), blocks: flat });
+      var flat = []; ss.forEach(function (x) { flat = flat.concat(x.blocks); });
+      pages.push({ chapter: chp.n, title: chp.title, lead: EPI[chp.n], sections: ss.map(function (x) { return { title: x.title, lead: x.lead, blocks: x.blocks }; }), blocks: flat });
     });
-
-    // ページ番号と「次は」の見出し
     pages.forEach(function (pg, i) {
       pg.index = i;
       pg.next = pages[i + 1] ? "第" + pages[i + 1].chapter + "章　" + pages[i + 1].title : null;
