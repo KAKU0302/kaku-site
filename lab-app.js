@@ -481,19 +481,19 @@
 
   // CORE6：レーダー＋6つの軸（以前の無料診断結果と同じ並び）
   function radarSvg(R) {
-    var size = 300, c = size / 2, maxR = 92, n = L.AXIS_ORDER.length;
-    function pt(i, v) { var ang = Math.PI * 2 * i / n - Math.PI / 2, r = v / 100 * maxR; return [c + r * Math.cos(ang), c + r * Math.sin(ang)]; }
+    var W = 340, H = 330, cx = W / 2, cy = 163, maxR = 120, n = L.AXIS_ORDER.length;
+    function pt(i, v) { var ang = Math.PI * 2 * i / n - Math.PI / 2, r = v / 100 * maxR; return [cx + r * Math.cos(ang), cy + r * Math.sin(ang)]; }
     var g = "";
     [0.33, 0.66, 1].forEach(function (f) { g += '<polygon points="' + L.AXIS_ORDER.map(function (_, i) { return pt(i, 100 * f).join(","); }).join(" ") + '" class="rg"/>'; });
     var lines = "", labels = "", vals = [];
     L.AXIS_ORDER.forEach(function (id, i) {
-      var a = R.core.axes[id], st = a && a.status === "ok" ? Math.min(100, Math.round(Math.abs(a.mean) * 50)) : 0;
-      var e = pt(i, 100), lp = pt(i, 124);
-      lines += '<line x1="' + c + '" y1="' + c + '" x2="' + e[0].toFixed(1) + '" y2="' + e[1].toFixed(1) + '" class="rg"/>';
+      var a = R.core.axes[id], st = a && a.status === "ok" ? Math.min(100, Math.round(Math.abs(a.mean) / 1.5 * 100)) : 0;
+      var e = pt(i, 100), lp = pt(i, 117);
+      lines += '<line x1="' + cx + '" y1="' + cy + '" x2="' + e[0].toFixed(1) + '" y2="' + e[1].toFixed(1) + '" class="rg"/>';
       labels += '<text x="' + lp[0].toFixed(1) + '" y="' + lp[1].toFixed(1) + '" class="rl" text-anchor="middle" dominant-baseline="middle">' + esc(AXIS_NAME[id]) + "</text>";
-      vals.push(pt(i, Math.max(st, 4)).map(function (x) { return x.toFixed(1); }).join(","));
+      vals.push(pt(i, Math.max(st, 8)).map(function (x) { return x.toFixed(1); }).join(","));
     });
-    return '<svg class="k-radar" viewBox="0 0 ' + size + " " + size + '" role="img" aria-label="CORE6レーダーチャート">' + g + lines +
+    return '<svg class="k-radar" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="CORE6レーダーチャート">' + g + lines +
       '<polygon points="' + vals.join(" ") + '" class="rd"/>' + labels + "</svg>";
   }
   var AXIS_NAME = {};

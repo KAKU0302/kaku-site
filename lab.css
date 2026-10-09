@@ -495,10 +495,10 @@ details.k-det summary::after { color: var(--k-gold); }
 .k-en { font-family: var(--k-sans, inherit); font-size: 11px; letter-spacing: .12em; color: var(--k-soft); opacity: .8; font-weight: 600; margin-left: 6px; }
 .k-small { font-size: 12.5px; line-height: 1.75; }
 .k-radarwrap { display: flex; justify-content: center; margin: 6px 0 4px; }
-.k-radar { width: min(100%, 320px); height: auto; overflow: visible; }
+.k-radar { width: min(100%, 460px); height: auto; overflow: visible; }
 .k-radar .rg { fill: none; stroke: rgba(255,255,255,.16); stroke-width: 1; }
 .k-radar .rd { fill: rgba(200,169,107,.28); stroke: var(--k-gold); stroke-width: 2.5; }
-.k-radar .rl { fill: var(--k-soft); font-size: 12px; font-weight: 700; }
+.k-radar .rl { fill: var(--k-soft); font-size: 13px; font-weight: 700; }
 .k-core6g { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 .k-c6 { padding: 10px 12px 9px; border-radius: 12px; border: 1px solid var(--k-line); background: rgba(22,28,48,.6); min-width: 0; }
 .k-c6h { font-size: 12.5px; line-height: 1.5; color: var(--k-soft); }
