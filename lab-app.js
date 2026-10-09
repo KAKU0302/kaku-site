@@ -392,14 +392,7 @@
         '<div class="k-typecap">どの軸にも、はっきり寄る傾向が見られなかったため、参考にできるタイプも出せませんでした。</div>';
     }
     h += "</div>";
-    h += '<div class="k-portrait">' + R.portrait.sentences.map(function (s) { return '<p class="lead">' + esc(s) + "</p>"; }).join("");
-    R.portrait.how.forEach(function (t) { h += '<p style="margin-top:14px">' + esc(t) + "</p>"; });
-    R.portrait.scenes.forEach(function (sc) { h += '<div class="k-scene"><b>' + esc(sc.label) + "</b><p>" + esc(sc.text) + "</p></div>"; });
-    if (R.portrait.mixed.length) {
-      h += '<p class="k-soft" style="margin-top:14px">' + R.portrait.mixed.map(esc).join("<br>") + "</p>";
-    }
-    h += "</div>";
-    h += '<div class="k-note info">この人物像は、あなたが答えた36問のうち、はっきり寄りが出た軸だけから書いています。12TYPEは入口にすぎません。文章の正確性は、まだ検証していません。</div>';
+    h += portraitHtml(R);
     if (R.type.note === "weak" && tm) {
       h += '<div class="k-note">タイプとの近さは弱めです。どのタイプにもはっきりとは寄らない回答だったため、いちばん近いものを参考として表示しています。人物像・CORE6を中心に見てください。</div>';
     }
@@ -430,6 +423,54 @@
     h += '<div class="k-stack k-foot k-endops"><button class="k-btn ghost block" data-act="data">回答データを書き出す・削除する</button>' +
       '<button class="k-btn ghost block" data-act="reset">' + (ui.confirmReset ? "本当に消して、最初からやり直す（もう一度押す）" : "最初からやり直す") + "</button></div>";
     return h + "</div>";
+  }
+
+  // 人物像：回答から見える人物の解釈と、その魅力（褒め）。読み返す・人に見せる前提の読み物
+  function portraitHtml(R) {
+    var P = R.portrait, tm = R.shownType, h = "";
+    if (!P.title) {
+      return '<div class="k-portrait"><p class="lead">今回の回答からは、人物像を読み取れませんでした。</p></div>';
+    }
+    h += '<section class="k-pt">';
+    h += '<p class="k-pt-kick">あなたを一言でいうと</p>';
+    h += '<h2 class="k-pt-title">' + P.title.split(" × ").map(function (t) { return '<span class="k-pt-t">' + esc(t) + "</span>"; }).join('<span class="k-pt-x" aria-hidden="true"> × </span>') + "</h2>";
+    h += '<p class="k-pt-epi">' + esc(P.epithet) + "</p>";
+    if (P.typePraise) h += '<p class="k-pt-praise">' + esc(P.typePraise) + "</p>";
+    else if (P.wide) h += '<p class="k-pt-praise">' + esc(P.wide) + "</p>";
+
+    h += '<h3 class="k-pt-h">回答から見えた、あなたの魅力</h3><div class="k-pt-cards">';
+    P.charms.forEach(function (c, i) {
+      h += '<article class="k-pt-card"><div class="k-pt-hd"><span class="k-pt-no" aria-hidden="true">' + (i + 1) + '</span><h4>' + esc(c.title) + "</h4></div><p>" + esc(c.text) + "</p></article>";
+    });
+    h += "</div>";
+
+    if (P.twists.length) {
+      h += '<h3 class="k-pt-h">意外な一面</h3>';
+      P.twists.forEach(function (t) { h += '<p class="k-pt-twist">' + esc(t.text) + "</p>"; });
+    }
+
+    if (P.fans.length) {
+      h += '<h3 class="k-pt-h">周りは、こう感じているかもしれません</h3><ul class="k-pt-fans">';
+      P.fans.forEach(function (f) { h += "<li>「" + esc(f) + "」</li>"; });
+      h += "</ul>";
+    }
+
+    if (P.closing) h += '<p class="k-pt-close">' + esc(P.closing) + "</p>";
+    h += '<div class="k-pt-share"><button class="k-btn ghost block" data-act="copyShare">' + (ui.shared ? "コピーしました。好きな場所に貼ってください" : "この結果をコピーして、誰かに見せる") + "</button></div>";
+    h += '<p class="k-pt-note">回答から読み取れた傾向を、前向きな言葉で書いた読み物です。診断や判定ではなく、自分を見つめるきっかけとして読んでください。</p>';
+    h += "</section>";
+    return h;
+  }
+
+  // 共有用の文面（タイプ名は、人物像本文ではなくここで足す）
+  function shareText(R) {
+    var P = R.portrait, tm = R.shownType, weak = R.type && R.type.note === "weak";
+    var t = tm && !weak ? "私のKAKUは「" + tm.nameJp + "」。" : "KAKUで自分を見つめてみました。";
+    t += P.title ? "「" + P.title + "」でした。" : "";
+    if (P.fans.length) t += "\n周りからは、「" + P.fans[0] + "」と思われているかも。";
+    t += "\n#KAKU核診断";
+    try { t += "\n" + location.origin + "/"; } catch (e) { /* 取得できない環境では付けない */ }
+    return t;
   }
 
   // CORE6：36問の回答から出した、6つの軸の傾向（RESULTの中心の見せ場）
@@ -731,6 +772,12 @@
           var txt = exportJson();
           if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { ui.copied = true; render(); }, function () { /* 何もしない */ });
         } catch (err2) { /* 何もしない */ }
+        break;
+      case "copyShare":
+        try {
+          var Rs = C.buildResult(S), st = shareText(Rs);
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(st).then(function () { ui.shared = true; render(); }, function () { /* 何もしない */ });
+        } catch (err3) { /* 何もしない */ }
         break;
       case "deleteSaved": storageDel(); S.consent = false; ui.copied = false; render(); break;
       case "redoCore":

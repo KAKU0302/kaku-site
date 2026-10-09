@@ -33,7 +33,8 @@
     return {
       id: id,
       nameJp: t ? t.nameJp : f[0], nameEn: t ? t.nameEn : f[1],
-      color: t ? t.color : f[2], image: t ? t.image : f[3]
+      color: t ? t.color : f[2], image: t ? t.image : f[3],
+      catchcopy: t && t.catchcopy ? t.catchcopy : "", praise: t && t.praise ? t.praise : ""
     };
   }
 
@@ -60,6 +61,7 @@
         rec.poleName = k === "a" ? AXIS_BY_ID[id].poleA : AXIS_BY_ID[id].poleB;
         rec.strong = rec.abs >= 1.2;
         rec.p = P.POLES[id][rec.pole];
+        rec.c = P.CHARM[id][rec.pole];
         leans.push(rec);
       } else if (k === "scene_diff") {
         rec.work = a.sceneMeans.work; rec.life = a.sceneMeans.life;
@@ -68,6 +70,7 @@
         sceneDiff.push(rec);
       } else {
         rec.bal = P.BALANCED[id];
+        rec.bc = P.BALANCED_CHARM[id];
         balanced.push(rec);
       }
     });
@@ -78,26 +81,46 @@
   // ------------------------------------------------------------------
   // 人物像（結果画面の最初）
   // ------------------------------------------------------------------
-  function buildPortrait(ax) {
-    var leans = ax.leans, out = { sentences: [], how: [], scenes: [], mixed: [] };
-    if (!leans.length) {
-      out.sentences.push("今回は、どれか一つの方向に強く寄る答えではありませんでした。");
-      out.sentences.push("場面に合わせて動き方を変えている人かもしれませんし、迷った設問が多かっただけかもしれません。");
-      ax.balanced.slice(0, 3).forEach(function (b) { out.how.push(b.bal.line); });
-    } else {
-      out.sentences.push("あなたは、" + leans[0].p.end + "。");
-      if (leans[1]) out.sentences.push("そして、" + leans[1].p.end + "でもあります。");
-      if (leans[2]) out.sentences.push("さらに、" + leans[2].p.end + "という一面もあります。");
-      leans.slice(0, 2).forEach(function (l) { out.how.push(l.p.how); });
-      out.scenes.push({ label: "仕事では", text: leans[0].p.work });
-      out.scenes.push({ label: "日常では", text: (leans[1] ? leans[1] : leans[0]).p.life });
-    }
-    ax.sceneDiff.forEach(function (s) {
-      out.mixed.push(AXIS_BY_ID[s.axis].nameJp + "については、仕事では" + s.workPole + "寄り、日常では" + s.lifePole + "寄りと、場面で動き方を変えている回答でした。");
+  // 回答の言い換えではなく、「どんな人か」の解釈と、その魅力（褒め）を書く。
+  //  tm : 代表タイプを自信を持って出せるときだけ渡す（weak・保留では null）
+  function buildPortrait(ax, tm) {
+    var leans = ax.leans, bals = ax.balanced;
+    var out = { sentences: [], how: [], scenes: [], mixed: [], title: "", epithet: "", charms: [], twists: [], fans: [], typePraise: "", wide: "", closing: "", noLean: !leans.length };
+
+    // 魅力カード：寄りの強い順に最大3つ。足りなければ「どちらにも寄らない」軸の魅力で補う
+    leans.slice(0, 3).forEach(function (l) {
+      out.charms.push({ axis: l.axis, axisName: AXIS_BY_ID[l.axis].nameJp, title: l.c.title, text: l.c.text, fan: l.c.fan, kind: "lean", c: l.c });
     });
-    if (leans.length) {
-      ax.balanced.slice(0, 2).forEach(function (b) { out.mixed.push(b.bal.line); });
+    for (var i = 0; i < bals.length && out.charms.length < 3; i++) {
+      var b = bals[i];
+      out.charms.push({ axis: b.axis, axisName: AXIS_BY_ID[b.axis].nameJp, title: b.bc.title, text: b.bc.text, fan: b.bc.fan, kind: "balanced", c: b.bc });
     }
+
+    // 一言（見出し）と、その言い換え
+    var cs = out.charms;
+    if (cs.length >= 2) out.title = cs[0].title + " × " + cs[1].title;
+    else if (cs.length === 1) out.title = cs[0].title;
+    if (cs.length >= 2) out.epithet = "あなたは、" + cs[0].c.ept + "、" + cs[1].c.epe + "です。";
+    else if (cs.length === 1) out.epithet = "あなたは、" + cs[0].c.epe + "です。";
+
+    // 代表タイプが確かなときは、そのタイプの称賛文を添える。確かでないときは「型に収まらない幅」として書く
+    if (tm && tm.praise) out.typePraise = tm.praise;
+    else out.wide = "ひとつの型にきれいに収まらないのは、あなたの幅の広さの表れです。";
+
+    // 場面で違う軸：二つの顔
+    ax.sceneDiff.forEach(function (s) {
+      out.twists.push({
+        axisName: AXIS_BY_ID[s.axis].nameJp, work: s.workPole, life: s.lifePole,
+        text: "「" + AXIS_BY_ID[s.axis].nameJp + "」では、仕事は「" + s.workPole + "」寄り、日常は「" + s.lifePole + "」寄り。場面ごとに自分を切り替えられるのは、状況を読める人にしかできないことです。"
+      });
+    });
+
+    out.fans = cs.map(function (c) { return c.fan; });
+    if (cs.length) out.closing = "ここに書いたのは、あなたの回答から見えた魅力の入口です。読み返して、「あ、これ自分だ」と思えるところを、ひとつ見つけてください。";
+
+    // 互換用（本文の文）
+    if (out.epithet) out.sentences.push(out.epithet);
+    if (out.typePraise) out.sentences.push(out.typePraise); else if (out.wide) out.sentences.push(out.wide);
     return out;
   }
 
@@ -174,7 +197,7 @@
     var R = {
       versions: L.VERSIONS, type: type, core: core, ax: ax,
       shownType: type.shown ? typeMeta(type.shown) : null,
-      portrait: buildPortrait(ax),
+      portrait: buildPortrait(ax, type.shown && type.note !== "weak" ? typeMeta(type.shown) : null),
       cur: cur, gapFulfil: describeFulfil(g1), gapFulfilRaw: g1,
       change: describeChange(g2), changeRaw: g2,
       state: describeState(S.state && Object.keys(S.state).length ? S.state : null),

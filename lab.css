@@ -461,3 +461,29 @@ details.k-det summary::after { color: var(--k-gold); }
 .k-bbbtn { margin-top: 18px; min-height: 56px; font-size: 16.5px; letter-spacing: .06em; }
 .k-endops { margin-top: var(--s3); }
 @media (max-width: 340px) { .k-bbtitle { font-size: 21px; } .k-gaplead { font-size: 16.5px; } .k-gb { grid-template-columns: 4.2em minmax(0, 1fr) 3em; gap: 6px; } .k-chip6 .nm { font-size: 13.5px; } }
+
+/* ---- 人物像（魅力の読み物） ---- */
+.k-pt { margin-top: var(--s2); padding: 26px 20px 20px; border-radius: var(--r-card); background: linear-gradient(180deg, rgba(28,36,64,.78), rgba(22,28,48,.78)); border: 1px solid var(--k-line); text-align: left; display: flex; flex-direction: column; gap: 14px; }
+.k-pt > * { margin: 0; }
+.k-pt-kick { font-size: 12px; letter-spacing: .18em; color: var(--k-gold); text-align: center; }
+.k-pt-title { font-family: var(--k-serif); font-size: 26px; line-height: 1.5; font-weight: 700; text-align: center; color: var(--k-gold-hi); letter-spacing: .02em; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.k-pt-t { white-space: nowrap; }
+.k-pt-x { font-size: 18px; color: var(--k-gold); opacity: .8; line-height: 1.2; }
+.k-pt-epi { margin-top: 6px; font-family: var(--k-serif); font-size: 18px; line-height: 1.85; font-weight: 700; color: var(--k-text); text-wrap: pretty; }
+.k-pt-praise { font-size: 15.5px; line-height: 1.9; color: var(--k-soft); text-wrap: pretty; }
+.k-pt-h { margin-top: 14px; font-family: var(--k-serif); font-size: 15px; letter-spacing: .06em; color: var(--k-gold); display: flex; align-items: center; gap: 10px; }
+.k-pt-h::after { content: ""; flex: 1; height: 1px; background: var(--k-line); }
+.k-pt-cards { display: flex; flex-direction: column; gap: 12px; }
+.k-pt-cards, .k-pt-fans { margin: 0; }
+.k-pt-card { padding: 16px; border-radius: 14px; background: rgba(11,16,32,.55); border: 1px solid var(--k-line); display: flex; flex-direction: column; gap: 8px; }
+.k-pt-hd { display: flex; align-items: center; gap: 10px; }
+.k-pt-no { flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--k-gold); color: var(--k-ink); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.k-pt-card h4 { margin: 0; font-family: var(--k-serif); font-size: 18px; line-height: 1.5; color: var(--k-text); }
+.k-pt-card p { margin: 0; font-size: 14.5px; line-height: 1.9; color: var(--k-soft); text-wrap: pretty; }
+.k-pt-twist { font-size: 14.5px; line-height: 1.85; color: var(--k-soft); padding: 12px 14px; border-left: 3px solid var(--k-gold); background: rgba(200,169,107,.08); border-radius: 0 10px 10px 0; text-wrap: pretty; }
+.k-pt-fans { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.k-pt-fans li { font-family: var(--k-serif); font-size: 16px; line-height: 1.7; color: var(--k-text); padding: 10px 14px; border-radius: 14px 14px 14px 3px; background: rgba(200,169,107,.12); border: 1px solid rgba(200,169,107,.28); }
+.k-pt-close { margin-top: 10px; font-size: 14.5px; line-height: 1.9; color: var(--k-soft); text-align: center; text-wrap: balance; }
+.k-pt-note { font-size: 12px; line-height: 1.7; color: var(--k-soft); opacity: .8; text-align: center; }
+@media (max-width: 360px) { .k-pt { padding-left: 14px; padding-right: 14px; } .k-pt-title { font-size: 23px; } .k-pt-card { padding: 14px; } }
+@media (prefers-reduced-motion: no-preference) { .k-result .k-pt { animation: kreveal .7s cubic-bezier(.2,.7,.2,1) .85s both; } }
